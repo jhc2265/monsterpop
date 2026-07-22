@@ -1,0 +1,20 @@
+const paths = {
+  back: '<path d="m15 18-6-6 6-6"/><path d="M9 12h10"/>',
+  sound: '<path d="M11 5 6 9H2v6h4l5 4V5Z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18 6a8 8 0 0 1 0 12"/>',
+  mute: '<path d="M11 5 6 9H2v6h4l5 4V5Z"/><path d="m18 9-6 6"/><path d="m12 9 6 6"/>',
+  logout: '<path d="M10 17l5-5-5-5"/><path d="M15 12H3"/><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>',
+  play: '<path d="m8 5 11 7-11 7V5Z"/>',
+  trophy: '<path d="M8 21h8"/><path d="M12 17v4"/><path d="M7 4h10v4a5 5 0 0 1-10 0V4Z"/><path d="M7 6H4v2a3 3 0 0 0 3 3"/><path d="M17 6h3v2a3 3 0 0 1-3 3"/>',
+  chat: '<path d="M21 15a4 4 0 0 1-4 4H8l-5 3 1.5-5A7 7 0 0 1 3 13V8a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4v7Z"/>',
+  home: '<path d="m3 11 9-8 9 8"/><path d="M5 10v10h14V10"/><path d="M9 20v-6h6v6"/>',
+  refresh: '<path d="M20 6v5h-5"/><path d="M19 11a7 7 0 1 0-2 6"/>',
+  plus: '<path d="M12 5v14M5 12h14"/>',
+  pause: '<path d="M9 5v14M15 5v14"/>',
+  send: '<path d="m22 2-7 20-4-9-9-4 20-7Z"/><path d="M22 2 11 13"/>',
+  spark: '<path d="m12 3 1.4 4.6L18 9l-4.6 1.4L12 15l-1.4-4.6L6 9l4.6-1.4L12 3Z"/>',
+  sword: '<path d="m14.5 4.5 5-2-2 5L9 16l-3-3 8.5-8.5Z"/><path d="m5 14 5 5"/><path d="m4 20 3-3"/>',
+}
+
+export default function Icon({ name, size = 20, strokeWidth = 2, className = '' }) {
+  return <svg className={className} width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" dangerouslySetInnerHTML={{ __html: paths[name] || paths.spark }} />
+}
