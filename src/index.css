@@ -1,13 +1,13 @@
 :root {
-  --bg: #0e0b2b;
-  --card: #1d1748;
-  --card-2: #251c5c;
+  --bg: #090720;
+  --card: #17113a;
+  --card-2: #221a52;
   --purple: #7c3aed;
   --pink: #ec4899;
   --cyan: #22d3ee;
   --yellow: #fbbf24;
-  --text: #f8fafc;
-  --muted: #a5b4fc;
+  --text: #f8f7ff;
+  --muted: #aaa4c8;
   --danger: #f87171;
 }
 
@@ -20,7 +20,7 @@ html,
 body {
   margin: 0;
   padding: 0;
-  background: #06041a;
+  background: #050214;
   color: var(--text);
   font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI',
     'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
@@ -41,7 +41,7 @@ body {
       120% 60% at 50% 0%,
       #2a1d63 0%,
       var(--bg) 45%,
-      #06041a 100%
+      #050214 100%
     );
   overflow: hidden;
 }
@@ -277,7 +277,7 @@ label {
   font-weight: 900;
 }
 .combo-val {
-  color: var(--yellow);
+  color: var(--pink);
 }
 .timer-bar {
   height: 8px;
