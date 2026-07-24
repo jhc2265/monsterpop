@@ -1189,3 +1189,41 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
 .battle-controls .burst-button small { font-size: 11px; }
 .action-cue { min-width: 34px; height: 22px; font-size: 11px; }
 .gesture-legend span { font-size: 10px; }
+
+/* Home hierarchy trial */
+.next-unlock { min-height: 48px; display: flex; align-items: center; gap: 10px; margin-top: 12px; }
+.next-unlock > span { width: 42px; height: 42px; display: grid; place-items: center; flex: 0 0 auto; overflow: hidden; border: 1px solid rgba(191,148,255,.18); border-radius: 13px; background: rgba(11,7,38,.45); color: #b886ff; }
+.next-unlock > span img { width: 52px; height: 52px; object-fit: contain; filter: grayscale(.55) brightness(.72); }
+.next-unlock > div { min-width: 0; flex: 1; }
+.next-unlock small, .next-unlock strong { display: block; }
+.next-unlock small { color: #9088a6; font-size: 12px; }
+.next-unlock strong { margin-top: 2px; color: #e3ddef; font-size: 13px; }
+.next-unlock > b { padding: 4px 7px; border-radius: 7px; background: rgba(143,71,238,.12); color: #b991ff; font-size: 11px; }
+.progress-mission { margin-top: 10px; padding-top: 11px; }
+.progress-mission > b { padding: 3px 7px; border-radius: 7px; background: rgba(70,229,255,.07); }
+.boss-card { min-height: 292px; display: flex; flex-direction: column; align-items: stretch; padding: 18px; }
+.boss-main { position: relative; min-height: 202px; }
+.boss-card .hero-copy { position: relative; z-index: 3; width: 60%; padding: 3px 0 0 2px; }
+.boss-label { margin-bottom: 9px; }
+.hunt-meta { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 10px; }
+.hunt-meta span { padding: 4px 6px; border: 1px solid rgba(255,255,255,.11); border-radius: 7px; background: rgba(10,5,43,.28); color: #d3c9e6; font-size: 10px; font-weight: 700; white-space: nowrap; }
+.hunt-meta span:first-child { color: #ff89d6; }
+.hunt-meta span:nth-child(2) { color: var(--gold); }
+.boss-card .hero-copy h2 { font-size: 22px; }
+.boss-card .hero-copy p { margin: 10px 0 0; color: #c8c1d9; font-size: 13px; line-height: 1.6; }
+.boss-main .boss-visual { right: -4px; top: 50%; width: 43%; height: 180px; }
+.boss-card .hero-monster { width: 172px; right: -2px; bottom: 0; }
+.boss-card .boss-start { width: 100%; min-height: 54px; justify-content: flex-start; margin-top: 7px; padding: 7px 14px 7px 10px; border-radius: 16px; }
+.boss-card .boss-start img { width: 36px; height: 36px; }
+.boss-card .boss-start span { flex: 1; padding-left: 5px; font-size: 16px; text-align: center; }
+.boss-card .boss-start b { margin-left: 0; font-size: 24px; }
+.home-record { padding: 16px; background: rgba(16,12,43,.62); }
+.home-record-title { margin-bottom: 8px; }
+.record-list > div { min-height: 54px; display: grid; grid-template-columns: minmax(90px,1fr) auto minmax(92px,1fr); align-items: center; gap: 10px; border-top: 1px solid rgba(255,255,255,.07); }
+.record-list > div > span { color: #aaa3bb; font-size: 13px; }
+.record-list > div > strong { color: #f2eff8; font-size: 20px; text-align: right; }
+.record-list > div > small { color: #837c95; font-size: 12px; text-align: right; }
+.record-list > div > small b { color: #f06bbb; }
+.bottom-nav button.primary:not(.active) > span { border-color: rgba(213,190,255,.34); background: linear-gradient(145deg, #3d266d, #792a82); box-shadow: 0 7px 17px rgba(68,28,112,.35), inset 0 1px rgba(255,255,255,.16); }
+.bottom-nav button.primary:not(.active) > span img { opacity: .7; filter: grayscale(.2) saturate(.68) brightness(.9) drop-shadow(0 2px 3px rgba(34,10,67,.4)); }
+.bottom-nav button.primary:not(.active) small { color: #89819d; }
