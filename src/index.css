@@ -554,6 +554,11 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
 .home-welcome h1 strong { color: #e96bcf; }
 .home-welcome p { margin: 4px 0 0; color: var(--muted); font-size: 11px; }
 .home-welcome .icon-btn { width: 42px; height: 42px; }
+.art-button { position: relative; overflow: visible; }
+.art-button img { width: 35px; height: 35px; object-fit: contain; filter: drop-shadow(0 4px 7px rgba(92,38,184,.38)); transition: transform .16s, filter .16s; }
+.art-button:hover img { transform: scale(1.08) rotate(-3deg); filter: drop-shadow(0 5px 10px rgba(214,70,235,.45)) brightness(1.08); }
+.art-button.is-muted img { opacity: .42; filter: grayscale(.6); }
+.art-button.is-muted::after { content: ''; position: absolute; width: 25px; height: 2px; border-radius: 2px; background: #ff7195; box-shadow: 0 0 5px #ff7195; transform: rotate(-45deg); }
 .home-settings { position: absolute; z-index: 20; right: 0; top: 51px; width: 150px; overflow: hidden; padding: 7px; border: 1px solid var(--line-strong); border-radius: 15px; background: rgba(17,12,48,.97); box-shadow: 0 16px 34px rgba(2,0,18,.45); backdrop-filter: blur(18px); }
 .home-settings > span { display: block; padding: 6px 8px 8px; color: var(--muted); font-size: 9px; font-weight: 800; letter-spacing: .8px; }
 .home-settings button { width: 100%; display: flex; align-items: center; gap: 8px; padding: 9px; border: 0; border-radius: 10px; background: transparent; color: #ff91a4; font-size: 12px; font-weight: 700; cursor: pointer; }
@@ -573,6 +578,7 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
 .enhanced-stats { gap: 9px; margin-bottom: 14px; }
 .enhanced-stats .stat-card { min-height: 84px; padding: 13px 12px; }
 .enhanced-stats .stat-icon { width: 42px; height: 42px; }
+.art-tile img { width: 125%; height: 125%; object-fit: contain; filter: drop-shadow(0 5px 7px rgba(4,1,27,.28)); }
 .enhanced-stats .stat-icon.pink { color: #ff9fde; background: rgba(240,76,189,.15); }
 .enhanced-stats .stat-card > div { min-width: 0; }
 .enhanced-stats .stat-card small { margin-bottom: 1px; }
@@ -582,6 +588,7 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
 
 .hunt-button-v2 { min-height: 67px; margin-bottom: 14px; background: linear-gradient(110deg, #6536eb, #a53ddd 58%, #db3cae); box-shadow: 0 13px 27px rgba(100,40,204,.26), inset 0 1px rgba(255,255,255,.18); }
 .hunt-button-v2 .hunt-icon { width: 46px; height: 46px; border-radius: 15px; }
+.hunt-button-v2 .hunt-icon.art-tile img { width: 86%; height: 86%; }
 .hunt-button-v2 strong { font-size: 16px; }
 .hunt-button-v2 small { font-size: 9px; }
 
@@ -608,6 +615,9 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
 .hunter-menu .menu-card strong { font-size: 12px; }
 .hunter-menu .menu-card small { margin-top: 3px; font-size: 8px; line-height: 1.35; }
 .hunter-menu .menu-icon { width: 46px; height: 46px; margin: 0 auto; }
+.hunter-menu .menu-icon.art-tile { overflow: visible; background: transparent; }
+.hunter-menu .menu-icon.art-tile img { width: 150%; height: 150%; transition: transform .18s ease, filter .18s ease; }
+.hunter-menu .menu-card:hover .menu-icon.art-tile img { transform: translateY(-3px) scale(1.05); filter: drop-shadow(0 8px 10px rgba(162,56,225,.35)) brightness(1.08); }
 .menu-icon.pink { color: #ff9bdc; background: rgba(240,76,189,.14); }
 .hunter-menu .menu-rank { border-color: rgba(137,78,255,.24); background: radial-gradient(circle at 50% 20%, rgba(114,57,230,.15), transparent 50%), rgba(22,16,53,.9); }
 .hunter-menu .menu-book { border-color: rgba(240,76,189,.24); background: radial-gradient(circle at 50% 20%, rgba(240,76,189,.13), transparent 50%), rgba(22,16,53,.9); }
