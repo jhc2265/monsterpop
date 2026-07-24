@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext'
 import { sound } from '../lib/sound'
 import { timeAgo } from '../lib/format'
 import Icon from '../components/Icon'
+import BottomNav from '../components/BottomNav'
 
 export default function Community() {
   const { user } = useAuth(); const navigate = useNavigate()
@@ -24,5 +25,6 @@ export default function Community() {
     {loading ? <div className="empty-state"><span className="loader" />게시글을 불러오는 중...</div> : posts.length === 0 ? <div className="empty-state"><span className="empty-icon"><Icon name="chat" /></span><h3>첫 이야기를 기다리고 있어요</h3><p>공략이나 멋진 기록을 공유해 보세요.</p></div> : <section className="post-list">{posts.map((post, index) => <article key={post.id} className="post-item" onClick={() => navigate(`/community/${post.id}`)}><div className="post-head"><div className="avatar small">{(post.profiles?.nickname || '헌')[0]}</div><div><strong>{post.profiles?.nickname || '익명 헌터'}</strong><small>{timeAgo(post.created_at)}</small></div>{index === 0 && <span className="pill pill-best">BEST</span>}</div><h2>{post.title}</h2><p>{post.content.length > 90 ? `${post.content.slice(0, 90)}…` : post.content}</p><div className="post-footer"><span><Icon name="chat" size={15} /> 이야기 보기</span><b>›</b></div></article>)}</section>}
     <button className="fab" onClick={() => { sound.button(); setShowWrite(true) }} aria-label="글쓰기"><Icon name="plus" size={25} /></button>
     {showWrite && <div className="modal-overlay" onClick={() => setShowWrite(false)}><section className="modal" onClick={(e) => e.stopPropagation()}><div className="modal-handle" /><div className="modal-title"><div><span className="overline">NEW STORY</span><h2>새 글 작성</h2></div><button className="text-button" onClick={() => setShowWrite(false)}>닫기</button></div><div className="field"><label htmlFor="post-title">제목</label><input id="post-title" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="어떤 이야기를 나눌까요?" maxLength={60} /></div><div className="field"><label htmlFor="post-content">내용</label><textarea id="post-content" value={content} onChange={(e) => setContent(e.target.value)} rows={6} placeholder="공략, 기록, 몬스터 이야기 모두 좋아요." /></div>{error && <div className="notice notice-error">{error}</div>}<div className="btn-row"><button className="btn btn-secondary" onClick={() => setShowWrite(false)}>취소</button><button className="btn btn-primary" onClick={submit} disabled={busy}>{busy ? '등록 중...' : '게시하기'}</button></div></section></div>}
+    <BottomNav />
   </main>
 }

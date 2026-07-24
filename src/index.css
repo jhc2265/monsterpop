@@ -643,3 +643,71 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
   .daily-mission { min-height: 68px; margin-bottom: 13px; padding-block: 10px; }
   .hunter-menu .menu-card { min-height: 108px; }
 }
+
+/* Simplified home hierarchy and shared bottom navigation */
+.page:has(.bottom-nav) { padding-bottom: calc(104px + env(safe-area-inset-bottom)); }
+.home-v2 { padding-top: max(18px, env(safe-area-inset-top)); }
+.home-welcome { margin-bottom: 16px; }
+.home-welcome .icon-btn { width: 39px; height: 39px; border-radius: 13px; }
+.home-welcome .topbar-actions { gap: 6px; }
+.boss-card { min-height: 172px; margin-bottom: 16px; padding: 18px 20px; }
+.boss-card .hero-copy h2 { font-size: 20px; }
+.boss-card .hero-copy p { margin: 8px 0 9px; }
+.boss-reward { padding: 5px 8px; border-radius: 999px; }
+.boss-visual { right: 13px; width: 43%; height: 94%; }
+.boss-visual > span { inset: 7%; border: 0; box-shadow: 0 0 30px rgba(238,61,215,.17); }
+.boss-card .hero-monster { width: 154px; right: 0; bottom: -2px; }
+.enhanced-stats { margin-bottom: 16px; }
+.enhanced-stats .stat-card { min-height: 72px; border-color: rgba(212,204,255,.07); background: rgba(18,14,47,.7); box-shadow: none; }
+.enhanced-stats .stat-icon { width: 36px; height: 36px; border-radius: 11px; background: transparent; }
+.enhanced-stats .art-tile img { width: 138%; height: 138%; }
+.enhanced-stats .stat-card strong { font-size: 18px; }
+.enhanced-stats .stat-card em { margin-top: 2px; font-size: 7px; }
+.hunt-button-v2 { min-height: 61px; margin-bottom: 20px; }
+.hunt-button-v2 .hunt-icon { width: 40px; height: 40px; border-radius: 13px; }
+.hunt-button-v2 .hunt-icon.art-tile img { width: 76%; height: 76%; }
+.hunt-button-v2 strong { font-size: 15px; }
+.hunt-button-v2 small { font-size: 8px; }
+.mission-v2 { display: block; min-height: 0; margin: 0; padding: 15px 17px; border-color: rgba(212,204,255,.08); border-radius: 18px; background: rgba(18,14,47,.7); box-shadow: none; }
+.mission-v2-head, .mission-v2-body { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.mission-v2-head { margin-bottom: 12px; }
+.mission-v2-head strong { font-size: 11px; }
+.mission-v2-head span { color: var(--gold); font-size: 10px; font-weight: 800; }
+.mission-v2-body strong { color: #d8d3e6; font-size: 11px; }
+.mission-v2.complete .mission-v2-body strong { color: #a98cff; }
+.mission-v2-body span { color: var(--muted); font-size: 9px; }
+.mission-v2 .mission-bar { margin-top: 10px; }
+
+.bottom-nav {
+  position: fixed;
+  z-index: 40;
+  left: 50%;
+  bottom: max(10px, env(safe-area-inset-bottom));
+  width: min(calc(100% - 24px), 436px);
+  min-height: 70px;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  align-items: end;
+  padding: 7px 7px 8px;
+  border: 1px solid rgba(184,151,255,.16);
+  border-radius: 23px;
+  background: rgba(13,9,38,.94);
+  box-shadow: 0 15px 38px rgba(2,0,17,.5), inset 0 1px rgba(255,255,255,.06);
+  backdrop-filter: blur(20px);
+  transform: translateX(-50%);
+}
+.bottom-nav button { position: relative; min-width: 0; height: 54px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; padding: 0; border: 0; border-radius: 16px; background: transparent; color: #777090; cursor: pointer; transition: color .16s, background .16s, transform .16s; }
+.bottom-nav button > span { width: 29px; height: 27px; display: grid; place-items: center; }
+.bottom-nav button small { font-size: 8px; font-weight: 800; white-space: nowrap; }
+.bottom-nav button:hover, .bottom-nav button.active { color: #d6c7ff; background: rgba(124,60,255,.09); }
+.bottom-nav button.active::after { content: ''; position: absolute; bottom: -5px; width: 15px; height: 2px; border-radius: 4px; background: var(--primary-light); box-shadow: 0 0 8px var(--primary-light); }
+.bottom-nav button.primary { align-self: center; height: 64px; margin-top: -20px; color: #fff; }
+.bottom-nav button.primary > span { width: 48px; height: 48px; border: 2px solid rgba(255,255,255,.55); border-radius: 50%; background: var(--gradient); box-shadow: 0 8px 20px rgba(142,54,230,.44), inset 0 1px rgba(255,255,255,.3); }
+.bottom-nav button.primary small { margin-top: -1px; color: #c5bce0; }
+.bottom-nav button.primary.active::after { display: none; }
+.community-page .fab { bottom: calc(95px + env(safe-area-inset-bottom)); }
+
+@media (min-width: 700px) {
+  .bottom-nav { bottom: 30px; }
+  .community-page .fab { bottom: 116px; }
+}

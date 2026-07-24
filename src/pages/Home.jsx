@@ -4,6 +4,7 @@ import { supabase } from '../lib/supabase'
 import { useAuth } from '../context/AuthContext'
 import { sound } from '../lib/sound'
 import Icon from '../components/Icon'
+import BottomNav from '../components/BottomNav'
 
 export default function Home() {
   const { user, profile, signOut } = useAuth()
@@ -57,8 +58,8 @@ export default function Home() {
         <p>오늘도 최고 기록에 도전해보세요.</p>
       </div>
       <div className="topbar-actions">
-        <button className={`icon-btn art-button ${muted ? 'is-muted' : ''}`} onClick={toggleMute} aria-label={muted ? '소리 켜기' : '소리 끄기'}><img src="/images/ui/sound.png" alt="" /></button>
-        <button className="icon-btn art-button" onClick={() => setSettingsOpen((open) => !open)} aria-label="설정" aria-expanded={settingsOpen}><img src="/images/ui/settings.png" alt="" /></button>
+        <button className="icon-btn" onClick={toggleMute} aria-label={muted ? '소리 켜기' : '소리 끄기'}><Icon name={muted ? 'mute' : 'sound'} /></button>
+        <button className="icon-btn" onClick={() => setSettingsOpen((open) => !open)} aria-label="설정" aria-expanded={settingsOpen}><Icon name="settings" /></button>
       </div>
       {settingsOpen && <div className="home-settings">
         <span>계정 설정</span>
@@ -96,22 +97,11 @@ export default function Home() {
       <span className="hunt-arrow">›</span>
     </button>
 
-    <section className="daily-mission" aria-label="오늘의 미션">
-      <div className="mission-label"><span>오늘의</span><strong>미션</strong></div>
-      <div className="mission-main">
-        <div><strong>오늘 사냥 1회 완료</strong><span>{missionDone ? '1 / 1' : '0 / 1'}</span></div>
-        <div className="mission-bar"><i style={{ width: missionDone ? '100%' : '8%' }} /></div>
-      </div>
-      <div className="mission-reward"><small>보상</small><strong>★ 200</strong></div>
+    <section className={`daily-mission mission-v2 ${missionDone ? 'complete' : ''}`} aria-label="오늘의 미션">
+      <div className="mission-v2-head"><strong>오늘의 미션</strong><span>★ 200</span></div>
+      <div className="mission-v2-body"><strong>{missionDone ? '✓' : '○'} 오늘 사냥 1회 완료</strong><span>{missionDone ? '1 / 1' : '0 / 1'}</span></div>
+      {!missionDone && <div className="mission-bar"><i style={{ width: '8%' }} /></div>}
     </section>
-
-    <section className="section-block hunter-menu">
-      <div className="section-heading"><div><h2>헌터 메뉴</h2></div></div>
-      <div className="menu-cards">
-        <button className="menu-card menu-rank" onClick={() => go('/ranking')}><span className="menu-icon purple art-tile"><img src="/images/ui/trophy.png" alt="" /></span><span><strong>랭킹</strong><small>실시간 순위 확인</small></span></button>
-        <button className="menu-card menu-book" onClick={() => go('/collection')}><span className="menu-icon pink art-tile"><img src="/images/ui/book.png" alt="" /></span><span><strong>몬스터 도감</strong><small>몬스터 확인</small></span></button>
-        <button className="menu-card menu-chat" onClick={() => go('/community')}><span className="menu-icon cyan art-tile"><img src="/images/ui/community.png" alt="" /></span><span><strong>커뮤니티</strong><small>헌터들과 소통</small></span></button>
-      </div>
-    </section>
+    <BottomNav />
   </main>
 }

@@ -4,6 +4,7 @@ import { supabase } from '../lib/supabase'
 import { useAuth } from '../context/AuthContext'
 import { sound } from '../lib/sound'
 import Icon from '../components/Icon'
+import BottomNav from '../components/BottomNav'
 
 export default function Ranking() {
   const { user } = useAuth(); const navigate = useNavigate()
@@ -27,7 +28,7 @@ export default function Ranking() {
       <section className="podium">{[podium[1], podium[0], podium[2]].map((row, index) => row && <Podium key={row.user_id} row={row} rank={[2,1,3][index]} me={row.user_id === user.id} />)}</section>
       {rest.length > 0 && <section className="rank-list"><div className="list-label">전체 순위</div>{rest.map((row, index) => <RankRow key={row.user_id} row={row} rank={index + 4} me={row.user_id === user.id} />)}</section>}
     </>}
-    <button className="btn btn-primary sticky-action" onClick={() => { sound.button(); navigate('/game') }}><Icon name="play" size={18} /> 새로운 기록에 도전</button>
+    <BottomNav />
   </main>
 }
 
