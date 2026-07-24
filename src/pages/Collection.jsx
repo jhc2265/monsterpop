@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom'
 import { MONSTERS } from '../lib/monsters'
 import Icon from '../components/Icon'
 import MonsterImage from '../components/MonsterImage'
+import BottomNav from '../components/BottomNav'
 
 export default function Collection() {
   const navigate = useNavigate()
@@ -20,5 +21,6 @@ export default function Collection() {
         <div><h2>{monster.name}</h2><p>처치 점수 <strong>{monster.score}</strong></p></div>
       </article>)}
     </section>
+    <BottomNav />
   </main>
 }
