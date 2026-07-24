@@ -8,7 +8,7 @@ import BottomNav from '../components/BottomNav'
 import { timeAgo } from '../lib/format'
 
 export default function Home() {
-  const { user, profile, signOut } = useAuth()
+  const { user, profile } = useAuth()
   const navigate = useNavigate()
   const [best, setBest] = useState(0)
   const [delta, setDelta] = useState(null)
@@ -16,7 +16,6 @@ export default function Home() {
   const [totalPlayers, setTotalPlayers] = useState(0)
   const [recent, setRecent] = useState(null)
   const [muted, setMuted] = useState(sound.isMuted())
-  const [settingsOpen, setSettingsOpen] = useState(false)
 
   useEffect(() => { if (user) loadStats() }, [user])
 
@@ -65,12 +64,8 @@ export default function Home() {
       </div>
       <div className="topbar-actions">
         <button className="icon-btn" onClick={toggleMute} aria-label={muted ? '소리 켜기' : '소리 끄기'}><Icon name={muted ? 'mute' : 'sound'} /></button>
-        <button className="icon-btn" onClick={() => setSettingsOpen((open) => !open)} aria-label="설정" aria-expanded={settingsOpen}><Icon name="settings" /></button>
+        <button className="icon-btn" onClick={() => go('/settings')} aria-label="설정"><Icon name="settings" /></button>
       </div>
-      {settingsOpen && <div className="home-settings">
-        <span>계정 설정</span>
-        <button onClick={() => { sound.button(); signOut() }}><Icon name="logout" size={17} /> 로그아웃</button>
-      </div>}
     </header>
 
     <section className="hero-card boss-card">

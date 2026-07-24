@@ -3,6 +3,8 @@ let masterGain = null
 let bgmTimer = null
 let bgmOn = false
 let muted = false
+let bgmEnabled = true
+let effectsEnabled = true
 
 function ensureContext() {
   if (!context) {
@@ -34,15 +36,15 @@ function tone(frequency, duration = 0.12, type = 'square', volume = 0.3, delay =
 }
 
 export const sound = {
-  button() { tone(660, 0.08, 'triangle', 0.25) },
-  hit(combo = 0) { const base = 520 + Math.min(combo, 20) * 18; tone(base, 0.1, 'square', 0.3); tone(base * 1.5, 0.08, 'square', 0.15, 0.02) },
-  combo() { tone(880, 0.09, 'sawtooth', 0.2); tone(1174, 0.09, 'sawtooth', 0.2, 0.06) },
-  rare() { tone(392, 0.14, 'sawtooth', 0.28); tone(587, 0.14, 'sawtooth', 0.24, 0.08); tone(784, 0.18, 'sawtooth', 0.24, 0.16) },
-  miss() { tone(180, 0.18, 'sine', 0.25) },
-  start() { tone(523, 0.12, 'square', 0.25); tone(659, 0.12, 'square', 0.25, 0.1); tone(784, 0.18, 'square', 0.25, 0.2) },
-  over() { tone(659, 0.18, 'triangle', 0.28); tone(523, 0.18, 'triangle', 0.28, 0.14); tone(392, 0.3, 'triangle', 0.28, 0.28) },
+  button() { if (effectsEnabled) tone(660, 0.08, 'triangle', 0.25) },
+  hit(combo = 0) { if (!effectsEnabled) return; const base = 520 + Math.min(combo, 20) * 18; tone(base, 0.1, 'square', 0.3); tone(base * 1.5, 0.08, 'square', 0.15, 0.02) },
+  combo() { if (!effectsEnabled) return; tone(880, 0.09, 'sawtooth', 0.2); tone(1174, 0.09, 'sawtooth', 0.2, 0.06) },
+  rare() { if (!effectsEnabled) return; tone(392, 0.14, 'sawtooth', 0.28); tone(587, 0.14, 'sawtooth', 0.24, 0.08); tone(784, 0.18, 'sawtooth', 0.24, 0.16) },
+  miss() { if (effectsEnabled) tone(180, 0.18, 'sine', 0.25) },
+  start() { if (!effectsEnabled) return; tone(523, 0.12, 'square', 0.25); tone(659, 0.12, 'square', 0.25, 0.1); tone(784, 0.18, 'square', 0.25, 0.2) },
+  over() { if (!effectsEnabled) return; tone(659, 0.18, 'triangle', 0.28); tone(523, 0.18, 'triangle', 0.28, 0.14); tone(392, 0.3, 'triangle', 0.28, 0.28) },
   startBGM() {
-    if (bgmOn || muted) return
+    if (bgmOn || muted || !bgmEnabled) return
     ensureContext(); bgmOn = true
     const notes = [523, 587, 659, 784, 659, 587, 523, 440]; let index = 0
     const step = () => { if (!bgmOn) return; tone(notes[index % notes.length], 0.22, 'triangle', 0.08); tone(notes[index % notes.length] / 2, 0.22, 'sine', 0.06); index += 1; bgmTimer = setTimeout(step, 260) }
@@ -51,5 +53,7 @@ export const sound = {
   stopBGM() { bgmOn = false; if (bgmTimer) clearTimeout(bgmTimer); bgmTimer = null },
   setMuted(value) { muted = value; if (value) this.stopBGM(); if (masterGain) masterGain.gain.value = value ? 0 : 0.5 },
   isMuted() { return muted },
+  setBgmEnabled(value) { bgmEnabled = value; if (!value) this.stopBGM() },
+  setEffectsEnabled(value) { effectsEnabled = value },
   unlock() { ensureContext() },
 }

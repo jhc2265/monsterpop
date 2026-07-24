@@ -59,6 +59,7 @@ export default function Game() {
   const scoreRef = useRef(0)
   const comboRef = useRef(0)
   const maxComboRef = useRef(0)
+  const monsterCountsRef = useRef({})
   const playingRef = useRef(false)
   const pausedRef = useRef(false)
 
@@ -117,7 +118,7 @@ export default function Game() {
     sound.stopBGM()
     sound.over()
     navigate('/result', {
-      state: { score: scoreRef.current, maxCombo: maxComboRef.current },
+      state: { score: scoreRef.current, maxCombo: maxComboRef.current, monsterCounts: monsterCountsRef.current },
       replace: true,
     })
   }
@@ -158,6 +159,7 @@ export default function Game() {
     addEffect(target.x, target.y + 7, `+${gained}`, target.grade === '보스' ? 'boss' : 'score')
     if (nextCombo % 5 === 0) sound.combo()
     if (target.grade === '영웅' || target.grade === '보스') sound.rare()
+    monsterCountsRef.current[target.id] = (monsterCountsRef.current[target.id] || 0) + 1
     replaceEnemy(target.entityId)
   }
 
@@ -171,6 +173,7 @@ export default function Game() {
     let bonus = 0
     enemies.forEach((enemy) => {
       bonus += enemy.score
+      monsterCountsRef.current[enemy.id] = (monsterCountsRef.current[enemy.id] || 0) + 1
       addEffect(enemy.x, enemy.y, 'BURST!', 'burst')
     })
     scoreRef.current += bonus
