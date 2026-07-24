@@ -13,6 +13,10 @@ const paths = {
   send: '<path d="m22 2-7 20-4-9-9-4 20-7Z"/><path d="M22 2 11 13"/>',
   spark: '<path d="m12 3 1.4 4.6L18 9l-4.6 1.4L12 15l-1.4-4.6L6 9l4.6-1.4L12 3Z"/>',
   sword: '<path d="m14.5 4.5 5-2-2 5L9 16l-3-3 8.5-8.5Z"/><path d="m5 14 5 5"/><path d="m4 20 3-3"/>',
+  lock: '<rect width="14" height="11" x="5" y="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/>',
+  eye: '<path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"/><circle cx="12" cy="12" r="2.5"/>',
+  eyeOff: '<path d="m3 3 18 18"/><path d="M10.6 6.1A11 11 0 0 1 12 6c6.5 0 10 6 10 6a18 18 0 0 1-2.1 2.8"/><path d="M6.5 6.5C3.6 8.2 2 12 2 12s3.5 6 10 6a10 10 0 0 0 4-.8"/><path d="M9.9 9.9A3 3 0 0 0 14.1 14.1"/>',
+  check: '<path d="m5 12 4 4L19 6"/>',
 }
 
 export default function Icon({ name, size = 20, strokeWidth = 2, className = '' }) {

@@ -5,11 +5,13 @@ import { useAuth } from '../context/AuthContext'
 import { sound } from '../lib/sound'
 import Icon from '../components/Icon'
 
-export default function Login() {
-  const [mode, setMode] = useState('login')
+export default function Login({ initialMode = 'login' }) {
+  const isLogin = initialMode === 'login'
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [nickname, setNickname] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
+  const [remember, setRemember] = useState(true)
   const [error, setError] = useState('')
   const [info, setInfo] = useState('')
   const [busy, setBusy] = useState(false)
@@ -17,12 +19,6 @@ export default function Login() {
   const navigate = useNavigate()
 
   useEffect(() => { if (user) navigate('/home', { replace: true }) }, [user, navigate])
-
-  function switchMode(next) {
-    setMode(next)
-    setError('')
-    setInfo('')
-  }
 
   async function submit(event) {
     event.preventDefault()
@@ -33,7 +29,7 @@ export default function Login() {
     setBusy(true)
 
     try {
-      if (mode === 'signup') {
+      if (!isLogin) {
         if (nickname.trim().length < 2) {
           setError('닉네임을 2자 이상 입력해 주세요.')
           return
@@ -47,11 +43,12 @@ export default function Login() {
         if (data.session) navigate('/home', { replace: true })
         else {
           setInfo('가입이 완료되었습니다. 이메일 인증 후 로그인해 주세요.')
-          setMode('login')
         }
       } else {
         const { error: loginError } = await supabase.auth.signInWithPassword({ email, password })
         if (loginError) throw loginError
+        if (remember) localStorage.setItem('monsterpop-remember-email', email)
+        else localStorage.removeItem('monsterpop-remember-email')
         navigate('/home', { replace: true })
       }
     } catch (err) {
@@ -61,63 +58,81 @@ export default function Login() {
     }
   }
 
-  const isLogin = mode === 'login'
+  async function resetPassword() {
+    setError('')
+    setInfo('')
+    if (!email) {
+      setError('비밀번호를 찾을 이메일을 먼저 입력해 주세요.')
+      return
+    }
+    setBusy(true)
+    try {
+      const { error: resetError } = await supabase.auth.resetPasswordForEmail(email)
+      if (resetError) throw resetError
+      setInfo('비밀번호 재설정 메일을 보냈습니다.')
+    } catch (err) {
+      setError(translate(err.message))
+    } finally {
+      setBusy(false)
+    }
+  }
 
-  return <main className="page login-page">
+  useEffect(() => {
+    if (isLogin) setEmail(localStorage.getItem('monsterpop-remember-email') || '')
+  }, [isLogin])
+
+  return <main className="page login-page auth-page">
     <div className="login-ambient" aria-hidden="true">
       <span className="login-grid" />
       <span className="login-glow login-glow-left" />
       <span className="login-glow login-glow-right" />
     </div>
 
-    <section className="login-brand">
-      <div className="login-kicker"><i /><span>30초 몬스터 헌팅</span><i /></div>
-      <div className="login-visual" aria-hidden="true">
-        <span className="monster-halo halo-outer" />
-        <span className="monster-halo halo-inner" />
-        <span className="spark spark-one">✦</span>
-        <span className="spark spark-two">✦</span>
-        <span className="spark spark-three">·</span>
-        <img className="login-monster" src="/images/boss.png" alt="" />
+    <section className="auth-brand">
+      <div className="auth-monster-wrap" aria-hidden="true">
+        <span className="auth-monster-glow" />
+        <img src="/images/boss.png" alt="" />
       </div>
-      <div className="login-logo">
-        <h1 className="title">MONSTER<span>POP</span></h1>
-        <p className="sub">몬스터를 사냥하고 콤보를 쌓아<br />최고의 헌터에 도전하세요.</p>
+      <h1>MONSTER<span>POP</span></h1>
+      <div className="auth-welcome">
+        <h2>{isLogin ? '다시 오셨군요!' : '새로운 헌터군요!'}</h2>
+        <p>{isLogin ? '사냥 기록을 이어가세요.' : '헌터 정보를 등록하고 사냥을 시작하세요.'}</p>
       </div>
     </section>
 
-    <section className="auth-shell" aria-label={isLogin ? '로그인' : '회원가입'}>
-      <div className="tabs auth-tabs" role="tablist" aria-label="계정 메뉴">
-        <button type="button" role="tab" aria-selected={isLogin} className={isLogin ? 'active' : ''} onClick={() => switchMode('login')}>로그인</button>
-        <button type="button" role="tab" aria-selected={!isLogin} className={!isLogin ? 'active' : ''} onClick={() => switchMode('signup')}>회원가입</button>
+    <form onSubmit={submit} className="auth-form">
+      {!isLogin && <div className="field">
+        <label htmlFor="nickname">닉네임</label>
+        <div className="auth-input"><Icon name="spark" size={19} /><input id="nickname" value={nickname} onChange={(e) => setNickname(e.target.value)} placeholder="헌터 닉네임" maxLength={16} required /></div>
+      </div>}
+
+      <div className="field">
+        <label htmlFor="email">이메일</label>
+        <div className="auth-input"><span className="auth-at">@</span><input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" autoComplete="email" required /></div>
       </div>
 
-      <form onSubmit={submit} className="login-form">
-        {mode === 'signup' && <div className="field">
-          <label htmlFor="nickname">닉네임</label>
-          <div className="input-wrap"><span className="input-symbol">✦</span><input id="nickname" value={nickname} onChange={(e) => setNickname(e.target.value)} placeholder="헌터 닉네임" maxLength={16} /></div>
-        </div>}
-        <div className="field">
-          <label htmlFor="email">이메일</label>
-          <div className="input-wrap"><span className="input-symbol">@</span><input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" autoComplete="email" required /></div>
-        </div>
-        <div className="field">
-          <label htmlFor="password">비밀번호</label>
-          <div className="input-wrap"><span className="input-symbol">◆</span><input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="6자 이상 입력" autoComplete={isLogin ? 'current-password' : 'new-password'} minLength={6} required /></div>
-        </div>
-        {error && <div className="notice notice-error">{error}</div>}
-        {info && <div className="notice notice-info">{info}</div>}
-        <button className="btn btn-primary login-submit" disabled={busy}>
-          <span>{busy ? '처리 중...' : isLogin ? '사냥 시작하기' : '헌터로 등록하기'}</span>
-          {!busy && <span className="submit-arrow">→</span>}
-        </button>
-      </form>
-    </section>
+      <div className="field">
+        <label htmlFor="password">비밀번호</label>
+        <div className="auth-input"><Icon name="lock" size={20} /><input id="password" type={showPassword ? 'text' : 'password'} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="비밀번호를 입력하세요" autoComplete={isLogin ? 'current-password' : 'new-password'} minLength={6} required /><button type="button" className="password-toggle" onClick={() => setShowPassword((value) => !value)} aria-label={showPassword ? '비밀번호 숨기기' : '비밀번호 보기'}><Icon name={showPassword ? 'eyeOff' : 'eye'} size={21} /></button></div>
+      </div>
 
-    <button className="text-button login-switch" onClick={() => switchMode(isLogin ? 'signup' : 'login')}>
-      {isLogin ? <>처음이신가요? <strong>회원가입</strong></> : <>이미 계정이 있나요? <strong>로그인</strong></>}
+      {isLogin && <div className="auth-options">
+        <label className="remember-check"><input type="checkbox" checked={remember} onChange={(e) => setRemember(e.target.checked)} /><span><Icon name="check" size={16} /></span> 로그인 상태 유지</label>
+        <button type="button" onClick={resetPassword}>비밀번호 찾기 <b>›</b></button>
+      </div>}
+
+      {error && <div className="notice notice-error">{error}</div>}
+      {info && <div className="notice notice-info">{info}</div>}
+
+      <button className="auth-submit" disabled={busy}>
+        <span>{busy ? '처리 중...' : isLogin ? '로그인하고 사냥하기' : '헌터로 가입하기'}</span>
+        {!busy && <b>→</b>}
+      </button>
+    </form>
+
+    <button className="auth-route-link" onClick={() => navigate(isLogin ? '/signup' : '/login')}>
+      {isLogin ? <>처음이신가요? <strong>회원가입</strong></> : <>이미 계정이 있나요? <strong>로그인</strong></>} <span>›</span>
     </button>
-    <div className="login-status"><i /> HUNT SERVER ONLINE</div>
   </main>
 }
 

@@ -19,7 +19,8 @@ function Protected({ children }) {
 export default function App() {
   return <div className="app-container"><Routes>
     <Route path="/" element={<Hero />} />
-    <Route path="/login" element={<Login />} />
+    <Route path="/login" element={<Login initialMode="login" />} />
+    <Route path="/signup" element={<Login initialMode="signup" />} />
     <Route path="/home" element={<Protected><Home /></Protected>} />
     <Route path="/game" element={<Protected><Game /></Protected>} />
     <Route path="/result" element={<Protected><Result /></Protected>} />
