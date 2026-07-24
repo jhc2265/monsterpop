@@ -6,6 +6,7 @@ import { sound } from '../lib/sound'
 import Icon from '../components/Icon'
 import BottomNav from '../components/BottomNav'
 import { timeAgo } from '../lib/format'
+import { getLevelProgress, LEVEL_UNLOCKS, resolveProgress } from '../lib/progression'
 
 export default function Home() {
   const { user, profile } = useAuth()
@@ -55,6 +56,8 @@ export default function Home() {
   }
 
   const missionDone = best > 0
+  const progress = getLevelProgress(resolveProgress(profile, user.id).xp)
+  const nextUnlock = LEVEL_UNLOCKS[Math.min(10, progress.level + 1)]
 
   return <main className="page home-page home-v2">
     <header className="home-welcome">
@@ -67,6 +70,11 @@ export default function Home() {
         <button className="icon-btn" onClick={() => go('/settings')} aria-label="설정"><Icon name="settings" /></button>
       </div>
     </header>
+
+    <section className="hunter-progress" aria-label="헌터 레벨">
+      <div className="hunter-progress-head"><span>LV.{progress.level}</span><strong>{progress.level >= 10 ? '최고 레벨 달성!' : `다음 해금 · ${nextUnlock?.title}`}</strong><small>{progress.level >= 10 ? `${progress.total.toLocaleString()} XP` : `${progress.current.toLocaleString()} / ${progress.needed.toLocaleString()} XP`}</small></div>
+      <div className="hunter-xp-bar"><i style={{ width: `${progress.percent}%` }} /></div>
+    </section>
 
     <section className="hero-card boss-card">
       <div className="hero-copy">
@@ -98,11 +106,11 @@ export default function Home() {
       <span className="hunt-arrow">›</span>
     </button>
 
-    <section className={`daily-mission mission-v2 ${missionDone ? 'complete' : ''}`} aria-label="오늘의 미션">
+    {progress.level >= 2 ? <section className={`daily-mission mission-v2 ${missionDone ? 'complete' : ''}`} aria-label="오늘의 미션">
       <div className="mission-v2-head"><strong>오늘의 미션</strong><span>★ 200</span></div>
       <div className="mission-v2-body"><strong>{missionDone ? '✓' : '○'} 오늘 사냥 1회 완료</strong>{!missionDone && <span>0 / 1</span>}</div>
       {!missionDone && <div className="mission-bar"><i style={{ width: '8%' }} /></div>}
-    </section>
+    </section> : <section className="mission-locked"><Icon name="lock" size={17} /><div><strong>오늘의 미션</strong><span>Lv.2에서 해금됩니다</span></div></section>}
 
     <section className="recent-hunt" aria-label="최근 사냥 기록">
       <div className="recent-hunt-head"><strong>최근 사냥</strong><span>{recent ? timeAgo(recent.created_at) : '기록 없음'}</span></div>

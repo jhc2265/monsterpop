@@ -4,6 +4,8 @@ import { pickRandomMonster } from '../lib/monsters'
 import MonsterImage from '../components/MonsterImage'
 import Icon from '../components/Icon'
 import { sound } from '../lib/sound'
+import { useAuth } from '../context/AuthContext'
+import { getLevel, getUnlockedMonsterIds, resolveProgress } from '../lib/progression'
 
 const GAME_TIME = 30
 const MAX_ENEMIES = 9
@@ -25,8 +27,8 @@ const ACTIONS = {
 let entityId = 0
 let effectId = 0
 
-function makeEnemy(index = 0, randomize = false) {
-  const monster = pickRandomMonster()
+function makeEnemy(index = 0, randomize = false, allowedIds) {
+  const monster = pickRandomMonster(allowedIds)
   const positionIndex = randomize ? Math.floor(Math.random() * POSITIONS.length) : index % POSITIONS.length
   const position = POSITIONS[positionIndex]
   const maxHp = HP[monster.grade] || 1
@@ -44,6 +46,10 @@ function makeEnemy(index = 0, randomize = false) {
 
 export default function Game() {
   const navigate = useNavigate()
+  const { user, profile } = useAuth()
+  const playerLevel = getLevel(resolveProgress(profile, user.id).xp)
+  const allowedMonsterIds = getUnlockedMonsterIds(playerLevel)
+  const skillUnlocked = playerLevel >= 4
   const [countdown, setCountdown] = useState(3)
   const [playing, setPlaying] = useState(false)
   const [paused, setPaused] = useState(false)
@@ -69,9 +75,9 @@ export default function Game() {
   const lastTapRef = useRef({})
 
   const fillArena = useCallback(() => {
-    const next = Array.from({ length: MAX_ENEMIES }, (_, index) => makeEnemy(index))
+    const next = Array.from({ length: MAX_ENEMIES }, (_, index) => makeEnemy(index, false, allowedMonsterIds))
     setEnemies(next)
-  }, [])
+  }, [playerLevel])
 
   useEffect(() => {
     sound.unlock()
@@ -118,7 +124,7 @@ export default function Game() {
           escaped.forEach((enemy) => addEffect(enemy.x, enemy.y, 'ESCAPE', 'miss'))
         }, 0)
         const survivors = items.filter((enemy) => now - enemy.bornAt < enemy.escapeDuration)
-        return [...survivors, ...escaped.map((_, index) => makeEnemy(index, true))]
+        return [...survivors, ...escaped.map((_, index) => makeEnemy(index, true, allowedMonsterIds))]
       })
     }, 180)
     return () => clearInterval(escapeWatcher)
@@ -158,7 +164,7 @@ export default function Game() {
 
   function replaceEnemy(deadId) {
     setEnemies((items) => items.filter((enemy) => enemy.entityId !== deadId))
-    setTimeout(() => setEnemies((current) => [...current, makeEnemy(deadId, true)]), 320)
+    setTimeout(() => setEnemies((current) => [...current, makeEnemy(deadId, true, allowedMonsterIds)]), 320)
   }
 
   function completeGesture(target) {
@@ -172,7 +178,7 @@ export default function Game() {
     comboRef.current = nextCombo
     maxComboRef.current = Math.max(maxComboRef.current, nextCombo)
     const killed = remaining <= 0
-    const nextEnergy = Math.min(SKILL_MAX, energyRef.current + 1 + (quick ? 1 : 0))
+    const nextEnergy = skillUnlocked ? Math.min(SKILL_MAX, energyRef.current + 1 + (quick ? 1 : 0)) : 0
     energyRef.current = nextEnergy
     setEnergy(nextEnergy)
     sound.hit(comboRef.current)
@@ -257,7 +263,7 @@ export default function Game() {
   }
 
   function useBurst() {
-    if (!playing || paused || energyRef.current < SKILL_MAX) return
+    if (!skillUnlocked || !playing || paused || energyRef.current < SKILL_MAX) return
     sound.combo()
     let bonus = 0
     const defeated = []
@@ -276,7 +282,7 @@ export default function Game() {
     setEnergy(0)
     setLastJudge('SHADOW BURST!')
     setEnemies((items) => items.filter((enemy) => !defeated.includes(enemy.entityId)).map((enemy) => ({ ...enemy, hp: enemy.hp - 1, bornAt: Date.now() })))
-    setTimeout(() => setEnemies((items) => [...items, ...Array.from({ length: defeated.length }, (_, index) => makeEnemy(index, true))]), 280)
+    setTimeout(() => setEnemies((items) => [...items, ...Array.from({ length: defeated.length }, (_, index) => makeEnemy(index, true, allowedMonsterIds))]), 280)
   }
 
   function togglePause() {
@@ -340,10 +346,10 @@ export default function Game() {
 
     <section className="battle-controls">
       <div className="timing-status"><small>REACTION HUNT</small><strong>{lastJudge}</strong><span>표시된 동작으로 도망가기 전에 사냥하세요!</span></div>
-      <button className={`burst-button ${energy >= SKILL_MAX ? 'ready' : ''}`} onClick={useBurst} disabled={energy < SKILL_MAX} aria-label="섀도우 버스트">
-        <img src="/images/ui/hunt-swords.png" alt="" /><small>{energy >= SKILL_MAX ? 'BURST!' : `${energy} / ${SKILL_MAX}`}</small>
+      <button className={`burst-button ${energy >= SKILL_MAX ? 'ready' : ''} ${!skillUnlocked ? 'locked' : ''}`} onClick={useBurst} disabled={!skillUnlocked || energy < SKILL_MAX} aria-label={skillUnlocked ? '섀도우 버스트' : '레벨 4에서 해금'}>
+        <img src="/images/ui/hunt-swords.png" alt="" /><small>{!skillUnlocked ? 'LV.4' : energy >= SKILL_MAX ? 'BURST!' : `${energy} / ${SKILL_MAX}`}</small>
       </button>
-      <div className="skill-meter"><span><i style={{ width: `${(energy / SKILL_MAX) * 100}%` }} /></span><small>섀도우 버스트</small></div>
+      <div className="skill-meter"><span><i style={{ width: `${skillUnlocked ? (energy / SKILL_MAX) * 100 : 0}%` }} /></span><small>{skillUnlocked ? '섀도우 버스트' : 'Lv.4에서 스킬 해금'}</small></div>
     </section>
 
   </main>
