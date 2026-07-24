@@ -8,6 +8,7 @@ import Result from './pages/Result'
 import Ranking from './pages/Ranking'
 import Community from './pages/Community'
 import PostDetail from './pages/PostDetail'
+import Collection from './pages/Collection'
 
 function Protected({ children }) {
   const { user, loading } = useAuth()
@@ -25,6 +26,7 @@ export default function App() {
     <Route path="/game" element={<Protected><Game /></Protected>} />
     <Route path="/result" element={<Protected><Result /></Protected>} />
     <Route path="/ranking" element={<Protected><Ranking /></Protected>} />
+    <Route path="/collection" element={<Protected><Collection /></Protected>} />
     <Route path="/community" element={<Protected><Community /></Protected>} />
     <Route path="/community/:id" element={<Protected><PostDetail /></Protected>} />
     <Route path="*" element={<Navigate to="/" replace />} />
