@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext'
 import { sound } from '../lib/sound'
 import Icon from '../components/Icon'
 import BottomNav from '../components/BottomNav'
+import { timeAgo } from '../lib/format'
 
 export default function Home() {
   const { user, profile, signOut } = useAuth()
@@ -12,16 +13,21 @@ export default function Home() {
   const [best, setBest] = useState(0)
   const [delta, setDelta] = useState(null)
   const [rank, setRank] = useState(null)
-  const [rankPercent, setRankPercent] = useState(null)
+  const [totalPlayers, setTotalPlayers] = useState(0)
+  const [recent, setRecent] = useState(null)
   const [muted, setMuted] = useState(sound.isMuted())
   const [settingsOpen, setSettingsOpen] = useState(false)
 
   useEffect(() => { if (user) loadStats() }, [user])
 
   async function loadStats() {
-    const { data: mine } = await supabase.from('scores').select('score').eq('user_id', user.id).order('score', { ascending: false }).limit(2)
+    const [{ data: mine }, { data: latest }] = await Promise.all([
+      supabase.from('scores').select('score').eq('user_id', user.id).order('score', { ascending: false }).limit(2),
+      supabase.from('scores').select('score, max_combo, created_at').eq('user_id', user.id).order('created_at', { ascending: false }).limit(1),
+    ])
     const myBest = mine?.[0]?.score ?? 0
     setBest(myBest)
+    setRecent(latest?.[0] || null)
 
     const previous = mine?.[1]?.score
     if (myBest > 0 && previous > 0) setDelta(Math.round(((myBest - previous) / previous) * 100))
@@ -33,7 +39,7 @@ export default function Home() {
       const scores = Object.values(bestByUser).sort((a, b) => b - a)
       const currentRank = scores.indexOf(myBest) + 1
       setRank(currentRank)
-      setRankPercent(Math.max(1, Math.ceil((currentRank / scores.length) * 100)))
+      setTotalPlayers(scores.length)
     }
   }
 
@@ -87,7 +93,7 @@ export default function Home() {
       </article>
       <article className="stat-card">
         <span className="stat-icon pink art-tile"><img src="/images/ui/crown.png" alt="" /></span>
-        <div><small>현재 순위</small><strong>{rank ? `${rank}위` : '도전 전'}</strong><em>{rankPercent ? <>상위 <b>{rankPercent}%</b></> : '순위에 도전하세요'}</em></div>
+        <div><small>현재 순위</small><strong>{rank ? `${rank}위` : '도전 전'}</strong><em>{rank ? <>전체 {totalPlayers.toLocaleString()}명 중 <b>{rank}위</b></> : '순위에 도전하세요'}</em></div>
       </article>
     </section>
 
@@ -99,8 +105,19 @@ export default function Home() {
 
     <section className={`daily-mission mission-v2 ${missionDone ? 'complete' : ''}`} aria-label="오늘의 미션">
       <div className="mission-v2-head"><strong>오늘의 미션</strong><span>★ 200</span></div>
-      <div className="mission-v2-body"><strong>{missionDone ? '✓' : '○'} 오늘 사냥 1회 완료</strong><span>{missionDone ? '1 / 1' : '0 / 1'}</span></div>
+      <div className="mission-v2-body"><strong>{missionDone ? '✓' : '○'} 오늘 사냥 1회 완료</strong>{!missionDone && <span>0 / 1</span>}</div>
       {!missionDone && <div className="mission-bar"><i style={{ width: '8%' }} /></div>}
+    </section>
+
+    <section className="recent-hunt" aria-label="최근 사냥 기록">
+      <div className="recent-hunt-head"><strong>최근 사냥</strong><span>{recent ? timeAgo(recent.created_at) : '기록 없음'}</span></div>
+      {recent ? <div className="recent-hunt-stats">
+        <div><small>획득 점수</small><strong>{recent.score.toLocaleString()}</strong></div>
+        <i />
+        <div><small>최고 콤보</small><strong>{recent.max_combo || 0}</strong></div>
+        <i />
+        <div><small>현재 순위</small><strong>{rank ? `${rank}위` : '-'}</strong></div>
+      </div> : <button onClick={() => go('/game')}>아직 사냥 기록이 없어요. <strong>첫 사냥 시작하기 →</strong></button>}
     </section>
     <BottomNav />
   </main>

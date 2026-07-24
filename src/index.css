@@ -677,6 +677,22 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
 .mission-v2.complete .mission-v2-body strong { color: #a98cff; }
 .mission-v2-body span { color: var(--muted); font-size: 9px; }
 .mission-v2 .mission-bar { margin-top: 10px; }
+.recent-hunt { margin-top: 20px; padding: 15px 17px; border-top: 1px solid rgba(212,204,255,.08); border-bottom: 1px solid rgba(212,204,255,.06); background: linear-gradient(90deg, transparent, rgba(29,21,66,.36), transparent); }
+.recent-hunt-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 13px; }
+.recent-hunt-head strong { color: #d8d3e7; font-size: 11px; }
+.recent-hunt-head span { color: #6f688a; font-size: 8px; }
+.recent-hunt-stats { display: grid; grid-template-columns: 1fr 1px 1fr 1px 1fr; align-items: center; text-align: center; }
+.recent-hunt-stats > i { width: 1px; height: 24px; background: rgba(212,204,255,.08); }
+.recent-hunt-stats small, .recent-hunt-stats strong { display: block; }
+.recent-hunt-stats small { color: #77708f; font-size: 7px; }
+.recent-hunt-stats strong { margin-top: 3px; color: #e7e3f3; font-size: 12px; }
+.recent-hunt > button { width: 100%; padding: 3px; border: 0; background: transparent; color: #77708f; font-size: 9px; cursor: pointer; }
+.recent-hunt > button strong { margin-left: 4px; color: #ad82ff; }
+.enhanced-stats .stat-card:first-child .art-tile img { width: 150%; height: 150%; }
+.enhanced-stats .stat-card:nth-child(2) .art-tile img { width: 120%; height: 120%; }
+.boss-card .hero-monster { width: 165px; right: 5px; }
+.hunt-button-v2 { background: linear-gradient(110deg, #6237d8, #9436c9 58%, #c938a5); }
+.hunt-button-v2 .hunt-arrow { font-size: 24px; }
 
 .bottom-nav {
   position: fixed;
