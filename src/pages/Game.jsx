@@ -8,13 +8,11 @@ import { useAuth } from '../context/AuthContext'
 import { getLevel, getUnlockedMonsterIds, resolveProgress } from '../lib/progression'
 
 const GAME_TIME = 30
-const MAX_ENEMIES = 9
+const MAX_ENEMIES = 5
 const SKILL_MAX = 6
 const POSITIONS = [
-  { x: 16, y: 22 }, { x: 40, y: 18 }, { x: 66, y: 21 }, { x: 86, y: 29 },
-  { x: 25, y: 39 }, { x: 53, y: 36 }, { x: 76, y: 47 },
-  { x: 13, y: 56 }, { x: 41, y: 54 }, { x: 63, y: 62 }, { x: 87, y: 66 },
-  { x: 29, y: 70 },
+  { x: 18, y: 25 }, { x: 50, y: 20 }, { x: 82, y: 27 },
+  { x: 28, y: 52 }, { x: 70, y: 52 }, { x: 50, y: 70 },
 ]
 const HP = { 일반: 1, 희귀: 1, 영웅: 1, 보스: 3 }
 const ESCAPE_DURATION = { slime: 5600, rabbit: 3600, fox: 4300, boss: 7600 }
@@ -27,9 +25,10 @@ const ACTIONS = {
 let entityId = 0
 let effectId = 0
 
-function makeEnemy(index = 0, randomize = false, allowedIds) {
+function makeEnemy(index = 0, randomize = false, allowedIds, occupied = []) {
   const monster = pickRandomMonster(allowedIds)
-  const positionIndex = randomize ? Math.floor(Math.random() * POSITIONS.length) : index % POSITIONS.length
+  const freeIndexes = POSITIONS.map((_, positionIndex) => positionIndex).filter((positionIndex) => !occupied.includes(positionIndex))
+  const positionIndex = randomize && freeIndexes.length ? freeIndexes[Math.floor(Math.random() * freeIndexes.length)] : index % POSITIONS.length
   const position = POSITIONS[positionIndex]
   const maxHp = HP[monster.grade] || 1
   return {
@@ -39,6 +38,7 @@ function makeEnemy(index = 0, randomize = false, allowedIds) {
     maxHp,
     bornAt: Date.now(),
     escapeDuration: ESCAPE_DURATION[monster.id] || 5000,
+    positionIndex,
     x: position.x + (Math.random() * 5 - 2.5),
     y: position.y + (Math.random() * 4 - 2),
   }
@@ -124,7 +124,12 @@ export default function Game() {
           escaped.forEach((enemy) => addEffect(enemy.x, enemy.y, 'ESCAPE', 'miss'))
         }, 0)
         const survivors = items.filter((enemy) => now - enemy.bornAt < enemy.escapeDuration)
-        return [...survivors, ...escaped.map((_, index) => makeEnemy(index, true, allowedMonsterIds))]
+        const replacements = []
+        escaped.forEach((_, index) => {
+          const occupied = [...survivors, ...replacements].map((enemy) => enemy.positionIndex)
+          replacements.push(makeEnemy(index, true, allowedMonsterIds, occupied))
+        })
+        return [...survivors, ...replacements]
       })
     }, 180)
     return () => clearInterval(escapeWatcher)
@@ -136,11 +141,18 @@ export default function Game() {
     if (!playing) return
     const teleporter = setInterval(() => {
       if (pausedRef.current) return
-      setEnemies((items) => items.map((enemy) => {
-        if (enemy.id !== 'rabbit' || Math.random() > .55) return enemy
-        const position = POSITIONS[Math.floor(Math.random() * POSITIONS.length)]
-        return { ...enemy, x: position.x, y: position.y, bornAt: Date.now() }
-      }))
+      setEnemies((items) => {
+        const occupied = new Set(items.map((enemy) => enemy.positionIndex))
+        return items.map((enemy) => {
+          if (enemy.id !== 'rabbit' || Math.random() > .55) return enemy
+          occupied.delete(enemy.positionIndex)
+          const freeIndexes = POSITIONS.map((_, index) => index).filter((index) => !occupied.has(index))
+          const positionIndex = freeIndexes[Math.floor(Math.random() * freeIndexes.length)] ?? enemy.positionIndex
+          occupied.add(positionIndex)
+          const position = POSITIONS[positionIndex]
+          return { ...enemy, positionIndex, x: position.x, y: position.y, bornAt: Date.now() }
+        })
+      })
     }, 900)
     return () => clearInterval(teleporter)
   }, [playing])
@@ -164,7 +176,7 @@ export default function Game() {
 
   function replaceEnemy(deadId) {
     setEnemies((items) => items.filter((enemy) => enemy.entityId !== deadId))
-    setTimeout(() => setEnemies((current) => [...current, makeEnemy(deadId, true, allowedMonsterIds)]), 320)
+    setTimeout(() => setEnemies((current) => [...current, makeEnemy(deadId, true, allowedMonsterIds, current.map((enemy) => enemy.positionIndex))]), 320)
   }
 
   function completeGesture(target) {
@@ -282,7 +294,11 @@ export default function Game() {
     setEnergy(0)
     setLastJudge('SHADOW BURST!')
     setEnemies((items) => items.filter((enemy) => !defeated.includes(enemy.entityId)).map((enemy) => ({ ...enemy, hp: enemy.hp - 1, bornAt: Date.now() })))
-    setTimeout(() => setEnemies((items) => [...items, ...Array.from({ length: defeated.length }, (_, index) => makeEnemy(index, true, allowedMonsterIds))]), 280)
+    setTimeout(() => setEnemies((items) => {
+      const replacements = []
+      defeated.forEach((_, index) => replacements.push(makeEnemy(index, true, allowedMonsterIds, [...items, ...replacements].map((enemy) => enemy.positionIndex))))
+      return [...items, ...replacements]
+    }), 280)
   }
 
   function togglePause() {
@@ -340,7 +356,7 @@ export default function Game() {
 
       {effects.map((effect) => <div key={effect.id} className={`battle-effect ${effect.type}`} style={{ left: `${effect.x}%`, top: `${effect.y}%` }}>{effect.text}</div>)}
 
-      {countdown > 0 && <div className="battle-countdown"><span>REACTION HUNT</span><strong>{countdown}</strong><p>표시를 보고 탭 · 스와이프 · 더블 탭 · 길게 누르기</p></div>}
+      {countdown > 0 && <div className="battle-countdown"><span>REACTION HUNT</span><strong key={countdown}>{countdown}</strong><p>표시를 보고 탭 · 스와이프 · 더블 탭 · 길게 누르기</p></div>}
       {paused && <div className="battle-pause-overlay"><span className="eyebrow">GAME PAUSED</span><h2>잠시 쉬어갈까요?</h2><button className="btn btn-primary" onClick={togglePause}><Icon name="play" size={18} /> 계속하기</button><button className="btn btn-secondary" onClick={quit}>그만하기</button></div>}
     </section>
 
