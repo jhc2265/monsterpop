@@ -1,6 +1,7 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { useAuth } from './context/AuthContext'
 import Login from './pages/Login'
+import Hero from './pages/Hero'
 import Home from './pages/Home'
 import Game from './pages/Game'
 import Result from './pages/Result'
@@ -17,8 +18,9 @@ function Protected({ children }) {
 
 export default function App() {
   return <div className="app-container"><Routes>
+    <Route path="/" element={<Hero />} />
     <Route path="/login" element={<Login />} />
-    <Route path="/" element={<Protected><Home /></Protected>} />
+    <Route path="/home" element={<Protected><Home /></Protected>} />
     <Route path="/game" element={<Protected><Game /></Protected>} />
     <Route path="/result" element={<Protected><Result /></Protected>} />
     <Route path="/ranking" element={<Protected><Ranking /></Protected>} />

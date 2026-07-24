@@ -197,7 +197,7 @@ export default function Game() {
   function quit() {
     playingRef.current = false
     sound.stopBGM()
-    navigate('/', { replace: true })
+    navigate('/home', { replace: true })
   }
 
   return <main className="battle-page">

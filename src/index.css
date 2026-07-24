@@ -383,3 +383,45 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
   .login-submit { min-height: 50px; }
   .login-switch { margin-top: 8px; }
 }
+
+/* Intro hero */
+.hero-landing { position: relative; isolation: isolate; width: 100%; min-height: 100svh; overflow: hidden; background: #08051f; }
+.hero-world-art { position: absolute; z-index: -3; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center top; filter: saturate(1.05) contrast(1.03); animation: heroReveal 1.2s cubic-bezier(.2,.8,.2,1) both; }
+.hero-world-shade { position: absolute; z-index: -2; inset: 0; background: linear-gradient(180deg, rgba(4,3,23,.08) 0%, transparent 42%, rgba(7,4,28,.3) 57%, rgba(5,3,22,.96) 81%, #050316 100%), radial-gradient(circle at 50% 38%, transparent 26%, rgba(4,2,22,.16) 70%, rgba(3,2,18,.42) 100%); }
+.hero-stars { position: absolute; z-index: -1; inset: 0; pointer-events: none; }
+.hero-stars i { position: absolute; width: 4px; height: 4px; border-radius: 50%; background: #fff; box-shadow: 0 0 10px 3px #a86bff; animation: heroTwinkle 2.6s ease-in-out infinite; }
+.hero-stars i:nth-child(1) { left: 12%; top: 15%; }
+.hero-stars i:nth-child(2) { right: 13%; top: 22%; width: 3px; height: 3px; animation-delay: .6s; }
+.hero-stars i:nth-child(3) { left: 8%; top: 48%; width: 2px; height: 2px; animation-delay: 1.2s; }
+.hero-stars i:nth-child(4) { right: 10%; top: 51%; animation-delay: 1.8s; }
+.hero-landing-content { min-height: 100svh; display: flex; flex-direction: column; align-items: center; padding: max(35px, env(safe-area-inset-top)) 24px calc(28px + env(safe-area-inset-bottom)); text-align: center; }
+.hero-landing-kicker { color: #d7c4ff; font-size: 10px; font-weight: 900; letter-spacing: 2.4px; text-shadow: 0 0 14px rgba(191,107,255,.8); }
+.hero-landing-kicker span { margin: 0 8px; color: #f090ff; }
+.hero-copy-block { width: 100%; margin-top: auto; padding-top: 55vh; animation: heroCopyIn .75s .3s cubic-bezier(.2,.8,.2,1) both; }
+.hero-copy-block h1 { margin: 0; font-family: 'Black Han Sans', 'Noto Sans KR', sans-serif; font-size: clamp(47px, 13vw, 61px); line-height: .88; letter-spacing: -2px; text-shadow: 0 7px 22px rgba(0,0,0,.55); }
+.hero-copy-block h1 span { color: #f34fc3; text-shadow: 0 0 26px rgba(240,76,189,.45), 0 7px 22px rgba(0,0,0,.55); }
+.hero-copy-block p { margin: 15px 0 0; color: #cbc4e2; font-size: 13px; line-height: 1.65; }
+.hero-copy-block p strong { color: #fff; font-weight: 700; }
+.hero-actions { width: 100%; margin-top: 21px; animation: heroCopyIn .75s .45s cubic-bezier(.2,.8,.2,1) both; }
+.hero-start-button { width: 100%; min-height: 67px; display: flex; align-items: center; justify-content: space-between; padding: 7px 10px 7px 24px; border: 1px solid rgba(255,255,255,.3); border-radius: 22px; background: linear-gradient(105deg, #6d3cff 0%, #b13ee9 51%, #f044b7 100%); color: #fff; box-shadow: 0 14px 38px rgba(130,45,240,.42), inset 0 1px rgba(255,255,255,.35), 0 0 0 5px rgba(137,60,239,.12); cursor: pointer; transition: transform .15s ease, filter .15s ease, box-shadow .15s ease; }
+.hero-start-button:hover { filter: brightness(1.1); box-shadow: 0 16px 44px rgba(180,54,237,.5), inset 0 1px rgba(255,255,255,.4), 0 0 0 5px rgba(137,60,239,.16); }
+.hero-start-button:active { transform: scale(.975); }
+.hero-start-button > span { flex: 1; padding-left: 27px; font-size: 18px; font-weight: 900; }
+.hero-start-button b { width: 46px; height: 46px; display: grid; place-items: center; border: 1px solid rgba(255,255,255,.2); border-radius: 15px; background: rgba(255,255,255,.13); font-size: 24px; font-weight: 500; }
+.hero-login-link { margin-top: 16px; padding: 8px 12px; border: 0; background: transparent; color: #aaa2c4; font-size: 12px; cursor: pointer; }
+.hero-login-link strong { margin-left: 3px; color: #ff69cf; }
+.hero-login-link span { margin-left: 5px; color: #ff69cf; font-size: 18px; vertical-align: -1px; }
+@keyframes heroReveal { from { opacity: 0; transform: scale(1.06); } to { opacity: 1; transform: scale(1); } }
+@keyframes heroCopyIn { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes heroTwinkle { 50% { opacity: .25; transform: scale(.55); } }
+
+@media (max-height: 720px) {
+  .hero-landing-content { padding-top: max(24px, env(safe-area-inset-top)); padding-bottom: calc(18px + env(safe-area-inset-bottom)); }
+  .hero-copy-block { padding-top: 47vh; }
+  .hero-copy-block h1 { font-size: 44px; }
+  .hero-copy-block p { margin-top: 10px; line-height: 1.5; }
+  .hero-actions { margin-top: 15px; }
+  .hero-start-button { min-height: 59px; }
+  .hero-start-button b { width: 41px; height: 41px; }
+  .hero-login-link { margin-top: 9px; }
+}

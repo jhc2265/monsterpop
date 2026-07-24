@@ -21,7 +21,7 @@ export default function Ranking() {
   }
   const podium = rows.slice(0, 3); const rest = rows.slice(3)
   return <main className="page ranking-page">
-    <header className="topbar"><button className="icon-btn" onClick={() => navigate('/')} aria-label="뒤로"><Icon name="back" /></button><div className="title-stack"><span className="overline">HALL OF FAME</span><h1>헌터 랭킹</h1></div><span className="topbar-spacer" /></header>
+    <header className="topbar"><button className="icon-btn" onClick={() => navigate('/home')} aria-label="뒤로"><Icon name="back" /></button><div className="title-stack"><span className="overline">HALL OF FAME</span><h1>헌터 랭킹</h1></div><span className="topbar-spacer" /></header>
     <div className="tabs"><button className={tab === 'all' ? 'active' : ''} onClick={() => setTab('all')}>전체 랭킹</button><button className={tab === 'today' ? 'active' : ''} onClick={() => setTab('today')}>오늘의 랭킹</button></div>
     {loading ? <div className="empty-state"><span className="loader" />랭킹을 집계하는 중...</div> : rows.length === 0 ? <Empty /> : <>
       <section className="podium">{[podium[1], podium[0], podium[2]].map((row, index) => row && <Podium key={row.user_id} row={row} rank={[2,1,3][index]} me={row.user_id === user.id} />)}</section>

@@ -16,7 +16,7 @@ export default function Login() {
   const { user } = useAuth()
   const navigate = useNavigate()
 
-  useEffect(() => { if (user) navigate('/', { replace: true }) }, [user, navigate])
+  useEffect(() => { if (user) navigate('/home', { replace: true }) }, [user, navigate])
 
   function switchMode(next) {
     setMode(next)
@@ -44,7 +44,7 @@ export default function Login() {
           options: { data: { nickname: nickname.trim() } },
         })
         if (signUpError) throw signUpError
-        if (data.session) navigate('/', { replace: true })
+        if (data.session) navigate('/home', { replace: true })
         else {
           setInfo('가입이 완료되었습니다. 이메일 인증 후 로그인해 주세요.')
           setMode('login')
@@ -52,7 +52,7 @@ export default function Login() {
       } else {
         const { error: loginError } = await supabase.auth.signInWithPassword({ email, password })
         if (loginError) throw loginError
-        navigate('/', { replace: true })
+        navigate('/home', { replace: true })
       }
     } catch (err) {
       setError(translate(err.message))
