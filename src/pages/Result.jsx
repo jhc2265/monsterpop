@@ -10,6 +10,7 @@ import { MONSTERS } from '../lib/monsters'
 export default function Result() {
   const { user, refreshProfile } = useAuth(); const navigate = useNavigate(); const location = useLocation(); const { score = 0, maxCombo = 0, monsterCounts = {} } = location.state || {}
   const [saving, setSaving] = useState(true); const [isBest, setIsBest] = useState(false); const [rank, setRank] = useState(null); const [saveError, setSaveError] = useState(''); const [xpGain, setXpGain] = useState(0); const [xpProgress, setXpProgress] = useState(null); const [newDiscoveries, setNewDiscoveries] = useState([]); const [levelUp, setLevelUp] = useState(null); const savedRef = useRef(false)
+  const [resultStep, setResultStep] = useState(1)
   useEffect(() => { if (!location.state) { navigate('/home', { replace: true }); return } if (!savedRef.current) { savedRef.current = true; saveAndRank() } }, [])
   async function saveAndRank() {
     try {
@@ -56,18 +57,24 @@ export default function Result() {
   const totalKills = Object.values(monsterCounts).reduce((sum, count) => sum + count, 0)
   const representative = getRepresentativeMonster(monsterCounts)
   const scoreGrade = getScoreGrade(score)
-  return <main className="page result-page">
+  return <main className={`page result-page result-step-${resultStep}`}>
     <div className="result-burst" aria-hidden="true"><span /><span /><span /></div>
-    <section className="result-header"><span className="eyebrow"><Icon name="spark" size={14} /> HUNT COMPLETE</span><h1>{isBest ? '새로운 최고 기록!' : '사냥 완료!'}</h1><p>{isBest ? '기록을 경신했어요. 멋진 사냥이었어요!' : '훌륭한 사냥이었어요, 헌터.'}</p></section>
-    <section className="result-card result-card-v2">
+    <section className={`result-header ${resultStep === 2 ? 'result-header-compact' : ''}`}><span className="eyebrow"><Icon name="spark" size={14} /> {resultStep === 1 ? 'HUNT COMPLETE' : 'REWARD COMPLETE'}</span><h1>{resultStep === 1 ? (isBest ? '새로운 최고 기록!' : '사냥 완료!') : '보상을 확인하세요!'}</h1>{resultStep === 1 && <p>{isBest ? '기록을 경신했어요. 멋진 사냥이었어요!' : '훌륭한 사냥이었어요, 헌터.'}</p>}</section>
+    {resultStep === 1 ? <section className="result-card result-card-v2">
       <div className="result-achievements">{isBest && <span className="achievement best"><Icon name="spark" size={13} /> NEW BEST</span>}{rank === 1 && <span className="achievement crown"><Icon name="crown" size={14} /> 랭킹 1위</span>}{newDiscoveries.length > 0 && <span className="achievement discovery">NEW MONSTER</span>}</div>
       <div className="result-monster-stage"><img src={representative.image} alt={representative.name} /><strong>{representative.id === 'boss' ? '그림자 대왕 격파!' : `${representative.name} ${monsterCounts[representative.id] || 0}마리 처치!`}</strong></div>
       <div className="score-panel"><div><small>FINAL SCORE</small><strong className="result-score">{score.toLocaleString()}</strong></div><div className={`score-grade grade-${scoreGrade.toLowerCase()}`}><span>{scoreGrade}</span><small>RANK</small></div></div>
       <div className="result-summary"><div><span>최고 콤보</span><strong>{maxCombo}</strong></div><i /><div><span>처치 몬스터</span><strong>{totalKills}마리</strong></div><i /><div><span>현재 순위</span><strong>{saving ? '...' : rank ? `${rank}위` : '-'}</strong></div></div>
+    </section> : <section className="result-reward-card">
+      <div className="reward-orb"><Icon name="spark" size={26} /><span>HUNT XP</span><strong>+{xpGain}</strong></div>
       <div className="xp-progress-card"><div className="xp-progress-head"><span>획득 경험치</span><strong>{saving ? '집계 중' : `+${xpGain} XP`}</strong></div>{xpProgress && <><div className="xp-progress-line"><b>LV.{xpProgress.level}</b><span><i style={{ width: `${xpProgress.percent}%` }} /></span><small>{xpProgress.level >= 10 ? 'MAX' : `${xpProgress.current} / ${xpProgress.needed} XP`}</small></div><p>{xpProgress.level >= 10 ? '최고 레벨을 달성했어요!' : `다음 레벨까지 ${(xpProgress.needed - xpProgress.current).toLocaleString()} XP`}</p></>}</div>
-    </section>
+      {newDiscoveries.length > 0 && <div className="reward-discovery"><span>NEW</span><strong>새로운 몬스터가 도감에 등록됐어요!</strong></div>}
+    </section>}
     {saving && <p className="status-copy"><span className="loader small" /> 기록을 저장하는 중...</p>}{saveError && <div className="notice notice-error">{saveError}</div>}
-    <div className="action-stack"><button className="btn btn-primary" onClick={() => go('/game', { replace: true })}><img src="/images/ui/hunt-swords.png" alt="" /> 다시 사냥하기</button><button className="btn btn-secondary" onClick={() => go('/ranking')}><Icon name="trophy" size={19} /> 랭킹 보기</button><button className="text-button" onClick={() => go('/home')}><Icon name="home" size={17} /> 홈으로</button></div>
+    {resultStep === 1 ? <div className="result-next-wrap">
+      <button className="btn btn-primary result-next-button" onClick={() => { sound.button(); setResultStep(2); window.scrollTo({ top: 0, behavior: 'smooth' }) }}>다음으로 <span aria-hidden="true">→</span></button>
+      <div className="result-step-dots" aria-label="결과 2단계 중 1단계"><b /><i /></div>
+    </div> : <div className="action-stack result-reward-actions"><button className="btn btn-primary" onClick={() => go('/game', { replace: true })}><img src="/images/ui/hunt-swords.png" alt="" /> 다시 사냥하기</button><button className="btn btn-secondary" onClick={() => go('/ranking')}><Icon name="trophy" size={19} /> 랭킹 보기</button><button className="text-button" onClick={() => go('/home')}><Icon name="home" size={17} /> 홈으로</button><button className="result-back-button" onClick={() => { sound.button(); setResultStep(1); window.scrollTo({ top: 0, behavior: 'smooth' }) }}>← 결과 다시 보기</button><div className="result-step-dots" aria-label="결과 2단계 중 2단계"><i /><b /></div></div>}
     {levelUp && <LevelUpModal levelUp={levelUp} onClose={() => setLevelUp(null)} onCollection={() => go('/collection')} />}
   </main>
 }
