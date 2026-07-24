@@ -1146,3 +1146,46 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
 .home-record-grid strong { margin-top: 1px; font-size: 18px; }
 .home-record-grid em { overflow: hidden; margin-top: 2px; color: #77708d; font-size: 8px; font-style: normal; text-overflow: ellipsis; white-space: nowrap; }
 .home-record-grid em b { color: #f26abc; }
+
+/* Mobile legibility and control sizing */
+.page small { font-size: 12px; }
+.home-welcome p { font-size: 13px; }
+.boss-label { font-size: 12px; }
+.boss-card .hero-copy p { font-size: 14px; line-height: 1.55; }
+.hunter-progress-head > div small,
+.hunter-progress-head > b,
+.progress-mission small,
+.progress-mission > b,
+.progress-next,
+.home-record-title button,
+.home-record-grid small,
+.home-record-grid em { font-size: 12px; }
+.home-record-grid .stat-icon { width: 32px; height: 32px; }
+.home-record-grid .art-tile img,
+.home-record-grid article:first-child .art-tile img { width: 108%; height: 108%; }
+.home-record-grid article { gap: 8px; }
+.boss-start { min-height: 50px; gap: 9px; padding: 7px 15px 7px 9px; border-radius: 15px; }
+.boss-start img { width: 34px; height: 34px; }
+.boss-start span { font-size: 15px; }
+.boss-start b { margin-left: 4px; font-size: 22px; }
+.bottom-nav { min-height: 78px; padding-top: 9px; }
+.bottom-nav button { height: 58px; }
+.bottom-nav button.primary { height: 70px; margin-top: -25px; }
+.bottom-nav button.primary > span {
+  width: 60px;
+  height: 60px;
+  min-width: 60px;
+  min-height: 60px;
+  aspect-ratio: 1 / 1;
+  flex: 0 0 60px;
+  border-width: 3px;
+  border-radius: 999px;
+}
+.bottom-nav button.primary > span img { width: 40px; height: 40px; }
+.bottom-nav button small { font-size: 12px; line-height: 1.2; }
+.timing-status small,
+.timing-status span,
+.skill-meter small,
+.battle-controls .burst-button small { font-size: 11px; }
+.action-cue { min-width: 34px; height: 22px; font-size: 11px; }
+.gesture-legend span { font-size: 10px; }
