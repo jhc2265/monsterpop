@@ -1227,3 +1227,13 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
 .bottom-nav button.primary:not(.active) > span { border-color: rgba(213,190,255,.34); background: linear-gradient(145deg, #3d266d, #792a82); box-shadow: 0 7px 17px rgba(68,28,112,.35), inset 0 1px rgba(255,255,255,.16); }
 .bottom-nav button.primary:not(.active) > span img { opacity: .7; filter: grayscale(.2) saturate(.68) brightness(.9) drop-shadow(0 2px 3px rgba(34,10,67,.4)); }
 .bottom-nav button.primary:not(.active) small { color: #89819d; }
+.progress-mission { min-height: 67px; margin-top: 13px; padding-top: 13px; }
+.progress-mission > span { width: 36px; height: 36px; }
+.progress-mission em { display: block; overflow: hidden; margin-top: 3px; color: #817a98; font-size: 11px; font-style: normal; text-overflow: ellipsis; white-space: nowrap; }
+.progress-mission.locked { opacity: .76; }
+.progress-mission.locked > span { background: rgba(255,255,255,.05); color: #837b98; }
+.progress-mission.locked > b { background: rgba(255,255,255,.05); color: #948ca7; }
+.home-record-grid { min-height: 68px; }
+.home-record-grid .stat-icon { width: 30px; height: 30px; flex: 0 0 30px; }
+.home-record-grid .art-tile img,
+.home-record-grid article:first-child .art-tile img { width: 104%; height: 104%; }

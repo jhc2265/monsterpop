@@ -5,8 +5,7 @@ import { useAuth } from '../context/AuthContext'
 import { sound } from '../lib/sound'
 import Icon from '../components/Icon'
 import BottomNav from '../components/BottomNav'
-import { getLevelProgress, LEVEL_UNLOCKS, resolveProgress } from '../lib/progression'
-import { MONSTERS } from '../lib/monsters'
+import { getLevelProgress, resolveProgress } from '../lib/progression'
 
 export default function Home() {
   const { user, profile } = useAuth()
@@ -52,8 +51,6 @@ export default function Home() {
 
   const missionDone = best > 0
   const progress = getLevelProgress(resolveProgress(profile, user.id).xp)
-  const nextUnlock = LEVEL_UNLOCKS[Math.min(10, progress.level + 1)]
-  const nextMonster = MONSTERS.find((monster) => nextUnlock?.monsters?.includes(monster.id))
   const featured = progress.level >= 5
     ? { label: 'TODAY’S BOSS', name: '그림자 대왕 출현!', copy: '강력한 그림자 대왕을 사냥하고 최고 기록에 도전하세요.', image: '/images/boss.png', grade: '보스 몬스터', score: '500점', difficulty: '★★★' }
     : progress.level >= 3
@@ -75,8 +72,7 @@ export default function Home() {
     <section className="hunter-progress" aria-label="헌터 레벨">
       <div className="hunter-progress-head"><span>LV.{progress.level}</span><div><strong>{profile?.nickname || '헌터'} · {progress.level >= 10 ? '마스터 헌터' : '성장 중인 헌터'}</strong></div><b>{progress.level >= 10 ? `${progress.total.toLocaleString()} XP` : `${progress.current.toLocaleString()} / ${progress.needed.toLocaleString()} XP`}</b></div>
       <div className="hunter-xp-bar"><i style={{ width: `${progress.percent}%` }} /></div>
-      {progress.level < 10 && <div className="next-unlock"><span>{nextMonster ? <img src={nextMonster.image} alt="" /> : <Icon name="spark" size={18} />}</span><div><small>다음 해금</small><strong>{nextUnlock?.title}</strong></div><b>LV.{progress.level + 1}</b></div>}
-      {progress.level >= 2 ? <div className={`progress-mission ${missionDone ? 'complete' : ''}`}><span><Icon name={missionDone ? 'check' : 'spark'} size={16} /></span><div><small>오늘의 미션</small><strong>오늘 사냥 1회 완료</strong></div><b>{missionDone ? '완료' : '+40 XP · ★ 200'}</b></div> : <div className="progress-next"><Icon name="lock" size={14} /><span>Lv.2 달성 시 오늘의 미션과 보상이 열려요</span></div>}
+      {progress.level >= 2 ? <div className={`progress-mission ${missionDone ? 'complete' : ''}`}><span><Icon name={missionDone ? 'check' : 'spark'} size={18} /></span><div><small>오늘의 미션</small><strong>오늘 사냥 1회 완료</strong><em>{missionDone ? '내일 새로운 미션이 열려요' : '사냥을 완료하고 성장 보상을 받으세요'}</em></div><b>{missionDone ? '완료' : '+40 XP · ★ 200'}</b></div> : <div className="progress-mission locked"><span><Icon name="lock" size={17} /></span><div><small>오늘의 미션</small><strong>일일 미션 준비 중</strong><em>Lv.2부터 매일 새로운 성장 목표가 열려요</em></div><b>LV.2</b></div>}
     </section>
 
     <section className="hero-card boss-card">
@@ -97,7 +93,7 @@ export default function Home() {
 
     <section className="home-record" aria-label="나의 기록">
       <div className="home-record-title"><span>내 기록</span><button onClick={() => go('/ranking')}>랭킹 보기 ›</button></div>
-      <div className="record-list"><div><span>최고 점수</span><strong>{best.toLocaleString()}</strong><small>{delta === null ? '첫 기록에 도전' : <>이전 기록 대비 <b>{delta >= 0 ? '▲' : '▼'} {Math.abs(delta)}%</b></>}</small></div><div><span>현재 순위</span><strong>{rank ? `${rank}위` : '도전 전'}</strong><small>{rank ? `전체 ${totalPlayers.toLocaleString()}명` : '기록을 세워보세요'}</small></div></div>
+      <div className="home-record-grid"><article><span className="stat-icon purple art-tile"><img src="/images/ui/trophy.png" alt="" /></span><div><small>최고 점수</small><strong>{best.toLocaleString()}</strong><em>{delta === null ? '첫 기록에 도전' : <>이전 기록 대비 <b>{delta >= 0 ? '▲' : '▼'} {Math.abs(delta)}%</b></>}</em></div></article><i /><article><span className="stat-icon pink art-tile"><img src="/images/ui/crown.png" alt="" /></span><div><small>현재 순위</small><strong>{rank ? `${rank}위` : '도전 전'}</strong><em>{rank ? `전체 ${totalPlayers.toLocaleString()}명` : '기록을 세워보세요'}</em></div></article></div>
     </section>
     <BottomNav />
   </main>
