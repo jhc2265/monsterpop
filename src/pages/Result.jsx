@@ -4,12 +4,12 @@ import { supabase } from '../lib/supabase'
 import { useAuth } from '../context/AuthContext'
 import { sound } from '../lib/sound'
 import Icon from '../components/Icon'
-import { getLevel, LEVEL_UNLOCKS, resolveProgress, saveStoredProgress } from '../lib/progression'
+import { getLevel, getLevelProgress, LEVEL_UNLOCKS, resolveProgress, saveStoredProgress } from '../lib/progression'
 import { MONSTERS } from '../lib/monsters'
 
 export default function Result() {
   const { user, refreshProfile } = useAuth(); const navigate = useNavigate(); const location = useLocation(); const { score = 0, maxCombo = 0, monsterCounts = {} } = location.state || {}
-  const [saving, setSaving] = useState(true); const [isBest, setIsBest] = useState(false); const [rank, setRank] = useState(null); const [saveError, setSaveError] = useState(''); const [xpGain, setXpGain] = useState(0); const [levelUp, setLevelUp] = useState(null); const savedRef = useRef(false)
+  const [saving, setSaving] = useState(true); const [isBest, setIsBest] = useState(false); const [rank, setRank] = useState(null); const [saveError, setSaveError] = useState(''); const [xpGain, setXpGain] = useState(0); const [xpProgress, setXpProgress] = useState(null); const [newDiscoveries, setNewDiscoveries] = useState([]); const [levelUp, setLevelUp] = useState(null); const savedRef = useRef(false)
   useEffect(() => { if (!location.state) { navigate('/home', { replace: true }); return } if (!savedRef.current) { savedRef.current = true; saveAndRank() } }, [])
   async function saveAndRank() {
     try {
@@ -36,6 +36,8 @@ export default function Result() {
       xp: previous.xp + gained,
       discovered: [...new Set([...previous.discovered, ...Object.keys(monsterCounts).filter((id) => monsterCounts[id] > 0)])],
     }
+    setXpProgress(getLevelProgress(next.xp))
+    setNewDiscoveries(next.discovered.filter((id) => !previous.discovered.includes(id)))
     saveStoredProgress(user.id, next)
     const oldLevel = getLevel(previous.xp)
     const newLevel = getLevel(next.xp)
@@ -51,14 +53,37 @@ export default function Result() {
     }
   }
   function go(path, options) { sound.button(); navigate(path, options) }
+  const totalKills = Object.values(monsterCounts).reduce((sum, count) => sum + count, 0)
+  const representative = getRepresentativeMonster(monsterCounts)
+  const scoreGrade = getScoreGrade(score)
   return <main className="page result-page">
     <div className="result-burst" aria-hidden="true"><span /><span /><span /></div>
-    <section className="result-header"><span className="eyebrow"><Icon name="spark" size={14} /> HUNT COMPLETE</span><h1>{isBest ? '새로운 최고 기록!' : '사냥 완료!'}</h1><p>훌륭한 사냥이었어요, 헌터.</p></section>
-    <section className="result-card"><div className="result-monster-wrap"><img src="/images/fox.png" alt="불꽃 여우" /></div><small>FINAL SCORE</small><strong className="result-score">{score.toLocaleString()}</strong>{isBest && <span className="best-badge">NEW BEST</span>}<div className="result-stats"><div><span>최고 콤보</span><strong>{maxCombo}</strong></div><i /><div><span>전체 순위</span><strong>{saving ? '...' : rank ? `${rank}위` : '-'}</strong></div></div><div className="xp-earned"><span>획득 경험치</span><strong>{saving ? '집계 중' : `+${xpGain} XP`}</strong></div></section>
+    <section className="result-header"><span className="eyebrow"><Icon name="spark" size={14} /> HUNT COMPLETE</span><h1>{isBest ? '새로운 최고 기록!' : '사냥 완료!'}</h1><p>{isBest ? '기록을 경신했어요. 멋진 사냥이었어요!' : '훌륭한 사냥이었어요, 헌터.'}</p></section>
+    <section className="result-card result-card-v2">
+      <div className="result-achievements">{isBest && <span className="achievement best"><Icon name="spark" size={13} /> NEW BEST</span>}{rank === 1 && <span className="achievement crown"><Icon name="crown" size={14} /> 랭킹 1위</span>}{newDiscoveries.length > 0 && <span className="achievement discovery">NEW MONSTER</span>}</div>
+      <div className="result-monster-stage"><img src={representative.image} alt={representative.name} /><strong>{representative.id === 'boss' ? '그림자 대왕 격파!' : `${representative.name} ${monsterCounts[representative.id] || 0}마리 처치!`}</strong></div>
+      <div className="score-panel"><div><small>FINAL SCORE</small><strong className="result-score">{score.toLocaleString()}</strong></div><div className={`score-grade grade-${scoreGrade.toLowerCase()}`}><span>{scoreGrade}</span><small>RANK</small></div></div>
+      <div className="result-summary"><div><span>최고 콤보</span><strong>{maxCombo}</strong></div><i /><div><span>처치 몬스터</span><strong>{totalKills}마리</strong></div><i /><div><span>현재 순위</span><strong>{saving ? '...' : rank ? `${rank}위` : '-'}</strong></div></div>
+      <div className="xp-progress-card"><div className="xp-progress-head"><span>획득 경험치</span><strong>{saving ? '집계 중' : `+${xpGain} XP`}</strong></div>{xpProgress && <><div className="xp-progress-line"><b>LV.{xpProgress.level}</b><span><i style={{ width: `${xpProgress.percent}%` }} /></span><small>{xpProgress.level >= 10 ? 'MAX' : `${xpProgress.current} / ${xpProgress.needed} XP`}</small></div><p>{xpProgress.level >= 10 ? '최고 레벨을 달성했어요!' : `다음 레벨까지 ${(xpProgress.needed - xpProgress.current).toLocaleString()} XP`}</p></>}</div>
+    </section>
     {saving && <p className="status-copy"><span className="loader small" /> 기록을 저장하는 중...</p>}{saveError && <div className="notice notice-error">{saveError}</div>}
-    <div className="action-stack"><button className="btn btn-primary" onClick={() => go('/game', { replace: true })}><Icon name="refresh" size={19} /> 다시 도전하기</button><button className="btn btn-secondary" onClick={() => go('/ranking')}><Icon name="trophy" size={19} /> 랭킹 확인하기</button><button className="text-button" onClick={() => go('/')}><Icon name="home" size={17} /> 홈으로 돌아가기</button></div>
+    <div className="action-stack"><button className="btn btn-primary" onClick={() => go('/game', { replace: true })}><img src="/images/ui/hunt-swords.png" alt="" /> 다시 사냥하기</button><button className="btn btn-secondary" onClick={() => go('/ranking')}><Icon name="trophy" size={19} /> 랭킹 보기</button><button className="text-button" onClick={() => go('/home')}><Icon name="home" size={17} /> 홈으로</button></div>
     {levelUp && <LevelUpModal levelUp={levelUp} onClose={() => setLevelUp(null)} onCollection={() => go('/collection')} />}
   </main>
+}
+
+function getRepresentativeMonster(counts) {
+  if (!Object.values(counts).some((count) => count > 0)) return MONSTERS[0]
+  if ((counts.boss || 0) > 0) return MONSTERS.find((monster) => monster.id === 'boss')
+  return [...MONSTERS].sort((a, b) => (counts[b.id] || 0) - (counts[a.id] || 0) || b.score - a.score)[0]
+}
+
+function getScoreGrade(score) {
+  if (score >= 18000) return 'SS'
+  if (score >= 12000) return 'S'
+  if (score >= 7000) return 'A'
+  if (score >= 3000) return 'B'
+  return 'C'
 }
 
 function LevelUpModal({ levelUp, onClose, onCollection }) {
