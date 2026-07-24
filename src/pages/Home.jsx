@@ -93,7 +93,7 @@ export default function Home() {
     </section>
 
     <button className="hunt-button hunt-button-v2" onClick={() => go('/game')}>
-      <span className="hunt-icon art-tile"><img src="/images/ui/play.png" alt="" /></span>
+      <span className="hunt-icon art-tile"><img src="/images/ui/hunt-swords.png" alt="" /></span>
       <span><strong>지금 사냥 시작하기</strong><small>30초 동안 최고 기록에 도전</small></span>
       <span className="hunt-arrow">›</span>
     </button>

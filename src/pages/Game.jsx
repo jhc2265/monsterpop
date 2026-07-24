@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { pickRandomMonster } from '../lib/monsters'
 import MonsterImage from '../components/MonsterImage'
@@ -7,6 +7,7 @@ import { sound } from '../lib/sound'
 
 const GAME_TIME = 30
 const MAX_ENEMIES = 9
+const SKILL_MAX = 6
 const POSITIONS = [
   { x: 16, y: 22 }, { x: 40, y: 18 }, { x: 66, y: 21 }, { x: 86, y: 29 },
   { x: 25, y: 39 }, { x: 53, y: 36 }, { x: 76, y: 47 },
@@ -14,6 +15,7 @@ const POSITIONS = [
   { x: 29, y: 70 },
 ]
 const HP = { 일반: 1, 희귀: 1, 영웅: 2, 보스: 3 }
+const TIMING_DURATION = { 일반: 1900, 희귀: 1200, 영웅: 1450, 보스: 1650 }
 let entityId = 0
 let effectId = 0
 
@@ -27,18 +29,11 @@ function makeEnemy(index = 0, randomize = false) {
     entityId: ++entityId,
     hp: maxHp,
     maxHp,
+    bornAt: Date.now(),
+    timingDuration: TIMING_DURATION[monster.grade] || 1700,
     x: position.x + (Math.random() * 5 - 2.5),
     y: position.y + (Math.random() * 4 - 2),
   }
-}
-
-function pickAutoTarget(enemies) {
-  if (!enemies.length) return null
-  return [...enemies].sort((a, b) => {
-    const aPriority = (a.grade === '보스' ? 1000 : a.grade === '영웅' ? 300 : 0) + a.y
-    const bPriority = (b.grade === '보스' ? 1000 : b.grade === '영웅' ? 300 : 0) + b.y
-    return bPriority - aPriority
-  })[0]
 }
 
 export default function Game() {
@@ -52,26 +47,20 @@ export default function Game() {
   const [coins, setCoins] = useState(0)
   const [energy, setEnergy] = useState(0)
   const [enemies, setEnemies] = useState([])
-  const [selectedId, setSelectedId] = useState(null)
   const [effects, setEffects] = useState([])
-  const [attacking, setAttacking] = useState(false)
+  const [lastJudge, setLastJudge] = useState('몬스터를 타이밍에 맞춰 터치하세요')
 
   const scoreRef = useRef(0)
   const comboRef = useRef(0)
   const maxComboRef = useRef(0)
   const monsterCountsRef = useRef({})
+  const energyRef = useRef(0)
   const playingRef = useRef(false)
   const pausedRef = useRef(false)
-
-  const selected = useMemo(
-    () => enemies.find((enemy) => enemy.entityId === selectedId) || null,
-    [enemies, selectedId],
-  )
 
   const fillArena = useCallback(() => {
     const next = Array.from({ length: MAX_ENEMIES }, (_, index) => makeEnemy(index))
     setEnemies(next)
-    setSelectedId(pickAutoTarget(next)?.entityId || null)
   }, [])
 
   useEffect(() => {
@@ -106,6 +95,19 @@ export default function Game() {
 
   useEffect(() => () => sound.stopBGM(), [])
 
+  useEffect(() => {
+    if (!playing) return
+    const teleporter = setInterval(() => {
+      if (pausedRef.current) return
+      setEnemies((items) => items.map((enemy) => {
+        if (enemy.id !== 'rabbit' || Math.random() > .55) return enemy
+        const position = POSITIONS[Math.floor(Math.random() * POSITIONS.length)]
+        return { ...enemy, x: position.x, y: position.y, bornAt: Date.now() }
+      }))
+    }, 900)
+    return () => clearInterval(teleporter)
+  }, [playing])
+
   function addEffect(x, y, text, type = 'hit') {
     const id = ++effectId
     setEffects((items) => [...items, { id, x, y, text, type }])
@@ -124,68 +126,83 @@ export default function Game() {
   }
 
   function replaceEnemy(deadId) {
-    const survivors = enemies.filter((enemy) => enemy.entityId !== deadId)
-    setEnemies(survivors)
-    setSelectedId(pickAutoTarget(survivors)?.entityId || null)
+    setEnemies((items) => items.filter((enemy) => enemy.entityId !== deadId))
     setTimeout(() => setEnemies((current) => [...current, makeEnemy(deadId, true)]), 320)
   }
 
+  function judgeTiming(target) {
+    const phase = ((Date.now() - target.bornAt) % target.timingDuration) / target.timingDuration
+    const distance = Math.abs(phase - .56)
+    if (distance <= .065) return { label: 'PERFECT', multiplier: 1.5, combo: 2, energy: 2, type: 'perfect' }
+    if (distance <= .14) return { label: 'GREAT', multiplier: 1.2, combo: 1, energy: 1, type: 'great' }
+    if (distance <= .26) return { label: 'GOOD', multiplier: 1, combo: 0, energy: 0, type: 'good' }
+    return { label: 'MISS', multiplier: 0, combo: -3, energy: 0, type: 'miss' }
+  }
+
   function attackEnemy(target) {
-    if (!playing || paused || !target || attacking) return
-    setAttacking(true)
-    setTimeout(() => setAttacking(false), 120)
-
-    setSelectedId(target.entityId)
-    const damage = target.grade === '보스' ? 1 : target.grade === '영웅' ? 1 : target.maxHp
-    const remaining = target.hp - damage
-    const nextEnergy = Math.min(8, energy + 1)
-    setEnergy(nextEnergy)
-    sound.hit(comboRef.current)
-    addEffect(target.x, target.y, remaining <= 0 ? 'PERFECT!' : 'HIT!', remaining <= 0 ? 'perfect' : 'hit')
-
-    if (remaining > 0) {
-      setEnemies((items) => items.map((enemy) => enemy.entityId === target.entityId ? { ...enemy, hp: remaining } : enemy))
+    if (!playing || paused || !target) return
+    const judgment = judgeTiming(target)
+    setLastJudge(judgment.label)
+    if (judgment.type === 'miss') {
+      comboRef.current = Math.max(0, comboRef.current - 3)
+      setCombo(comboRef.current)
+      sound.miss()
+      addEffect(target.x, target.y, 'MISS', 'miss')
+      setEnemies((items) => items.map((enemy) => enemy.entityId === target.entityId ? { ...enemy, bornAt: Date.now() } : enemy))
       return
     }
 
-    const nextCombo = comboRef.current + 1
+    const damage = 1
+    const remaining = target.hp - damage
+    const nextCombo = Math.max(0, comboRef.current + judgment.combo)
     comboRef.current = nextCombo
     maxComboRef.current = Math.max(maxComboRef.current, nextCombo)
-    const gained = Math.round(target.score * (1 + Math.min(nextCombo, 30) * 0.1))
+    const killed = remaining <= 0
+    const nextEnergy = Math.min(SKILL_MAX, energyRef.current + judgment.energy + (killed ? 1 : 0))
+    energyRef.current = nextEnergy
+    setEnergy(nextEnergy)
+    sound.hit(comboRef.current)
+    addEffect(target.x, target.y, judgment.label, judgment.type)
+
+    const gained = Math.round((target.score / target.maxHp) * judgment.multiplier * (1 + Math.min(nextCombo, 30) * .08))
     scoreRef.current += gained
     setScore(scoreRef.current)
     setCombo(nextCombo)
-    setCoins((value) => value + Math.max(1, Math.round(target.score / 100)))
+    setCoins((value) => value + Math.max(1, Math.round(gained / 100)))
     addEffect(target.x, target.y + 7, `+${gained}`, target.grade === '보스' ? 'boss' : 'score')
-    if (nextCombo % 5 === 0) sound.combo()
+    if (nextCombo > 0 && nextCombo % 5 === 0) sound.combo()
+
+    if (remaining > 0) {
+      setEnemies((items) => items.map((enemy) => enemy.entityId === target.entityId ? { ...enemy, hp: remaining, bornAt: Date.now() } : enemy))
+      return
+    }
+
     if (target.grade === '영웅' || target.grade === '보스') sound.rare()
     monsterCountsRef.current[target.id] = (monsterCountsRef.current[target.id] || 0) + 1
     replaceEnemy(target.entityId)
   }
 
-  function attack() {
-    attackEnemy(selected || pickAutoTarget(enemies))
-  }
-
   function useBurst() {
-    if (!playing || paused || energy < 8) return
+    if (!playing || paused || energyRef.current < SKILL_MAX) return
     sound.combo()
     let bonus = 0
+    const defeated = []
     enemies.forEach((enemy) => {
-      bonus += enemy.score
-      monsterCountsRef.current[enemy.id] = (monsterCountsRef.current[enemy.id] || 0) + 1
       addEffect(enemy.x, enemy.y, 'BURST!', 'burst')
+      if (enemy.grade === '일반' || enemy.grade === '희귀' || enemy.hp <= 1) {
+        bonus += enemy.score
+        defeated.push(enemy.entityId)
+        monsterCountsRef.current[enemy.id] = (monsterCountsRef.current[enemy.id] || 0) + 1
+      }
     })
     scoreRef.current += bonus
-    comboRef.current += enemies.length
-    maxComboRef.current = Math.max(maxComboRef.current, comboRef.current)
     setScore(scoreRef.current)
-    setCombo(comboRef.current)
-    setCoins((value) => value + enemies.length)
+    setCoins((value) => value + defeated.length)
+    energyRef.current = 0
     setEnergy(0)
-    setEnemies([])
-    setSelectedId(null)
-    setTimeout(fillArena, 180)
+    setLastJudge('SHADOW BURST!')
+    setEnemies((items) => items.filter((enemy) => !defeated.includes(enemy.entityId)).map((enemy) => ({ ...enemy, hp: enemy.hp - 1, bornAt: Date.now() })))
+    setTimeout(() => setEnemies((items) => [...items, ...Array.from({ length: defeated.length }, (_, index) => makeEnemy(index, true))]), 280)
   }
 
   function togglePause() {
@@ -194,7 +211,10 @@ export default function Game() {
     setPaused(next)
     sound.button()
     if (next) sound.stopBGM()
-    else sound.startBGM()
+    else {
+      setEnemies((items) => items.map((enemy) => ({ ...enemy, bornAt: Date.now() })))
+      sound.startBGM()
+    }
   }
 
   function quit() {
@@ -215,18 +235,18 @@ export default function Game() {
 
     <div className="battle-timebar"><span style={{ width: `${(timeLeft / GAME_TIME) * 100}%` }} /></div>
 
-    <section className={`battle-arena ${energy >= 8 ? 'burst-ready' : ''}`}>
+    <section className={`battle-arena ${energy >= SKILL_MAX ? 'burst-ready' : ''}`}>
       <img className="battle-background" src="/images/battle-arena.png" alt="" />
       <div className="battle-vignette" />
+      <div className="timing-legend"><span>GOOD</span><span>GREAT</span><b>PERFECT</b></div>
 
       {enemies.map((enemy) => {
-        const isSelected = selected?.entityId === enemy.entityId
         return <button
           key={enemy.entityId}
-          className={`battle-enemy ${isSelected ? 'selected' : ''} grade-${enemy.grade}`}
-          style={{ left: `${enemy.x}%`, top: `${enemy.y}%`, '--enemy-color': enemy.color }}
+          className={`battle-enemy grade-${enemy.grade}`}
+          style={{ left: `${enemy.x}%`, top: `${enemy.y}%`, '--enemy-color': enemy.color, '--timing-duration': `${enemy.timingDuration}ms` }}
           onClick={(event) => { event.stopPropagation(); attackEnemy(enemy) }}
-          aria-label={`${enemy.name} 바로 공격`}
+          aria-label={`${enemy.name} 타이밍 공격`}
         >
           <span className="target-ring" />
           <MonsterImage monster={enemy} />
@@ -241,13 +261,11 @@ export default function Game() {
     </section>
 
     <section className="battle-controls">
-      <div className="auto-target-badge"><i /><span><small>AUTO TARGET</small><strong>{selected?.name || '탐색 중'}</strong></span></div>
-      <button className={`attack-button ${attacking ? 'attacking' : ''}`} onClick={attack} disabled={!playing || paused || !selected} aria-label="자동 타깃 공격">
-        <span className="attack-rings" /><span className="attack-shine" /><Icon name="sword" size={34} strokeWidth={2.25} /><strong>ATTACK</strong>
+      <div className="timing-status"><small>TIMING ATTACK</small><strong>{lastJudge}</strong><span>몬스터의 링이 겹칠 때 직접 터치!</span></div>
+      <button className={`burst-button ${energy >= SKILL_MAX ? 'ready' : ''}`} onClick={useBurst} disabled={energy < SKILL_MAX} aria-label="섀도우 버스트">
+        <img src="/images/ui/hunt-swords.png" alt="" /><small>{energy >= SKILL_MAX ? 'BURST!' : `${energy} / ${SKILL_MAX}`}</small>
       </button>
-      <button className={`burst-button ${energy >= 8 ? 'ready' : ''}`} onClick={useBurst} disabled={energy < 8} aria-label="버스트 스킬">
-        <span><Icon name="spark" size={22} /></span><b>{energy >= 8 ? '!' : energy}</b><small>SKILL</small>
-      </button>
+      <div className="skill-meter"><span><i style={{ width: `${(energy / SKILL_MAX) * 100}%` }} /></span><small>섀도우 버스트</small></div>
     </section>
 
   </main>
