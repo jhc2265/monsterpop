@@ -9,8 +9,14 @@ create table if not exists public.profiles (
   id          uuid primary key references auth.users(id) on delete cascade,
   nickname    text not null,
   avatar_url  text,
+  xp          integer not null default 0,
+  discovered_monsters text[] not null default '{}',
   created_at  timestamptz default now()
 );
+
+-- 이미 만들어진 프로젝트에도 성장 필드를 안전하게 추가합니다.
+alter table public.profiles add column if not exists xp integer not null default 0;
+alter table public.profiles add column if not exists discovered_monsters text[] not null default '{}';
 
 -- ---------- 2) 점수 테이블 ----------
 create table if not exists public.scores (

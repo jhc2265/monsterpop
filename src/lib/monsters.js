@@ -5,12 +5,14 @@ export const MONSTERS = [
   { id: 'boss', name: '그림자 대왕', grade: '보스', score: 500, weight: 6, speed: '보통', image: '/images/boss.png', color: '#ff4fc8', emoji: '★', description: '어둠의 포털을 지배하는 강력한 보스. 여러 번 공격해야 처치할 수 있어요.' },
 ]
 
-export function pickRandomMonster() {
-  const total = MONSTERS.reduce((sum, monster) => sum + monster.weight, 0)
+export function pickRandomMonster(allowedIds = MONSTERS.map((monster) => monster.id)) {
+  const pool = MONSTERS.filter((monster) => allowedIds.includes(monster.id))
+  const available = pool.length ? pool : [MONSTERS[0]]
+  const total = available.reduce((sum, monster) => sum + monster.weight, 0)
   let random = Math.random() * total
-  for (const monster of MONSTERS) {
+  for (const monster of available) {
     if (random < monster.weight) return monster
     random -= monster.weight
   }
-  return MONSTERS[0]
+  return available[0]
 }

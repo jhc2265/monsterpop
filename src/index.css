@@ -1067,3 +1067,39 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
 .battle-arena:has(.battle-pause-overlay) .escape-bar i { animation-play-state: paused; }
 @keyframes monsterEscape { to { transform: scaleX(0); filter: hue-rotate(-60deg); } }
 @keyframes holdCharge { from { transform: rotate(0deg) scale(.9); opacity: .4; } to { transform: rotate(360deg) scale(1.06); opacity: 1; } }
+
+/* Hunter progression */
+.hunter-progress { margin: -2px 0 13px; padding: 10px 13px; border: 1px solid rgba(171,127,255,.15); border-radius: 14px; background: rgba(25,17,59,.56); }
+.hunter-progress-head { display: flex; align-items: center; gap: 8px; margin-bottom: 7px; }
+.hunter-progress-head > span { padding: 3px 7px; border-radius: 7px; background: linear-gradient(135deg, #7838ef, #d43db4); color: #fff; font-size: 10px; font-weight: 900; }
+.hunter-progress-head strong { min-width: 0; overflow: hidden; flex: 1; color: #c8c0db; font-size: 10px; text-overflow: ellipsis; white-space: nowrap; }
+.hunter-progress-head small { color: #817a99; font-size: 9px; white-space: nowrap; }
+.hunter-xp-bar { height: 5px; overflow: hidden; border-radius: 999px; background: rgba(255,255,255,.07); }
+.hunter-xp-bar i { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #7944ff, #f24fc1); box-shadow: 0 0 8px rgba(232,74,195,.58); transition: width .3s ease; }
+.mission-locked { min-height: 58px; display: flex; align-items: center; gap: 11px; margin-top: 12px; padding: 12px 15px; border: 1px dashed rgba(176,143,235,.17); border-radius: 17px; background: rgba(16,12,43,.6); color: #716a89; }
+.mission-locked > div { min-width: 0; }
+.mission-locked strong, .mission-locked span { display: block; }
+.mission-locked strong { color: #9b94ad; font-size: 12px; }
+.mission-locked span { margin-top: 2px; font-size: 10px; }
+
+.collection-card.locked, .collection-card.undiscovered { cursor: default; }
+.collection-card.locked img, .collection-card.locked > .ph { filter: grayscale(1) brightness(.25); opacity: .52; }
+.collection-card.undiscovered img, .collection-card.undiscovered > .ph { filter: grayscale(.9) brightness(.4) sepia(.25) hue-rotate(225deg); opacity: .68; }
+.collection-card.locked { border-color: rgba(133,124,157,.16); background: rgba(15,12,38,.82); }
+.collection-card.undiscovered { border-style: dashed; }
+.collection-lock { position: absolute; z-index: 4; left: 50%; top: 76px; width: 38px; height: 38px; display: grid; place-items: center; border: 1px solid rgba(255,255,255,.14); border-radius: 50%; background: rgba(7,5,25,.82); color: #a097b6; transform: translateX(-50%); }
+.collection-card:disabled { opacity: 1; }
+
+.xp-earned { display: flex; align-items: center; justify-content: space-between; margin-top: 16px; padding: 11px 13px; border: 1px solid rgba(173,124,255,.17); border-radius: 13px; background: rgba(113,50,187,.1); }
+.xp-earned span { color: #aaa3be; font-size: 12px; }
+.xp-earned strong { color: #db9dff; font-size: 15px; }
+.level-up-overlay { z-index: 80; align-items: center; padding: 22px; }
+.level-up-modal { width: min(100%, 390px); padding: 28px 22px 22px; border: 1px solid rgba(216,148,255,.38); border-radius: 27px; background: radial-gradient(circle at 50% 18%, rgba(207,71,212,.28), transparent 38%), linear-gradient(155deg, #25175e, #100c35 72%); box-shadow: 0 0 55px rgba(183,64,221,.3); text-align: center; animation: levelUpIn .35s cubic-bezier(.2,1.25,.4,1); }
+.level-up-modal h2 { margin: 8px 0 0; font: 800 29px 'Paperlogy', 'Pretendard', sans-serif; }
+.level-up-modal > img { width: 170px; height: 170px; margin: -2px auto -12px; object-fit: contain; filter: drop-shadow(0 13px 18px rgba(4,1,19,.5)); }
+.level-up-symbol { width: 96px; height: 96px; display: grid; place-items: center; margin: 24px auto 18px; border: 2px solid rgba(255,255,255,.42); border-radius: 28px; background: var(--gradient); box-shadow: 0 0 26px rgba(226,72,202,.4); }
+.level-up-modal > strong { display: block; color: #ff82d5; font-size: 19px; }
+.level-up-modal > p { margin: 7px 0 22px; color: #aca5c0; font-size: 13px; line-height: 1.55; }
+.burst-button.locked { border-color: #3e3858; background: #17132f; filter: grayscale(.72); }
+.burst-button.locked img { opacity: .28; }
+@keyframes levelUpIn { from { opacity: 0; transform: scale(.72) translateY(20px); } to { opacity: 1; transform: scale(1) translateY(0); } }

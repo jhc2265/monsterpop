@@ -4,9 +4,14 @@ import { MONSTERS } from '../lib/monsters'
 import Icon from '../components/Icon'
 import MonsterImage from '../components/MonsterImage'
 import BottomNav from '../components/BottomNav'
+import { useAuth } from '../context/AuthContext'
+import { getLevel, getMonsterUnlockLevel, resolveProgress } from '../lib/progression'
 
 export default function Collection() {
   const navigate = useNavigate()
+  const { user, profile } = useAuth()
+  const playerProgress = resolveProgress(profile, user.id)
+  const playerLevel = getLevel(playerProgress.xp)
   const [filter, setFilter] = useState('전체')
   const [sort, setSort] = useState('default')
   const [selected, setSelected] = useState(null)
@@ -34,11 +39,17 @@ export default function Collection() {
       </select>
     </section>
     <section className="collection-grid">
-      {monsters.map((monster) => <button className="collection-card" key={monster.id} style={{ '--monster-color': monster.color }} onClick={() => setSelected(monster)}>
+      {monsters.map((monster) => {
+        const requiredLevel = getMonsterUnlockLevel(monster.id)
+        const unlocked = playerLevel >= requiredLevel
+        const discovered = playerProgress.discovered.includes(monster.id)
+        return <button className={`collection-card ${!unlocked ? 'locked' : !discovered ? 'undiscovered' : ''}`} key={monster.id} style={{ '--monster-color': monster.color }} onClick={() => discovered && setSelected(monster)} disabled={!discovered}>
         <span className="collection-grade">{monster.grade}</span>
         <MonsterImage monster={monster} />
-        <div><h2>{monster.name}</h2><p>처치 점수 <strong>{monster.score}</strong></p><small>출현 확률 {Math.round((monster.weight / totalWeight) * 100)}%</small></div>
-      </button>)}
+        {!unlocked && <span className="collection-lock"><Icon name="lock" size={18} /></span>}
+        <div><h2>{unlocked ? monster.name : '???'}</h2>{!unlocked ? <p><strong>Lv.{requiredLevel}</strong>에서 출현 가능</p> : !discovered ? <><p>흔적이 발견되었습니다</p><small>사냥터에서 직접 만나보세요</small></> : <><p>처치 점수 <strong>{monster.score}</strong></p><small>출현 확률 {Math.round((monster.weight / totalWeight) * 100)}%</small></>}</div>
+      </button>
+      })}
     </section>
     {selected && <div className="modal-overlay monster-detail-overlay" onClick={() => setSelected(null)}><section className="modal monster-detail" onClick={(event) => event.stopPropagation()} style={{ '--monster-color': selected.color }}>
       <div className="modal-handle" />
