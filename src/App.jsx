@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { useAuth } from './context/AuthContext'
 import Login from './pages/Login'
@@ -9,6 +10,9 @@ import Ranking from './pages/Ranking'
 import Community from './pages/Community'
 import PostDetail from './pages/PostDetail'
 import Collection from './pages/Collection'
+import Settings from './pages/Settings'
+import { applyPreferences, getPreferences } from './lib/preferences'
+import { sound } from './lib/sound'
 
 function Protected({ children }) {
   const { user, loading } = useAuth()
@@ -18,6 +22,12 @@ function Protected({ children }) {
 }
 
 export default function App() {
+  useEffect(() => {
+    const preferences = getPreferences()
+    applyPreferences(preferences)
+    sound.setBgmEnabled(preferences.bgm)
+    sound.setEffectsEnabled(preferences.effects)
+  }, [])
   return <div className="app-container"><Routes>
     <Route path="/" element={<Hero />} />
     <Route path="/login" element={<Login initialMode="login" />} />
@@ -29,6 +39,7 @@ export default function App() {
     <Route path="/collection" element={<Protected><Collection /></Protected>} />
     <Route path="/community" element={<Protected><Community /></Protected>} />
     <Route path="/community/:id" element={<Protected><PostDetail /></Protected>} />
+    <Route path="/settings" element={<Protected><Settings /></Protected>} />
     <Route path="*" element={<Navigate to="/" replace />} />
   </Routes></div>
 }

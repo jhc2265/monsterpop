@@ -6,18 +6,28 @@ import { sound } from '../lib/sound'
 import Icon from '../components/Icon'
 
 export default function Result() {
-  const { user } = useAuth(); const navigate = useNavigate(); const location = useLocation(); const { score = 0, maxCombo = 0 } = location.state || {}
+  const { user } = useAuth(); const navigate = useNavigate(); const location = useLocation(); const { score = 0, maxCombo = 0, monsterCounts = {} } = location.state || {}
   const [saving, setSaving] = useState(true); const [isBest, setIsBest] = useState(false); const [rank, setRank] = useState(null); const [saveError, setSaveError] = useState(''); const savedRef = useRef(false)
   useEffect(() => { if (!location.state) { navigate('/home', { replace: true }); return } if (!savedRef.current) { savedRef.current = true; saveAndRank() } }, [])
   async function saveAndRank() {
     try {
       const { data: prev } = await supabase.from('scores').select('score').eq('user_id', user.id).order('score', { ascending: false }).limit(1); const prevBest = prev?.[0]?.score ?? 0
-      const { error } = await supabase.from('scores').insert({ user_id: user.id, score, max_combo: maxCombo }); if (error) throw error
+      let { error } = await supabase.from('scores').insert({ user_id: user.id, score, max_combo: maxCombo, monster_counts: monsterCounts })
+      if (error?.message?.includes('monster_counts')) ({ error } = await supabase.from('scores').insert({ user_id: user.id, score, max_combo: maxCombo }))
+      if (error) throw error
+      await saveMonsterCounts(user.id, monsterCounts)
       if (score > prevBest) setIsBest(true)
       const { data: all } = await supabase.from('scores').select('user_id, score').order('score', { ascending: false }); const bestByUser = {}
       for (const row of all || []) if (bestByUser[row.user_id] === undefined || row.score > bestByUser[row.user_id]) bestByUser[row.user_id] = row.score
       setRank(Object.values(bestByUser).sort((a, b) => b - a).indexOf(Math.max(prevBest, score)) + 1)
     } catch (err) { setSaveError(`점수를 저장하지 못했습니다: ${err.message}`) } finally { setSaving(false) }
+  }
+  async function saveMonsterCounts(userId, counts) {
+    for (const [monsterId, count] of Object.entries(counts)) {
+      const { data } = await supabase.from('user_monster_stats').select('kill_count').eq('user_id', userId).eq('monster_id', monsterId).maybeSingle()
+      const nextCount = (data?.kill_count || 0) + count
+      await supabase.from('user_monster_stats').upsert({ user_id: userId, monster_id: monsterId, kill_count: nextCount, last_hunted_at: new Date().toISOString() }, { onConflict: 'user_id,monster_id' })
+    }
   }
   function go(path, options) { sound.button(); navigate(path, options) }
   return <main className="page result-page">

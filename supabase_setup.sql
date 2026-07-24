@@ -18,6 +18,7 @@ create table if not exists public.scores (
   user_id     uuid not null references public.profiles(id) on delete cascade,
   score       integer not null default 0,
   max_combo   integer not null default 0,
+  monster_counts jsonb not null default '{}'::jsonb,
   created_at  timestamptz default now()
 );
 create index if not exists scores_score_idx on public.scores (score desc);
@@ -29,6 +30,7 @@ create table if not exists public.posts (
   user_id     uuid not null references public.profiles(id) on delete cascade,
   title       text not null,
   content     text not null,
+  category    text not null default '자유' check (category in ('공략', '기록 인증', '자유')),
   created_at  timestamptz default now()
 );
 create index if not exists posts_created_idx on public.posts (created_at desc);
@@ -43,6 +45,27 @@ create table if not exists public.comments (
 );
 create index if not exists comments_post_idx on public.comments (post_id, created_at);
 
+-- ---------- 5) 게시글 좋아요 ----------
+create table if not exists public.post_likes (
+  post_id     bigint not null references public.posts(id) on delete cascade,
+  user_id     uuid not null references public.profiles(id) on delete cascade,
+  created_at  timestamptz default now(),
+  primary key (post_id, user_id)
+);
+
+-- ---------- 6) 사용자별 몬스터 처치 기록 ----------
+create table if not exists public.user_monster_stats (
+  user_id        uuid not null references public.profiles(id) on delete cascade,
+  monster_id     text not null,
+  kill_count     integer not null default 0,
+  last_hunted_at timestamptz default now(),
+  primary key (user_id, monster_id)
+);
+
+-- 이미 만들어진 프로젝트에도 새 필드를 안전하게 추가합니다.
+alter table public.scores add column if not exists monster_counts jsonb not null default '{}'::jsonb;
+alter table public.posts add column if not exists category text not null default '자유';
+
 -- ============================================================
 --  RLS(행 수준 보안) 활성화 + 정책
 --  ※ 이걸 설정하지 않으면 insert/select 가 조용히 실패합니다!
@@ -51,6 +74,8 @@ alter table public.profiles enable row level security;
 alter table public.scores   enable row level security;
 alter table public.posts    enable row level security;
 alter table public.comments enable row level security;
+alter table public.post_likes enable row level security;
+alter table public.user_monster_stats enable row level security;
 
 -- 프로필: 누구나 조회 가능(랭킹 닉네임 표시용), 본인 것만 수정
 drop policy if exists "profiles_select_all" on public.profiles;
@@ -96,6 +121,28 @@ drop policy if exists "comments_delete_own" on public.comments;
 create policy "comments_delete_own" on public.comments
   for delete using (auth.uid() = user_id);
 
+-- 좋아요: 누구나 조회, 본인 좋아요만 추가/삭제
+drop policy if exists "post_likes_select_all" on public.post_likes;
+create policy "post_likes_select_all" on public.post_likes
+  for select using (true);
+drop policy if exists "post_likes_insert_own" on public.post_likes;
+create policy "post_likes_insert_own" on public.post_likes
+  for insert with check (auth.uid() = user_id);
+drop policy if exists "post_likes_delete_own" on public.post_likes;
+create policy "post_likes_delete_own" on public.post_likes
+  for delete using (auth.uid() = user_id);
+
+-- 몬스터 기록: 누구나 조회, 본인 기록만 저장/수정
+drop policy if exists "monster_stats_select_all" on public.user_monster_stats;
+create policy "monster_stats_select_all" on public.user_monster_stats
+  for select using (true);
+drop policy if exists "monster_stats_insert_own" on public.user_monster_stats;
+create policy "monster_stats_insert_own" on public.user_monster_stats
+  for insert with check (auth.uid() = user_id);
+drop policy if exists "monster_stats_update_own" on public.user_monster_stats;
+create policy "monster_stats_update_own" on public.user_monster_stats
+  for update using (auth.uid() = user_id);
+
 -- ============================================================
 --  회원가입 시 프로필 자동 생성 트리거
 --  (닉네임은 가입 시 user_metadata.nickname 값을 사용)
@@ -136,4 +183,4 @@ from public.scores s
 join public.profiles p on p.id = s.user_id
 order by s.user_id, s.score desc;
 
--- 끝. RUN 후 왼쪽 Table Editor 에서 4개 테이블이 보이면 성공입니다.
+-- 끝. RUN 후 왼쪽 Table Editor 에서 6개 테이블이 보이면 성공입니다.
