@@ -14,8 +14,14 @@ const POSITIONS = [
   { x: 13, y: 56 }, { x: 41, y: 54 }, { x: 63, y: 62 }, { x: 87, y: 66 },
   { x: 29, y: 70 },
 ]
-const HP = { 일반: 1, 희귀: 1, 영웅: 2, 보스: 3 }
-const TIMING_DURATION = { 일반: 1900, 희귀: 1200, 영웅: 1450, 보스: 1650 }
+const HP = { 일반: 1, 희귀: 1, 영웅: 1, 보스: 3 }
+const ESCAPE_DURATION = { slime: 5600, rabbit: 3600, fox: 4300, boss: 7600 }
+const ACTIONS = {
+  slime: { cue: 'TAP', hint: '한 번 터치' },
+  rabbit: { cue: '↔', hint: '좌우로 밀기' },
+  fox: { cue: '×2', hint: '빠르게 두 번' },
+  boss: { cue: 'HOLD', hint: '길게 누르기' },
+}
 let entityId = 0
 let effectId = 0
 
@@ -30,7 +36,7 @@ function makeEnemy(index = 0, randomize = false) {
     hp: maxHp,
     maxHp,
     bornAt: Date.now(),
-    timingDuration: TIMING_DURATION[monster.grade] || 1700,
+    escapeDuration: ESCAPE_DURATION[monster.id] || 5000,
     x: position.x + (Math.random() * 5 - 2.5),
     y: position.y + (Math.random() * 4 - 2),
   }
@@ -48,7 +54,8 @@ export default function Game() {
   const [energy, setEnergy] = useState(0)
   const [enemies, setEnemies] = useState([])
   const [effects, setEffects] = useState([])
-  const [lastJudge, setLastJudge] = useState('몬스터를 타이밍에 맞춰 터치하세요')
+  const [lastJudge, setLastJudge] = useState('몬스터 위의 조작 표시를 확인하세요')
+  const [holdingId, setHoldingId] = useState(null)
 
   const scoreRef = useRef(0)
   const comboRef = useRef(0)
@@ -57,6 +64,9 @@ export default function Game() {
   const energyRef = useRef(0)
   const playingRef = useRef(false)
   const pausedRef = useRef(false)
+  const pointerRef = useRef(null)
+  const holdTimerRef = useRef(null)
+  const lastTapRef = useRef({})
 
   const fillArena = useCallback(() => {
     const next = Array.from({ length: MAX_ENEMIES }, (_, index) => makeEnemy(index))
@@ -91,6 +101,27 @@ export default function Game() {
       })
     }, 1000)
     return () => clearInterval(interval)
+  }, [playing])
+
+  useEffect(() => {
+    if (!playing) return
+    const escapeWatcher = setInterval(() => {
+      if (pausedRef.current) return
+      const now = Date.now()
+      setEnemies((items) => {
+        const escaped = items.filter((enemy) => now - enemy.bornAt >= enemy.escapeDuration)
+        if (!escaped.length) return items
+        setTimeout(() => {
+          comboRef.current = Math.max(0, comboRef.current - escaped.length)
+          setCombo(comboRef.current)
+          setLastJudge(`${escaped.length}마리가 도망갔어요!`)
+          escaped.forEach((enemy) => addEffect(enemy.x, enemy.y, 'ESCAPE', 'miss'))
+        }, 0)
+        const survivors = items.filter((enemy) => now - enemy.bornAt < enemy.escapeDuration)
+        return [...survivors, ...escaped.map((_, index) => makeEnemy(index, true))]
+      })
+    }, 180)
+    return () => clearInterval(escapeWatcher)
   }, [playing])
 
   useEffect(() => () => sound.stopBGM(), [])
@@ -130,41 +161,25 @@ export default function Game() {
     setTimeout(() => setEnemies((current) => [...current, makeEnemy(deadId, true)]), 320)
   }
 
-  function judgeTiming(target) {
-    const phase = ((Date.now() - target.bornAt) % target.timingDuration) / target.timingDuration
-    const distance = Math.abs(phase - .56)
-    if (distance <= .065) return { label: 'PERFECT', multiplier: 1.5, combo: 2, energy: 2, type: 'perfect' }
-    if (distance <= .14) return { label: 'GREAT', multiplier: 1.2, combo: 1, energy: 1, type: 'great' }
-    if (distance <= .26) return { label: 'GOOD', multiplier: 1, combo: 0, energy: 0, type: 'good' }
-    return { label: 'MISS', multiplier: 0, combo: -3, energy: 0, type: 'miss' }
-  }
-
-  function attackEnemy(target) {
+  function completeGesture(target) {
     if (!playing || paused || !target) return
-    const judgment = judgeTiming(target)
-    setLastJudge(judgment.label)
-    if (judgment.type === 'miss') {
-      comboRef.current = Math.max(0, comboRef.current - 3)
-      setCombo(comboRef.current)
-      sound.miss()
-      addEffect(target.x, target.y, 'MISS', 'miss')
-      setEnemies((items) => items.map((enemy) => enemy.entityId === target.entityId ? { ...enemy, bornAt: Date.now() } : enemy))
-      return
-    }
-
+    const quick = Date.now() - target.bornAt < target.escapeDuration * .45
+    const label = quick ? 'QUICK!' : 'NICE!'
+    const multiplier = quick ? 1.3 : 1
     const damage = 1
     const remaining = target.hp - damage
-    const nextCombo = Math.max(0, comboRef.current + judgment.combo)
+    const nextCombo = comboRef.current + (quick ? 2 : 1)
     comboRef.current = nextCombo
     maxComboRef.current = Math.max(maxComboRef.current, nextCombo)
     const killed = remaining <= 0
-    const nextEnergy = Math.min(SKILL_MAX, energyRef.current + judgment.energy + (killed ? 1 : 0))
+    const nextEnergy = Math.min(SKILL_MAX, energyRef.current + 1 + (quick ? 1 : 0))
     energyRef.current = nextEnergy
     setEnergy(nextEnergy)
     sound.hit(comboRef.current)
-    addEffect(target.x, target.y, judgment.label, judgment.type)
+    setLastJudge(`${label} ${target.name}`)
+    addEffect(target.x, target.y, label, quick ? 'perfect' : 'good')
 
-    const gained = Math.round((target.score / target.maxHp) * judgment.multiplier * (1 + Math.min(nextCombo, 30) * .08))
+    const gained = Math.round((target.score / target.maxHp) * multiplier * (1 + Math.min(nextCombo, 30) * .08))
     scoreRef.current += gained
     setScore(scoreRef.current)
     setCombo(nextCombo)
@@ -180,6 +195,65 @@ export default function Game() {
     if (target.grade === '영웅' || target.grade === '보스') sound.rare()
     monsterCountsRef.current[target.id] = (monsterCountsRef.current[target.id] || 0) + 1
     replaceEnemy(target.entityId)
+  }
+
+  function wrongGesture(target, message) {
+    comboRef.current = Math.max(0, comboRef.current - 1)
+    setCombo(comboRef.current)
+    setLastJudge(message)
+    sound.miss()
+    addEffect(target.x, target.y, 'TRY AGAIN', 'miss')
+  }
+
+  function handlePointerDown(event, target) {
+    if (!playing || paused) return
+    event.preventDefault()
+    event.currentTarget.setPointerCapture?.(event.pointerId)
+    pointerRef.current = { entityId: target.entityId, x: event.clientX, y: event.clientY, completed: false }
+    if (target.id === 'boss') {
+      setHoldingId(target.entityId)
+      holdTimerRef.current = setTimeout(() => {
+        if (!pointerRef.current || pointerRef.current.entityId !== target.entityId) return
+        pointerRef.current.completed = true
+        setHoldingId(null)
+        completeGesture(target)
+      }, 620)
+    }
+  }
+
+  function handlePointerUp(event, target) {
+    event.preventDefault()
+    const pointer = pointerRef.current
+    if (!pointer || pointer.entityId !== target.entityId) return
+    clearTimeout(holdTimerRef.current)
+    setHoldingId(null)
+    if (pointer.completed) { pointerRef.current = null; return }
+
+    const dx = event.clientX - pointer.x
+    const dy = event.clientY - pointer.y
+    const distance = Math.hypot(dx, dy)
+    if (target.id === 'slime') completeGesture(target)
+    else if (target.id === 'rabbit') {
+      if (Math.abs(dx) >= 30 && Math.abs(dx) > Math.abs(dy)) completeGesture(target)
+      else wrongGesture(target, '토끼는 좌우로 밀어주세요')
+    } else if (target.id === 'fox') {
+      const previous = lastTapRef.current[target.entityId] || 0
+      if (Date.now() - previous <= 420 && distance < 16) {
+        delete lastTapRef.current[target.entityId]
+        completeGesture(target)
+      } else {
+        lastTapRef.current[target.entityId] = Date.now()
+        setLastJudge('한 번 더 빠르게 터치!')
+        addEffect(target.x, target.y, 'ONE MORE!', 'good')
+      }
+    } else if (target.id === 'boss') wrongGesture(target, '보스는 길게 눌러주세요')
+    pointerRef.current = null
+  }
+
+  function handlePointerCancel() {
+    clearTimeout(holdTimerRef.current)
+    pointerRef.current = null
+    setHoldingId(null)
   }
 
   function useBurst() {
@@ -238,30 +312,34 @@ export default function Game() {
     <section className={`battle-arena ${energy >= SKILL_MAX ? 'burst-ready' : ''}`}>
       <img className="battle-background" src="/images/battle-arena.png" alt="" />
       <div className="battle-vignette" />
-      <div className="timing-legend"><span>GOOD</span><span>GREAT</span><b>PERFECT</b></div>
+      <div className="gesture-legend"><span>TAP</span><span>↔ SWIPE</span><span>×2</span><span>HOLD</span></div>
 
       {enemies.map((enemy) => {
+        const action = ACTIONS[enemy.id]
         return <button
-          key={enemy.entityId}
-          className={`battle-enemy grade-${enemy.grade}`}
-          style={{ left: `${enemy.x}%`, top: `${enemy.y}%`, '--enemy-color': enemy.color, '--timing-duration': `${enemy.timingDuration}ms` }}
-          onClick={(event) => { event.stopPropagation(); attackEnemy(enemy) }}
-          aria-label={`${enemy.name} 타이밍 공격`}
+          key={`${enemy.entityId}-${enemy.bornAt}`}
+          className={`battle-enemy gesture-${enemy.id} grade-${enemy.grade} ${holdingId === enemy.entityId ? 'holding' : ''}`}
+          style={{ left: `${enemy.x}%`, top: `${enemy.y}%`, '--enemy-color': enemy.color, '--escape-duration': `${enemy.escapeDuration}ms` }}
+          onPointerDown={(event) => handlePointerDown(event, enemy)}
+          onPointerUp={(event) => handlePointerUp(event, enemy)}
+          onPointerCancel={handlePointerCancel}
+          aria-label={`${enemy.name}, ${action.hint}`}
         >
-          <span className="target-ring" />
+          <span className="action-cue">{action.cue}</span>
           <MonsterImage monster={enemy} />
+          <span className="escape-bar"><i /></span>
           {enemy.maxHp > 1 && <span className="enemy-health"><i style={{ width: `${(enemy.hp / enemy.maxHp) * 100}%` }} /></span>}
         </button>
       })}
 
       {effects.map((effect) => <div key={effect.id} className={`battle-effect ${effect.type}`} style={{ left: `${effect.x}%`, top: `${effect.y}%` }}>{effect.text}</div>)}
 
-      {countdown > 0 && <div className="battle-countdown"><span>GET READY</span><strong>{countdown}</strong></div>}
+      {countdown > 0 && <div className="battle-countdown"><span>REACTION HUNT</span><strong>{countdown}</strong><p>표시를 보고 탭 · 스와이프 · 더블 탭 · 길게 누르기</p></div>}
       {paused && <div className="battle-pause-overlay"><span className="eyebrow">GAME PAUSED</span><h2>잠시 쉬어갈까요?</h2><button className="btn btn-primary" onClick={togglePause}><Icon name="play" size={18} /> 계속하기</button><button className="btn btn-secondary" onClick={quit}>그만하기</button></div>}
     </section>
 
     <section className="battle-controls">
-      <div className="timing-status"><small>TIMING ATTACK</small><strong>{lastJudge}</strong><span>몬스터의 링이 겹칠 때 직접 터치!</span></div>
+      <div className="timing-status"><small>REACTION HUNT</small><strong>{lastJudge}</strong><span>표시된 동작으로 도망가기 전에 사냥하세요!</span></div>
       <button className={`burst-button ${energy >= SKILL_MAX ? 'ready' : ''}`} onClick={useBurst} disabled={energy < SKILL_MAX} aria-label="섀도우 버스트">
         <img src="/images/ui/hunt-swords.png" alt="" /><small>{energy >= SKILL_MAX ? 'BURST!' : `${energy} / ${SKILL_MAX}`}</small>
       </button>
