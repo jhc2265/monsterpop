@@ -5,7 +5,6 @@ import { useAuth } from '../context/AuthContext'
 import { sound } from '../lib/sound'
 import Icon from '../components/Icon'
 import BottomNav from '../components/BottomNav'
-import { timeAgo } from '../lib/format'
 import { getLevelProgress, LEVEL_UNLOCKS, resolveProgress } from '../lib/progression'
 
 export default function Home() {
@@ -15,19 +14,14 @@ export default function Home() {
   const [delta, setDelta] = useState(null)
   const [rank, setRank] = useState(null)
   const [totalPlayers, setTotalPlayers] = useState(0)
-  const [recent, setRecent] = useState(null)
   const [muted, setMuted] = useState(sound.isMuted())
 
   useEffect(() => { if (user) loadStats() }, [user])
 
   async function loadStats() {
-    const [{ data: mine }, { data: latest }] = await Promise.all([
-      supabase.from('scores').select('score').eq('user_id', user.id).order('score', { ascending: false }).limit(2),
-      supabase.from('scores').select('score, max_combo, created_at').eq('user_id', user.id).order('created_at', { ascending: false }).limit(1),
-    ])
+    const { data: mine } = await supabase.from('scores').select('score').eq('user_id', user.id).order('score', { ascending: false }).limit(2)
     const myBest = mine?.[0]?.score ?? 0
     setBest(myBest)
-    setRecent(latest?.[0] || null)
 
     const previous = mine?.[1]?.score
     if (myBest > 0 && previous > 0) setDelta(Math.round(((myBest - previous) / previous) * 100))
@@ -58,6 +52,11 @@ export default function Home() {
   const missionDone = best > 0
   const progress = getLevelProgress(resolveProgress(profile, user.id).xp)
   const nextUnlock = LEVEL_UNLOCKS[Math.min(10, progress.level + 1)]
+  const featured = progress.level >= 5
+    ? { label: 'TODAY’S BOSS', name: '그림자 대왕 출현!', copy: '길게 눌러 방어막을 깨고\n최고 기록에 도전하세요.', image: '/images/boss.png' }
+    : progress.level >= 3
+      ? { label: 'TODAY’S HUNT', name: '불꽃 여우 출현!', copy: '빠르게 두 번 터치해\n고득점 몬스터를 사냥하세요.', image: '/images/fox.png' }
+      : { label: 'TODAY’S HUNT', name: '번개 토끼 출현!', copy: '좌우로 빠르게 밀어\n번개 토끼를 사냥하세요.', image: '/images/rabbit.png' }
 
   return <main className="page home-page home-v2">
     <header className="home-welcome">
@@ -72,55 +71,33 @@ export default function Home() {
     </header>
 
     <section className="hunter-progress" aria-label="헌터 레벨">
-      <div className="hunter-progress-head"><span>LV.{progress.level}</span><strong>{progress.level >= 10 ? '최고 레벨 달성!' : `다음 해금 · ${nextUnlock?.title}`}</strong><small>{progress.level >= 10 ? `${progress.total.toLocaleString()} XP` : `${progress.current.toLocaleString()} / ${progress.needed.toLocaleString()} XP`}</small></div>
+      <div className="hunter-progress-head"><span>LV.{progress.level}</span><div><strong>{profile?.nickname || '헌터'} · {progress.level >= 10 ? '마스터 헌터' : '성장 중인 헌터'}</strong><small>{progress.level >= 10 ? '최고 레벨 달성!' : `다음 해금 · ${nextUnlock?.title}`}</small></div><b>{progress.level >= 10 ? `${progress.total.toLocaleString()} XP` : `${progress.current.toLocaleString()} / ${progress.needed.toLocaleString()} XP`}</b></div>
       <div className="hunter-xp-bar"><i style={{ width: `${progress.percent}%` }} /></div>
+      {progress.level >= 2 ? <div className={`progress-mission ${missionDone ? 'complete' : ''}`}><span><Icon name={missionDone ? 'check' : 'spark'} size={16} /></span><div><small>오늘의 미션</small><strong>오늘 사냥 1회 완료</strong></div><b>{missionDone ? '완료' : '+40 XP · ★ 200'}</b></div> : <div className="progress-next"><Icon name="lock" size={14} /><span>Lv.2 달성 시 오늘의 미션과 보상이 열려요</span></div>}
     </section>
 
     <section className="hero-card boss-card">
       <div className="hero-copy">
-        <span className="boss-label">TODAY&apos;S BOSS</span>
-        <h2>그림자 대왕 출현!</h2>
-        <p>30초 동안 콤보를 이어<br />최고 기록에 도전하세요.</p>
-        <span className="boss-reward">보상 <b>★ ×2</b></span>
+        <span className="boss-label">{featured.label}</span>
+        <h2>{featured.name}</h2>
+        <p>{featured.copy.split('\n').map((line) => <span key={line}>{line}<br /></span>)}</p>
+        <button className="boss-start" onClick={() => go('/game')}><img src="/images/ui/hunt-swords.png" alt="" /><span>사냥 시작</span><b>›</b></button>
       </div>
       <div className="boss-visual" aria-hidden="true">
         <span />
-        <img className="hero-monster" src="/images/boss.png" alt="" />
+        <img className="hero-monster" src={featured.image} alt="" />
       </div>
     </section>
 
-    <section className="quick-stats enhanced-stats" aria-label="나의 기록">
-      <article className="stat-card">
+    <section className="home-record" aria-label="나의 기록">
+      <div className="home-record-title"><span>내 기록</span><button onClick={() => go('/ranking')}>랭킹 보기 ›</button></div>
+      <div className="home-record-grid"><article>
         <span className="stat-icon purple art-tile"><img src="/images/ui/trophy.png" alt="" /></span>
-        <div><small>최고 점수</small><strong>{best.toLocaleString()}</strong><em>{delta === null ? '첫 기록을 세워보세요' : <>지난 기록 대비 <b>{delta >= 0 ? '↑' : '↓'} {Math.abs(delta)}%</b></>}</em></div>
-      </article>
-      <article className="stat-card">
+        <div><small>최고 점수</small><strong>{best.toLocaleString()}</strong><em>{delta === null ? '첫 기록을 세워보세요' : <>이전 기록 대비 <b>{delta >= 0 ? '↑' : '↓'} {Math.abs(delta)}%</b></>}</em></div>
+      </article><i /><article>
         <span className="stat-icon pink art-tile"><img src="/images/ui/crown.png" alt="" /></span>
         <div><small>현재 순위</small><strong>{rank ? `${rank}위` : '도전 전'}</strong><em>{rank ? <>전체 {totalPlayers.toLocaleString()}명 중 <b>{rank}위</b></> : '순위에 도전하세요'}</em></div>
-      </article>
-    </section>
-
-    <button className="hunt-button hunt-button-v2" onClick={() => go('/game')}>
-      <span className="hunt-icon art-tile"><img src="/images/ui/hunt-swords.png" alt="" /></span>
-      <span><strong>지금 사냥 시작하기</strong><small>30초 동안 최고 기록에 도전</small></span>
-      <span className="hunt-arrow">›</span>
-    </button>
-
-    {progress.level >= 2 ? <section className={`daily-mission mission-v2 ${missionDone ? 'complete' : ''}`} aria-label="오늘의 미션">
-      <div className="mission-v2-head"><strong>오늘의 미션</strong><span>★ 200</span></div>
-      <div className="mission-v2-body"><strong>{missionDone ? '✓' : '○'} 오늘 사냥 1회 완료</strong>{!missionDone && <span>0 / 1</span>}</div>
-      {!missionDone && <div className="mission-bar"><i style={{ width: '8%' }} /></div>}
-    </section> : <section className="mission-locked"><Icon name="lock" size={17} /><div><strong>오늘의 미션</strong><span>Lv.2에서 해금됩니다</span></div></section>}
-
-    <section className="recent-hunt" aria-label="최근 사냥 기록">
-      <div className="recent-hunt-head"><strong>최근 사냥</strong><span>{recent ? timeAgo(recent.created_at) : '기록 없음'}</span></div>
-      {recent ? <div className="recent-hunt-stats">
-        <div><small>획득 점수</small><strong>{recent.score.toLocaleString()}</strong></div>
-        <i />
-        <div><small>최고 콤보</small><strong>{recent.max_combo || 0}</strong></div>
-        <i />
-        <div><small>현재 순위</small><strong>{rank ? `${rank}위` : '-'}</strong></div>
-      </div> : <button onClick={() => go('/game')}>아직 사냥 기록이 없어요. <strong>첫 사냥 시작하기 →</strong></button>}
+      </article></div>
     </section>
     <BottomNav />
   </main>

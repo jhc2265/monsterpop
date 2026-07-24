@@ -1103,3 +1103,46 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
 .burst-button.locked { border-color: #3e3858; background: #17132f; filter: grayscale(.72); }
 .burst-button.locked img { opacity: .28; }
 @keyframes levelUpIn { from { opacity: 0; transform: scale(.72) translateY(20px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+
+/* Compact three-block home */
+.hunter-progress { margin: 0 0 15px; padding: 15px 16px 13px; border-radius: 19px; background: linear-gradient(130deg, rgba(49,29,106,.78), rgba(25,17,60,.72)); }
+.hunter-progress-head { align-items: center; margin-bottom: 11px; }
+.hunter-progress-head > span { padding: 6px 9px; border-radius: 9px; font-size: 12px; }
+.hunter-progress-head > div { min-width: 0; flex: 1; }
+.hunter-progress-head > div strong, .hunter-progress-head > div small { display: block; }
+.hunter-progress-head > div strong { overflow: hidden; color: #ece8f7; font-size: 13px; text-overflow: ellipsis; white-space: nowrap; }
+.hunter-progress-head > div small { margin-top: 3px; color: #9f97b6; font-size: 10px; }
+.hunter-progress-head > b { color: #aaa2bf; font-size: 10px; font-weight: 700; white-space: nowrap; }
+.hunter-xp-bar { height: 7px; }
+.progress-mission { min-height: 53px; display: flex; align-items: center; gap: 10px; margin-top: 13px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,.08); }
+.progress-mission > span { width: 31px; height: 31px; display: grid; place-items: center; border-radius: 10px; background: rgba(152,75,255,.15); color: #bd8cff; }
+.progress-mission > div { min-width: 0; flex: 1; }
+.progress-mission small, .progress-mission strong { display: block; }
+.progress-mission small { color: #8f87aa; font-size: 9px; }
+.progress-mission strong { margin-top: 2px; color: #d8d2e7; font-size: 12px; }
+.progress-mission > b { color: var(--gold); font-size: 10px; white-space: nowrap; }
+.progress-mission.complete > span { background: rgba(70,229,255,.12); color: var(--cyan); }
+.progress-mission.complete > b { color: var(--cyan); }
+.progress-next { display: flex; align-items: center; gap: 8px; margin-top: 12px; padding-top: 11px; border-top: 1px solid rgba(255,255,255,.08); color: #8e86a3; font-size: 10px; }
+.boss-card { min-height: 206px; align-items: center; margin-bottom: 15px; }
+.boss-card .hero-copy { width: 61%; }
+.boss-card .hero-copy p span:last-child br { display: none; }
+.boss-start { min-height: 38px; display: inline-flex; align-items: center; gap: 7px; padding: 5px 10px 5px 7px; border: 1px solid rgba(255,255,255,.2); border-radius: 12px; background: linear-gradient(110deg, #6e3ef1, #c93cb0); color: #fff; cursor: pointer; box-shadow: 0 8px 18px rgba(73,19,144,.3); }
+.boss-start img { width: 29px; height: 29px; object-fit: contain; }
+.boss-start span { font: 700 12px 'Paperlogy', 'Pretendard', sans-serif; white-space: nowrap; }
+.boss-start b { margin-left: 2px; font-size: 18px; font-weight: 400; }
+.home-record { padding: 14px 15px 13px; border: 1px solid rgba(194,168,255,.1); border-radius: 19px; background: rgba(18,14,47,.72); }
+.home-record-title { display: flex; align-items: center; justify-content: space-between; margin-bottom: 11px; }
+.home-record-title > span { color: #ddd7ec; font: 700 13px 'Paperlogy', 'Pretendard', sans-serif; }
+.home-record-title button { padding: 4px; border: 0; background: transparent; color: #9286b1; font-size: 10px; cursor: pointer; }
+.home-record-grid { display: grid; grid-template-columns: 1fr 1px 1fr; align-items: center; gap: 12px; }
+.home-record-grid > i { width: 1px; height: 42px; background: rgba(255,255,255,.08); }
+.home-record-grid article { min-width: 0; display: flex; align-items: center; gap: 9px; }
+.home-record-grid .stat-icon { width: 38px; height: 38px; border-radius: 11px; background: transparent; }
+.home-record-grid .art-tile img { width: 130%; height: 130%; }
+.home-record-grid article:first-child .art-tile img { width: 150%; height: 150%; }
+.home-record-grid small, .home-record-grid strong, .home-record-grid em { display: block; }
+.home-record-grid small { color: #8b84a2; font-size: 9px; }
+.home-record-grid strong { margin-top: 1px; font-size: 18px; }
+.home-record-grid em { overflow: hidden; margin-top: 2px; color: #77708d; font-size: 8px; font-style: normal; text-overflow: ellipsis; white-space: nowrap; }
+.home-record-grid em b { color: #f26abc; }
