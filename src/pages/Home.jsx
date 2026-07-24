@@ -57,8 +57,8 @@ export default function Home() {
         <p>오늘도 최고 기록에 도전해보세요.</p>
       </div>
       <div className="topbar-actions">
-        <button className="icon-btn" onClick={toggleMute} aria-label={muted ? '소리 켜기' : '소리 끄기'}><Icon name={muted ? 'mute' : 'sound'} /></button>
-        <button className="icon-btn" onClick={() => setSettingsOpen((open) => !open)} aria-label="설정" aria-expanded={settingsOpen}><Icon name="settings" /></button>
+        <button className={`icon-btn art-button ${muted ? 'is-muted' : ''}`} onClick={toggleMute} aria-label={muted ? '소리 켜기' : '소리 끄기'}><img src="/images/ui/sound.png" alt="" /></button>
+        <button className="icon-btn art-button" onClick={() => setSettingsOpen((open) => !open)} aria-label="설정" aria-expanded={settingsOpen}><img src="/images/ui/settings.png" alt="" /></button>
       </div>
       {settingsOpen && <div className="home-settings">
         <span>계정 설정</span>
@@ -81,17 +81,17 @@ export default function Home() {
 
     <section className="quick-stats enhanced-stats" aria-label="나의 기록">
       <article className="stat-card">
-        <span className="stat-icon purple"><Icon name="trophy" /></span>
+        <span className="stat-icon purple art-tile"><img src="/images/ui/trophy.png" alt="" /></span>
         <div><small>최고 점수</small><strong>{best.toLocaleString()}</strong><em>{delta === null ? '첫 기록을 세워보세요' : <>지난 기록 대비 <b>{delta >= 0 ? '↑' : '↓'} {Math.abs(delta)}%</b></>}</em></div>
       </article>
       <article className="stat-card">
-        <span className="stat-icon pink"><Icon name="crown" /></span>
+        <span className="stat-icon pink art-tile"><img src="/images/ui/crown.png" alt="" /></span>
         <div><small>현재 순위</small><strong>{rank ? `${rank}위` : '도전 전'}</strong><em>{rankPercent ? <>상위 <b>{rankPercent}%</b></> : '순위에 도전하세요'}</em></div>
       </article>
     </section>
 
     <button className="hunt-button hunt-button-v2" onClick={() => go('/game')}>
-      <span className="hunt-icon"><Icon name="play" size={22} /></span>
+      <span className="hunt-icon art-tile"><img src="/images/ui/play.png" alt="" /></span>
       <span><strong>지금 사냥 시작하기</strong><small>30초 동안 최고 기록에 도전</small></span>
       <span className="hunt-arrow">›</span>
     </button>
@@ -108,9 +108,9 @@ export default function Home() {
     <section className="section-block hunter-menu">
       <div className="section-heading"><div><h2>헌터 메뉴</h2></div></div>
       <div className="menu-cards">
-        <button className="menu-card menu-rank" onClick={() => go('/ranking')}><span className="menu-icon purple"><Icon name="trophy" /></span><span><strong>랭킹</strong><small>실시간 순위 확인</small></span></button>
-        <button className="menu-card menu-book" onClick={() => go('/collection')}><span className="menu-icon pink"><Icon name="book" /></span><span><strong>몬스터 도감</strong><small>몬스터 확인</small></span></button>
-        <button className="menu-card menu-chat" onClick={() => go('/community')}><span className="menu-icon cyan"><Icon name="chat" /></span><span><strong>커뮤니티</strong><small>헌터들과 소통</small></span></button>
+        <button className="menu-card menu-rank" onClick={() => go('/ranking')}><span className="menu-icon purple art-tile"><img src="/images/ui/trophy.png" alt="" /></span><span><strong>랭킹</strong><small>실시간 순위 확인</small></span></button>
+        <button className="menu-card menu-book" onClick={() => go('/collection')}><span className="menu-icon pink art-tile"><img src="/images/ui/book.png" alt="" /></span><span><strong>몬스터 도감</strong><small>몬스터 확인</small></span></button>
+        <button className="menu-card menu-chat" onClick={() => go('/community')}><span className="menu-icon cyan art-tile"><img src="/images/ui/community.png" alt="" /></span><span><strong>커뮤니티</strong><small>헌터들과 소통</small></span></button>
       </div>
     </section>
   </main>
