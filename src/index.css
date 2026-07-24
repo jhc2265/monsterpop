@@ -971,3 +971,99 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
   56% { transform: scale(1) rotate(8deg); opacity: 1; filter: brightness(1.4); }
   100% { transform: scale(.63) rotate(14deg); opacity: .2; }
 }
+
+/* Gesture-based reaction hunt */
+.battle-enemy { touch-action: none; user-select: none; -webkit-user-select: none; }
+.battle-enemy::before { display: none; }
+.action-cue {
+  position: absolute;
+  z-index: 7;
+  left: 50%;
+  top: -10px;
+  min-width: 31px;
+  height: 20px;
+  display: grid;
+  place-items: center;
+  padding: 0 7px;
+  border: 1px solid color-mix(in srgb, var(--enemy-color) 65%, #fff);
+  border-radius: 999px;
+  background: rgba(8,5,29,.88);
+  color: #fff;
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: .4px;
+  box-shadow: 0 0 11px color-mix(in srgb, var(--enemy-color) 52%, transparent);
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+.escape-bar {
+  position: absolute;
+  z-index: 7;
+  left: 12%;
+  right: 12%;
+  bottom: -4px;
+  height: 5px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,.2);
+  border-radius: 999px;
+  background: rgba(5,3,20,.78);
+  pointer-events: none;
+}
+.escape-bar i {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #ff526f, #ffca57 38%, var(--enemy-color));
+  transform-origin: left;
+  animation: monsterEscape var(--escape-duration) linear forwards;
+}
+.battle-enemy.holding::after {
+  content: 'HOLD';
+  position: absolute;
+  z-index: 8;
+  inset: -9%;
+  display: grid;
+  place-items: center;
+  border: 4px solid transparent;
+  border-top-color: #fff;
+  border-right-color: #ff62cb;
+  border-radius: 50%;
+  color: transparent;
+  animation: holdCharge .62s linear forwards;
+  pointer-events: none;
+}
+.battle-enemy.holding { filter: brightness(1.2); }
+.gesture-legend {
+  position: absolute;
+  z-index: 8;
+  top: 10px;
+  left: 50%;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 7px;
+  border: 1px solid rgba(183,143,255,.18);
+  border-radius: 999px;
+  background: rgba(8,5,29,.68);
+  transform: translateX(-50%);
+  backdrop-filter: blur(7px);
+  pointer-events: none;
+}
+.gesture-legend span {
+  padding: 2px 5px;
+  border-radius: 5px;
+  color: #c8bce5;
+  font-size: 7px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+.gesture-legend span + span { border-left: 1px solid rgba(255,255,255,.1); }
+.gesture-rabbit { transition: left .16s ease, top .16s ease, filter .16s, transform .16s; }
+.gesture-fox .action-cue { color: #ffb199; }
+.gesture-rabbit .action-cue { color: #79f3ff; }
+.gesture-boss .action-cue { color: #ff8edc; }
+.battle-countdown p { max-width: 250px; margin: 12px 0 0; color: #d0c8e7; font-size: 11px; line-height: 1.5; text-align: center; }
+.battle-arena:has(.battle-pause-overlay) .escape-bar i { animation-play-state: paused; }
+@keyframes monsterEscape { to { transform: scaleX(0); filter: hue-rotate(-60deg); } }
+@keyframes holdCharge { from { transform: rotate(0deg) scale(.9); opacity: .4; } to { transform: rotate(360deg) scale(1.06); opacity: 1; } }
