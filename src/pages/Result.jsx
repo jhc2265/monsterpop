@@ -8,7 +8,7 @@ import Icon from '../components/Icon'
 export default function Result() {
   const { user } = useAuth(); const navigate = useNavigate(); const location = useLocation(); const { score = 0, maxCombo = 0 } = location.state || {}
   const [saving, setSaving] = useState(true); const [isBest, setIsBest] = useState(false); const [rank, setRank] = useState(null); const [saveError, setSaveError] = useState(''); const savedRef = useRef(false)
-  useEffect(() => { if (!location.state) { navigate('/', { replace: true }); return } if (!savedRef.current) { savedRef.current = true; saveAndRank() } }, [])
+  useEffect(() => { if (!location.state) { navigate('/home', { replace: true }); return } if (!savedRef.current) { savedRef.current = true; saveAndRank() } }, [])
   async function saveAndRank() {
     try {
       const { data: prev } = await supabase.from('scores').select('score').eq('user_id', user.id).order('score', { ascending: false }).limit(1); const prevBest = prev?.[0]?.score ?? 0
