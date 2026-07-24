@@ -1,4 +1,26 @@
-@import url('https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Noto+Sans+KR:wght@400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Black+Han+Sans&display=swap');
+
+@font-face {
+  font-family: 'Pretendard';
+  src: url('/fonts/PretendardVariable.woff2') format('woff2-variations');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Paperlogy';
+  src: url('/fonts/Paperlogy-7Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Paperlogy';
+  src: url('/fonts/Paperlogy-8ExtraBold.woff2') format('woff2');
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
 
 :root {
   color-scheme: dark;
@@ -26,14 +48,27 @@
   --radius-md: 18px;
   --radius-lg: 24px;
   --radius-xl: 30px;
-  font-family: 'Noto Sans KR', Pretendard, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   font-synthesis: none;
 }
 
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 html { background: var(--bg-deep); }
 body { margin: 0; min-width: 320px; min-height: 100vh; background: #050313; color: var(--text); -webkit-font-smoothing: antialiased; }
+html, body, .app-container, .page {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+html::-webkit-scrollbar,
+body::-webkit-scrollbar,
+.app-container::-webkit-scrollbar,
+.page::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none;
+}
 button, input, textarea { font: inherit; }
+strong, .stat-card, .rank-score, .battle-score, .battle-timer, .result-stats { font-variant-numeric: tabular-nums; }
 button { color: inherit; }
 button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px solid rgba(70, 229, 255, .42); outline-offset: 2px; }
 #root { min-height: 100vh; }
@@ -693,6 +728,64 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
 .boss-card .hero-monster { width: 165px; right: 5px; }
 .hunt-button-v2 { background: linear-gradient(110deg, #6237d8, #9436c9 58%, #c938a5); }
 .hunt-button-v2 .hunt-arrow { font-size: 24px; }
+
+/* Typography system */
+.boss-card .hero-copy h2,
+.auth-welcome h2,
+.result-header h1,
+.battle-countdown strong,
+.collection-page .topbar h1,
+.ranking-page .topbar h1,
+.community-page .topbar h1 {
+  font-family: 'Paperlogy', 'Pretendard', sans-serif;
+  font-weight: 800;
+  letter-spacing: -.045em;
+}
+.hunt-button strong,
+.btn,
+.auth-submit > span,
+.section-heading h2,
+.mission-v2-head strong,
+.recent-hunt-head strong,
+.collection-card h2,
+.community-banner strong,
+.modal-title h2,
+.empty-state h3 {
+  font-family: 'Paperlogy', 'Pretendard', sans-serif;
+  font-weight: 700;
+  letter-spacing: -.03em;
+}
+.home-welcome h1,
+.topbar h1,
+.topbar h2 {
+  font-family: 'Pretendard', sans-serif;
+  font-weight: 700;
+}
+.home-welcome h1 strong { font-weight: 800; }
+.stat-card strong,
+.rank-score,
+.battle-score strong,
+.battle-timer strong,
+.result-stats strong,
+.podium-item > span {
+  font-family: 'Pretendard', sans-serif;
+  font-weight: 900;
+  letter-spacing: -.035em;
+}
+.bottom-nav button small,
+.field label,
+.overline,
+.boss-label,
+.hero-landing-kicker {
+  font-family: 'Pretendard', sans-serif;
+}
+.bottom-nav button small { font-weight: 600; }
+.bottom-nav button.active small { font-weight: 800; }
+.login-logo .title,
+.auth-brand > h1,
+.hero-copy-block h1 {
+  font-family: 'Black Han Sans', 'Pretendard', sans-serif;
+}
 
 .bottom-nav {
   position: fixed;
