@@ -75,7 +75,7 @@ export default function Result() {
       <button className="btn btn-primary result-next-button" onClick={() => { sound.button(); setResultStep(2); window.scrollTo({ top: 0, behavior: 'smooth' }) }}>다음으로 <span aria-hidden="true">→</span></button>
       <div className="result-step-dots" aria-label="결과 2단계 중 1단계"><b /><i /></div>
     </div> : <div className="action-stack result-reward-actions"><button className="btn btn-primary" onClick={() => go('/game', { replace: true })}><img src="/images/ui/hunt-swords.png" alt="" /> 다시 사냥하기</button><button className="btn btn-secondary" onClick={() => go('/ranking')}><Icon name="trophy" size={19} /> 랭킹 보기</button><button className="text-button" onClick={() => go('/home')}><Icon name="home" size={17} /> 홈으로</button><button className="result-back-button" onClick={() => { sound.button(); setResultStep(1); window.scrollTo({ top: 0, behavior: 'smooth' }) }}>← 결과 다시 보기</button><div className="result-step-dots" aria-label="결과 2단계 중 2단계"><i /><b /></div></div>}
-    {levelUp && <LevelUpModal levelUp={levelUp} onClose={() => setLevelUp(null)} onCollection={() => go('/collection')} />}
+    {levelUp && <LevelUpModal levelUp={levelUp} onClose={() => setLevelUp(null)} onCollection={() => go('/collection')} onTrySkill={() => go('/game', { replace: true })} onOpenMission={() => go('/home')} />}
   </main>
 }
 
@@ -93,14 +93,41 @@ function getScoreGrade(score) {
   return 'C'
 }
 
-function LevelUpModal({ levelUp, onClose, onCollection }) {
+function LevelUpModal({ levelUp, onClose, onCollection, onTrySkill, onOpenMission }) {
   const monster = MONSTERS.find((item) => levelUp.unlock?.monsters?.includes(item.id))
-  return <div className="modal-overlay level-up-overlay"><section className="level-up-modal">
-    <span className="eyebrow"><Icon name="spark" size={15} /> LEVEL UP!</span>
-    <h2>Lv.{levelUp.oldLevel} → Lv.{levelUp.newLevel}</h2>
-    {monster ? <img src={monster.image} alt={monster.name} /> : <div className="level-up-symbol"><Icon name={levelUp.unlock?.skill ? 'sword' : 'spark'} size={34} /></div>}
-    <strong>{levelUp.unlock?.title}</strong>
-    <p>{levelUp.unlock?.description}</p>
-    <div className="btn-row"><button className="btn btn-secondary" onClick={onClose}>계속하기</button><button className="btn btn-primary" onClick={onCollection}>도감 확인</button></div>
+  const isSkill = Boolean(levelUp.unlock?.skill)
+  const isMission = levelUp.newLevel === 2
+  const unlockType = monster ? 'NEW MONSTER' : isSkill ? 'NEW SKILL' : isMission ? 'DAILY CONTENT' : 'NEW REWARD'
+  const primaryAction = monster ? onCollection : isSkill ? onTrySkill : isMission ? onOpenMission : onClose
+  const primaryLabel = monster ? '도감 확인' : isSkill ? '사용해보기' : isMission ? '미션 보러가기' : '확인'
+  return <div className="modal-overlay level-up-overlay"><section className={`level-up-modal ${isSkill ? 'skill-unlock' : ''} ${isMission ? 'mission-unlock' : ''}`}>
+    <div className="level-up-confetti" aria-hidden="true"><i /><i /><i /><i /><i /><i /></div>
+    <span className="level-up-kicker"><Icon name="spark" size={14} /> LEVEL UP</span>
+    <h2><span>Lv.{levelUp.oldLevel}</span><i aria-hidden="true">→</i><strong>Lv.{levelUp.newLevel}</strong></h2>
+    <div className="unlock-showcase">
+      <div className="unlock-rays" aria-hidden="true" />
+      <span className="unlock-type">{unlockType}</span>
+      <div className="unlock-art">
+        {monster ? <img src={monster.image} alt={monster.name} /> : isSkill ? <img src="/images/ui/hunt-swords.png" alt="섀도우 버스트 쌍검" /> : isMission ? <MissionUnlockArt /> : <Icon name="spark" size={54} />}
+      </div>
+      {(isSkill || isMission) && <span className="unlock-skill-tag">{isSkill ? 'ACTIVE SKILL' : 'EVERY DAY'}</span>}
+    </div>
+    <div className="unlock-copy">
+      <small>새로운 힘을 획득했어요</small>
+      <strong>{levelUp.unlock?.title}</strong>
+      <p>{levelUp.unlock?.description}</p>
+    </div>
+    <div className="btn-row"><button className="btn btn-secondary" onClick={onClose}>계속하기</button><button className="btn btn-primary" onClick={primaryAction}>{primaryLabel}</button></div>
   </section></div>
+}
+
+function MissionUnlockArt() {
+  return <div className="mission-unlock-art" role="img" aria-label="오늘의 미션 체크리스트">
+    <div className="mission-board-clip"><Icon name="spark" size={15} /></div>
+    <div className="mission-board-head"><span>TODAY</span><strong>3</strong></div>
+    <div className="mission-board-row complete"><i><Icon name="check" size={11} /></i><span /></div>
+    <div className="mission-board-row"><i /><span /></div>
+    <div className="mission-board-row"><i /><span /></div>
+    <b><Icon name="spark" size={18} /></b>
+  </div>
 }
