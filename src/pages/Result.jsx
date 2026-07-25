@@ -64,7 +64,10 @@ export default function Result() {
   const nextUnlockMonster = MONSTERS.find((item) => nextUnlock?.monsters?.includes(item.id))
   return <main className={`page result-page result-step-${resultStep}`}>
     <div className="result-burst" aria-hidden="true"><span /><span /><span /></div>
-    <section className={`result-header ${resultStep === 2 ? 'result-header-compact' : ''}`}><span className="eyebrow"><Icon name="spark" size={14} /> {resultStep === 1 ? 'HUNT COMPLETE' : 'REWARD COMPLETE'}</span><h1>{resultStep === 1 ? '사냥 완료!' : '보상 정산 완료!'}</h1><p>{resultStep === 1 ? (isBest ? '최고 기록을 경신했어요, 헌터!' : '훌륭한 사냥이었어요, 헌터!') : '이번 사냥으로 한층 더 성장했어요!'}</p></section>
+    <section className={`result-header ${resultStep === 2 ? 'result-header-compact' : ''}`}>
+      {resultStep === 2 && <button className="result-step-back" onClick={() => { sound.button(); setResultStep(1); window.scrollTo({ top: 0, behavior: 'smooth' }) }} aria-label="전투 결과로 돌아가기"><Icon name="back" size={23} /></button>}
+      <span className="eyebrow"><Icon name="spark" size={14} /> {resultStep === 1 ? 'HUNT COMPLETE' : 'REWARD COMPLETE'}</span><h1>{resultStep === 1 ? '사냥 완료!' : '보상 정산 완료!'}</h1><p>{resultStep === 1 ? (isBest ? '최고 기록을 경신했어요, 헌터!' : '훌륭한 사냥이었어요, 헌터!') : '이번 사냥으로 한층 더 성장했어요!'}</p>
+    </section>
     {resultStep === 1 ? <section className="result-card result-card-v2">
       {isBest && <div className="result-best-flag"><strong>NEW BEST!</strong><span>최고 기록 경신!</span></div>}
       <div className="result-monster-stage"><img src={representative.image} alt={representative.name} /><strong>{representative.id === 'boss' ? '그림자 대왕 격파!' : `${representative.name} ${monsterCounts[representative.id] || 0}마리 처치!`}</strong></div>

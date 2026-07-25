@@ -1309,7 +1309,8 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
 .result-summary { min-height: 76px; display: grid; grid-template-columns: 1fr 1px 1fr 1px 1fr; align-items: center; margin-top: 11px; padding: 11px 4px; border: 1px solid var(--line); border-radius: 17px; background: rgba(11,8,36,.48); }
 .result-summary > i { width: 1px; height: 38px; background: rgba(255,255,255,.09); }
 .result-summary span, .result-summary strong { display: block; }
-.result-summary > div > img { width: 27px; height: 27px; margin-bottom: 2px; object-fit: contain; filter: drop-shadow(0 3px 6px rgba(5,1,24,.38)); }
+.result-summary > div > img { width: 28px; height: 28px; margin-bottom: 2px; object-fit: contain; filter: drop-shadow(0 3px 6px rgba(5,1,24,.38)); }
+.result-summary > div:nth-of-type(2) > img { width: 24px; height: 24px; margin-top: 2px; margin-bottom: 4px; }
 .result-summary span { color: #8e87a2; font-size: 11px; }
 .result-summary strong { margin-top: 4px; color: #f2eef8; font-size: 17px; }
 .xp-progress-card { margin-top: 11px; padding: 13px 14px; border: 1px solid rgba(174,117,255,.2); border-radius: 17px; background: rgba(62,30,113,.14); text-align: left; }
@@ -1335,13 +1336,17 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
 .result-step-dots b { width: 21px; background: linear-gradient(90deg, #8447ff, #ed45bc); box-shadow: 0 0 12px rgba(202,65,221,.35); }
 .result-header-compact { margin-top: 28px; }
 .result-header-compact h1 { margin-top: 14px; }
+.result-header-compact { position: relative; }
+.result-step-back { position: absolute; left: 0; top: 1px; width: 44px; height: 44px; display: grid; place-items: center; border: 1px solid rgba(185,137,255,.24); border-radius: 14px; background: rgba(28,17,71,.72); color: #c9a8ff; cursor: pointer; box-shadow: 0 8px 18px rgba(5,1,25,.22); transition: border-color .2s, background .2s, transform .2s; }
+.result-step-back:hover { border-color: rgba(211,167,255,.5); background: rgba(54,28,106,.82); transform: translateX(-2px); }
+.result-step-back:active { transform: scale(.96); }
 .result-reward-card { margin-top: 28px; padding: 24px 18px 20px; border: 1px solid rgba(181,135,255,.23); border-radius: 30px; background: linear-gradient(155deg, rgba(38,25,86,.94), rgba(15,11,45,.97)); box-shadow: var(--shadow-card); }
-.reward-settlement { min-height: 178px; display: grid; grid-template-columns: 1fr 134px 1fr; align-items: center; gap: 4px; margin: -3px 0 14px; padding: 12px 5px; border: 1px solid rgba(184,121,255,.18); border-radius: 19px; background: radial-gradient(circle at 50% 50%, rgba(163,67,241,.22), transparent 42%), rgba(20,12,58,.52); }
-.reward-crest { position: relative; width: 142px; height: 164px; display: grid; place-items: center; justify-self: center; color: #fff; filter: drop-shadow(0 11px 16px rgba(151,52,220,.36)); }
+.reward-settlement { min-height: 198px; display: grid; grid-template-columns: 1fr 164px 1fr; align-items: center; gap: 2px; margin: -3px 0 14px; padding: 10px 3px; border: 1px solid rgba(184,121,255,.18); border-radius: 19px; background: radial-gradient(circle at 50% 50%, rgba(163,67,241,.22), transparent 42%), rgba(20,12,58,.52); }
+.reward-crest { position: relative; width: 164px; height: 190px; display: grid; place-items: center; justify-self: center; color: #fff; filter: drop-shadow(0 11px 16px rgba(151,52,220,.36)); }
 .reward-crest > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
-.reward-crest > div { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding-top: 5px; }
+.reward-crest > div { position: relative; z-index: 1; width: 94px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding-top: 7px; }
 .reward-crest svg { color: #ffe47b; filter: drop-shadow(0 0 7px rgba(255,210,72,.55)); }
-.reward-crest strong { margin-top: 4px; font: 800 28px/1 'Paperlogy', 'Pretendard', sans-serif; text-shadow: 0 3px 8px rgba(12,2,40,.68); }
+.reward-crest strong { margin-top: 4px; font: 800 25px/1 'Paperlogy', 'Pretendard', sans-serif; letter-spacing: -.04em; white-space: nowrap; text-shadow: 0 3px 9px #100325, 0 0 10px #100325; }
 .reward-crest span { margin-top: 4px; color: #ead8ff; font-size: 10px; font-weight: 900; letter-spacing: .1em; }
 .reward-breakdown { display: grid; gap: 3px; min-width: 0; }
 .reward-breakdown.left { text-align: right; }
