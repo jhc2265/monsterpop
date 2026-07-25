@@ -63,7 +63,10 @@ export default function Result() {
     {resultStep === 1 ? <section className="result-card result-card-v2">
       <div className="result-achievements">{isBest && <span className="achievement best"><Icon name="spark" size={13} /> NEW BEST</span>}{rank === 1 && <span className="achievement crown"><Icon name="crown" size={14} /> 랭킹 1위</span>}{newDiscoveries.length > 0 && <span className="achievement discovery">NEW MONSTER</span>}</div>
       <div className="result-monster-stage"><img src={representative.image} alt={representative.name} /><strong>{representative.id === 'boss' ? '그림자 대왕 격파!' : `${representative.name} ${monsterCounts[representative.id] || 0}마리 처치!`}</strong></div>
-      <div className="score-panel"><div><small>FINAL SCORE</small><strong className="result-score">{score.toLocaleString()}</strong></div><div className={`score-grade grade-${scoreGrade.toLowerCase()}`}><span>{scoreGrade}</span><small>RANK</small></div></div>
+      <div className="score-panel">
+        <div className={`score-grade grade-${scoreGrade.toLowerCase()}`}><img src={`/images/ranks/rank-${scoreGrade.toLowerCase()}.png`} alt={`${scoreGrade} 랭크 배지`} /></div>
+        <div className="score-copy"><small>FINAL SCORE</small><strong className="result-score">{score.toLocaleString()}</strong></div>
+      </div>
       <div className="result-summary"><div><span>최고 콤보</span><strong>{maxCombo}</strong></div><i /><div><span>처치 몬스터</span><strong>{totalKills}마리</strong></div><i /><div><span>현재 순위</span><strong>{saving ? '...' : rank ? `${rank}위` : '-'}</strong></div></div>
     </section> : <section className="result-reward-card">
       <div className="reward-orb"><Icon name="spark" size={26} /><span>HUNT XP</span><strong>+{xpGain}</strong></div>
