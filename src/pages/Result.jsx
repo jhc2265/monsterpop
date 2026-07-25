@@ -72,11 +72,11 @@ export default function Result() {
         <div className={`score-grade grade-${scoreGrade.toLowerCase()}`}><img src={`/images/ranks/rank-${scoreGrade.toLowerCase()}.png`} alt={`${scoreGrade} 랭크 배지`} /></div>
         <div className="score-copy"><small>FINAL SCORE</small><strong className="result-score">{score.toLocaleString()}</strong></div>
       </div>
-      <div className="result-summary"><div><Icon name="sword" size={16} /><span>최고 콤보</span><strong>{maxCombo}</strong></div><i /><div><Icon name="spark" size={16} /><span>처치 몬스터</span><strong>{totalKills}마리</strong></div><i /><div><Icon name="crown" size={16} /><span>현재 순위</span><strong>{saving ? '...' : rank ? `${rank}위` : '-'}</strong></div></div>
+      <div className="result-summary"><div><img src="/images/ui/stat-combo.png" alt="" /><span>최고 콤보</span><strong>{maxCombo}</strong></div><i /><div><img src="/images/ui/stat-kills.png" alt="" /><span>처치 몬스터</span><strong>{totalKills}마리</strong></div><i /><div><img src="/images/ui/stat-rank.png" alt="" /><span>현재 순위</span><strong>{saving ? '...' : rank ? `${rank}위` : '-'}</strong></div></div>
     </section> : <section className="result-reward-card">
       <div className="reward-settlement">
         <div className="reward-breakdown left"><span>기본 보상</span><strong>+{baseXp} XP</strong><span>기록 보너스</span><strong>+{recordBonusXp} XP</strong></div>
-        <div className="reward-crest"><Icon name="spark" size={20} /><strong>+{xpGain}</strong><span>XP</span></div>
+        <div className="reward-crest"><img src="/images/ui/xp-crest.png" alt="" /><div><Icon name="spark" size={18} /><strong>+{xpGain}</strong><span>XP</span></div></div>
         <div className="reward-breakdown right"><span>사냥 보너스</span><strong>+{huntBonusXp} XP</strong><span>총 처치</span><strong>{totalKills}마리</strong></div>
       </div>
       <div className="xp-progress-card">{xpProgress && <><div className="xp-level-head"><strong>LV.{xpProgress.level}</strong><span>{xpProgress.level >= 10 ? 'MAX LEVEL' : `LEVEL UP까지 ${(xpProgress.needed - xpProgress.current).toLocaleString()} XP!`}</span><b>{xpProgress.level >= 10 ? 'MAX' : `LV.${xpProgress.level + 1}`}</b></div><div className="xp-progress-line"><span><i style={{ width: `${xpProgress.percent}%` }} /></span></div><div className="xp-progress-values"><small>{xpProgress.current} / {xpProgress.needed} XP</small><small>{xpProgress.level >= 10 ? '최고 레벨 달성' : `${xpProgress.current + (xpProgress.needed - xpProgress.current)} / ${xpProgress.needed} XP`}</small></div></>}</div>
@@ -86,14 +86,9 @@ export default function Result() {
     {saving && <p className="status-copy"><span className="loader small" /> 기록을 저장하는 중...</p>}{saveError && <div className="notice notice-error">{saveError}</div>}
     {resultStep === 1 ? <div className="result-next-wrap">
       <button className="btn btn-primary result-next-button" onClick={() => { sound.button(); setResultStep(2); window.scrollTo({ top: 0, behavior: 'smooth' }) }}>보상 확인하기 <span aria-hidden="true">→</span></button>
-      <ResultPagination step={1} onStep={setResultStep} />
-    </div> : <div className="action-stack result-reward-actions"><button className="btn btn-primary" onClick={() => go('/game', { replace: true })}><img src="/images/ui/hunt-swords.png" alt="" /> 다시 사냥하기</button><div className="result-secondary-actions"><button className="btn btn-secondary" onClick={() => go('/ranking')}><Icon name="trophy" size={19} /> 랭킹 보기</button><button className="btn btn-secondary" onClick={() => go('/home')}><Icon name="home" size={17} /> 홈으로</button></div><button className="result-back-button" onClick={() => { sound.button(); setResultStep(1); window.scrollTo({ top: 0, behavior: 'smooth' }) }}>← 전투 결과 다시 보기</button><ResultPagination step={2} onStep={setResultStep} /></div>}
+    </div> : <div className="result-reward-actions"><button className="btn btn-primary" onClick={() => go('/game', { replace: true })}><img src="/images/ui/hunt-swords.png" alt="" /><span>다시 사냥</span></button><button className="btn btn-secondary" onClick={() => go('/ranking')}><Icon name="trophy" size={19} /><span>랭킹</span></button><button className="btn btn-secondary" onClick={() => go('/home')}><Icon name="home" size={18} /><span>홈</span></button></div>}
     {levelUp && <LevelUpModal levelUp={levelUp} onClose={() => setLevelUp(null)} onCollection={() => go('/collection')} onTrySkill={() => go('/game', { replace: true })} onOpenMission={() => go('/home')} />}
   </main>
-}
-
-function ResultPagination({ step, onStep }) {
-  return <div className="result-pagination"><span>{step} / 2</span><div className="result-step-dots" aria-label={`결과 2단계 중 ${step}단계`}><button className={step === 1 ? 'active' : ''} onClick={() => onStep(1)} aria-label="전투 결과 보기" /><button className={step === 2 ? 'active' : ''} onClick={() => onStep(2)} aria-label="성장 보상 보기" /></div><small>{step === 1 ? '전투 결과' : '성장 · 보상'}</small></div>
 }
 
 function getRepresentativeMonster(counts) {
