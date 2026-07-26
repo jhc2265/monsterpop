@@ -11,6 +11,7 @@ import Community from './pages/Community'
 import PostDetail from './pages/PostDetail'
 import Collection from './pages/Collection'
 import Settings from './pages/Settings'
+import ErrorBoundary from './components/ErrorBoundary'
 import { applyPreferences, getPreferences } from './lib/preferences'
 import { sound } from './lib/sound'
 
@@ -28,7 +29,7 @@ export default function App() {
     sound.setBgmEnabled(preferences.bgm)
     sound.setEffectsEnabled(preferences.effects)
   }, [])
-  return <div className="app-container"><Routes>
+  return <div className="app-container"><ErrorBoundary><Routes>
     <Route path="/" element={<Hero />} />
     <Route path="/login" element={<Login initialMode="login" />} />
     <Route path="/signup" element={<Login initialMode="signup" />} />
@@ -41,5 +42,5 @@ export default function App() {
     <Route path="/community/:id" element={<Protected><PostDetail /></Protected>} />
     <Route path="/settings" element={<Protected><Settings /></Protected>} />
     <Route path="*" element={<Navigate to="/" replace />} />
-  </Routes></div>
+  </Routes></ErrorBoundary></div>
 }
