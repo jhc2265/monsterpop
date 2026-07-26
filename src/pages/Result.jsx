@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext'
 import { sound } from '../lib/sound'
 import Icon from '../components/Icon'
 import { getLevel, getLevelProgress, LEVEL_UNLOCKS, resolveProgress, saveStoredProgress } from '../lib/progression'
+import { recordGameForMissions } from '../lib/missions'
 import { MONSTERS } from '../lib/monsters'
 
 export default function Result() {
@@ -29,7 +30,8 @@ export default function Result() {
   }
   async function saveProgress(newBest) {
     const totalKills = Object.values(monsterCounts).reduce((sum, count) => sum + count, 0)
-    const gained = 20 + totalKills * 2 + (monsterCounts.boss || 0) * 10 + (newBest ? 15 : 0)
+    const missionBonus = recordGameForMissions(user.id, { maxCombo, totalKills })
+    const gained = 20 + totalKills * 2 + (monsterCounts.boss || 0) * 10 + (newBest ? 15 : 0) + missionBonus
     setXpGain(gained)
     const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single()
     const previous = resolveProgress(profile, user.id)

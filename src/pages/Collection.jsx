@@ -24,10 +24,8 @@ export default function Collection() {
   }, [filter, sort])
 
   return <main className="page collection-page">
-    <header className="topbar">
-      <button className="icon-btn" onClick={() => navigate('/home')} aria-label="뒤로"><Icon name="back" /></button>
+    <header className="topbar topbar-plain">
       <div className="title-stack"><span className="overline">MONSTER ARCHIVE</span><h1>몬스터 도감</h1></div>
-      <span className="topbar-spacer" />
     </header>
     <p className="collection-intro">사냥터에서 발견한 몬스터와 특징을 확인하세요.</p>
     <section className="collection-tools" aria-label="몬스터 필터와 정렬">

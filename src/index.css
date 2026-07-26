@@ -80,7 +80,7 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
 .empty-state h3 { color: var(--text); margin: 4px 0 0; }.empty-state p { margin: 0; font-size: 14px; line-height: 1.6; }.empty-icon { display: grid; place-items: center; width: 58px; height: 58px; color: var(--primary-light); border: 1px solid rgba(162,104,255,.25); border-radius: 19px; background: rgba(124,60,255,.1); }
 .loader { width: 22px; height: 22px; border: 2px solid rgba(255,255,255,.15); border-top-color: var(--cyan); border-radius: 50%; animation: spin .7s linear infinite; }.loader.small { width: 15px; height: 15px; display: inline-block; vertical-align: -2px; } @keyframes spin { to { transform: rotate(360deg); } }
 
-.topbar { min-height: 48px; display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 22px; }.topbar h1, .topbar h2 { margin: 1px 0 0; font-size: 20px; line-height: 1.2; letter-spacing: -.4px; }.topbar-actions { display: flex; gap: 8px; }.topbar-spacer { width: 44px; }.title-stack { text-align: center; }.overline, .eyebrow { color: var(--primary-light); font-size: 10px; line-height: 1; font-weight: 900; letter-spacing: 1.5px; }.eyebrow { display: inline-flex; align-items: center; gap: 6px; }.icon-btn { width: 44px; height: 44px; display: inline-grid; place-items: center; padding: 0; border: 1px solid var(--line); border-radius: 14px; background: rgba(25,19,61,.78); cursor: pointer; transition: transform .16s, background .16s, border-color .16s; }.icon-btn:hover { background: var(--surface-3); border-color: var(--line-strong); }.icon-btn:active { transform: scale(.94); }
+.topbar { min-height: 48px; display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 22px; }.topbar h1, .topbar h2 { margin: 1px 0 0; font-size: 20px; line-height: 1.2; letter-spacing: -.4px; }.topbar-actions { display: flex; gap: 8px; }.topbar-spacer { width: 44px; }.topbar.topbar-plain { justify-content: center; }.title-stack { text-align: center; }.overline, .eyebrow { color: var(--primary-light); font-size: 10px; line-height: 1; font-weight: 900; letter-spacing: 1.5px; }.eyebrow { display: inline-flex; align-items: center; gap: 6px; }.icon-btn { width: 44px; height: 44px; display: inline-grid; place-items: center; padding: 0; border: 1px solid var(--line); border-radius: 14px; background: rgba(25,19,61,.78); cursor: pointer; transition: transform .16s, background .16s, border-color .16s; }.icon-btn:hover { background: var(--surface-3); border-color: var(--line-strong); }.icon-btn:active { transform: scale(.94); }
 
 .card { padding: 20px; border: 1px solid var(--line); border-radius: var(--radius-lg); background: linear-gradient(145deg, rgba(31,24,72,.94), rgba(18,14,49,.94)); box-shadow: var(--shadow-card); }
 .btn { min-height: 52px; width: 100%; border: 0; border-radius: 16px; display: inline-flex; align-items: center; justify-content: center; gap: 9px; padding: 13px 18px; font-weight: 800; font-size: 15px; cursor: pointer; transition: transform .12s, filter .16s, border-color .16s; }.btn:hover { filter: brightness(1.08); }.btn:active { transform: scale(.975); }.btn:disabled { opacity: .5; cursor: not-allowed; }.btn-primary { background: var(--gradient); color: #fff; box-shadow: var(--shadow-glow), inset 0 1px rgba(255,255,255,.22); }.btn-secondary { background: var(--surface-2); border: 1px solid var(--line-strong); color: var(--text); }.btn-ghost { background: transparent; border: 1px solid var(--line-strong); color: var(--text-2); }.btn-row { display: flex; gap: 10px; }.text-button { display: inline-flex; align-items: center; justify-content: center; gap: 7px; padding: 8px; border: 0; background: none; color: var(--text-2); cursor: pointer; font-size: 13px; font-weight: 700; }.text-button:hover { color: var(--text); }.text-button.danger { color: var(--danger); padding-left: 0; }
@@ -1221,6 +1221,23 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
 .progress-mission > b { color: var(--gold); font-size: 10px; white-space: nowrap; }
 .progress-mission.complete > span { background: rgba(70,229,255,.12); color: var(--cyan); }
 .progress-mission.complete > b { color: var(--cyan); }
+.mission-list { margin-top: 12px; padding-top: 11px; border-top: 1px solid rgba(255,255,255,.08); display: grid; gap: 10px; }
+.mission-list-head { display: flex; align-items: center; justify-content: space-between; }
+.mission-list-head small { color: #bd8cff; font-size: 10px; font-weight: 800; letter-spacing: .4px; }
+.mission-list-head span { color: #9f97b6; font-size: 10px; font-weight: 700; }
+.mission-item { display: flex; align-items: center; gap: 10px; }
+.mission-check { flex: 0 0 auto; width: 26px; height: 26px; display: grid; place-items: center; border-radius: 8px; background: rgba(152,75,255,.15); color: #bd8cff; }
+.mission-item.done .mission-check { background: rgba(96,231,176,.16); color: var(--success); }
+.mission-body { min-width: 0; flex: 1; }
+.mission-body-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.mission-body-top strong { overflow: hidden; color: #ded8ec; font-size: 11px; font-weight: 700; text-overflow: ellipsis; white-space: nowrap; }
+.mission-body-top b { flex: 0 0 auto; color: var(--gold); font-size: 10px; font-weight: 800; white-space: nowrap; }
+.mission-item.done .mission-body-top b { color: var(--success); }
+.mission-track { height: 5px; margin: 5px 0 3px; overflow: hidden; border-radius: 999px; background: rgba(255,255,255,.07); }
+.mission-track i { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #8b4dff, #ef4cbd); transition: width .4s ease; }
+.mission-item.done .mission-track i { background: linear-gradient(90deg, var(--success), var(--cyan)); }
+.mission-body em { color: #817a99; font-size: 9px; font-style: normal; }
+.my-rank-card .rank-num { display: none; }
 .progress-next { display: flex; align-items: center; gap: 8px; margin-top: 12px; padding-top: 11px; border-top: 1px solid rgba(255,255,255,.08); color: #8e86a3; font-size: 10px; }
 .boss-card { min-height: 206px; align-items: center; margin-bottom: 15px; }
 .boss-card .hero-copy { width: 61%; }

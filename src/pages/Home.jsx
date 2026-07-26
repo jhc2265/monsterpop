@@ -6,6 +6,7 @@ import { sound } from '../lib/sound'
 import Icon from '../components/Icon'
 import BottomNav from '../components/BottomNav'
 import { getLevelProgress, resolveProgress } from '../lib/progression'
+import { getDailyMissions } from '../lib/missions'
 
 export default function Home() {
   const { user, profile } = useAuth()
@@ -49,8 +50,8 @@ export default function Home() {
     setMuted(next)
   }
 
-  const missionDone = best > 0
   const progress = getLevelProgress(resolveProgress(profile, user.id).xp)
+  const missions = progress.level >= 2 ? getDailyMissions(user.id) : []
   const featured = progress.level >= 5
     ? { label: 'TODAY’S BOSS', name: '그림자 대왕 출현!', copy: '강력한 그림자 대왕을 사냥하고 최고 기록에 도전하세요.', image: '/images/monsters/boss.webp', grade: '보스 몬스터', score: '500점', difficulty: '★★★' }
     : progress.level >= 3
@@ -72,7 +73,17 @@ export default function Home() {
     <section className="hunter-progress" aria-label="헌터 레벨">
       <div className="hunter-progress-head"><span>LV.{progress.level}</span><div><strong>{profile?.nickname || '헌터'} · {progress.level >= 10 ? '마스터 헌터' : '성장 중인 헌터'}</strong></div><b>{progress.level >= 10 ? `${progress.total.toLocaleString()} XP` : `${progress.current.toLocaleString()} / ${progress.needed.toLocaleString()} XP`}</b></div>
       <div className="hunter-xp-bar"><i style={{ width: `${progress.percent}%` }} /></div>
-      {progress.level >= 2 ? <div className={`progress-mission ${missionDone ? 'complete' : ''}`}><span><Icon name={missionDone ? 'check' : 'spark'} size={18} /></span><div><small>오늘의 미션</small><strong>오늘 사냥 1회 완료</strong><em>{missionDone ? '내일 새로운 미션이 열려요' : '사냥을 완료하고 성장 보상을 받으세요'}</em></div><b>{missionDone ? '완료' : '+40 XP · ★ 200'}</b></div> : <div className="progress-mission locked"><span><Icon name="lock" size={17} /></span><div><small>오늘의 미션</small><strong>일일 미션 준비 중</strong><em>Lv.2부터 매일 새로운 성장 목표가 열려요</em></div><b>LV.2</b></div>}
+      {progress.level >= 2 ? <div className="mission-list">
+        <div className="mission-list-head"><small>오늘의 미션</small><span>{missions.filter((m) => m.done).length}/{missions.length} 완료</span></div>
+        {missions.map((mission) => <div key={mission.id} className={`mission-item ${mission.done ? 'done' : ''}`}>
+          <span className="mission-check"><Icon name={mission.done ? 'check' : 'spark'} size={15} /></span>
+          <div className="mission-body">
+            <div className="mission-body-top"><strong>{mission.title}</strong><b>{mission.done ? '완료' : `+${mission.rewardXp} XP`}</b></div>
+            <div className="mission-track"><i style={{ width: `${mission.percent}%` }} /></div>
+            <em>{mission.value} / {mission.goal}</em>
+          </div>
+        </div>)}
+      </div> : <div className="progress-mission locked"><span><Icon name="lock" size={17} /></span><div><small>오늘의 미션</small><strong>일일 미션 준비 중</strong><em>Lv.2부터 매일 새로운 성장 목표가 열려요</em></div><b>LV.2</b></div>}
     </section>
 
     <section className="hero-card boss-card">

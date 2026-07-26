@@ -50,7 +50,7 @@ export default function Community() {
     return categoryMatch && searchMatch
   }).sort((a, b) => activeCategory === '인기' ? (b.post_likes?.length || 0) - (a.post_likes?.length || 0) : 0)
   return <main className="page community-page">
-    <header className="topbar"><button className="icon-btn" onClick={() => navigate('/home')} aria-label="뒤로"><Icon name="back" /></button><div className="title-stack"><span className="overline">HUNTER LOUNGE</span><h1>커뮤니티</h1></div><span className="topbar-spacer" /></header>
+    <header className="topbar topbar-plain"><div className="title-stack"><span className="overline">HUNTER LOUNGE</span><h1>커뮤니티</h1></div></header>
     <p className="community-intro">기록과 공략을 다른 헌터들과 공유해보세요.</p>
     <div className="community-search"><Icon name="search" size={18} /><input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="제목이나 헌터 이름 검색" /></div>
     <div className="filter-chips community-categories">{['전체', '인기', '공략', '기록 인증', '자유'].map((item) => <button key={item} className={activeCategory === item ? 'active' : ''} onClick={() => setActiveCategory(item)}>{item}</button>)}</div>
