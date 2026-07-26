@@ -80,12 +80,21 @@ export default function Result() {
       <div className="result-summary"><div><img src="/images/ui/stat-combo.webp" alt="" /><span>최고 콤보</span><strong>{maxCombo}</strong></div><i /><div><img src="/images/ui/stat-kills.webp" alt="" /><span>처치 몬스터</span><strong>{totalKills}마리</strong></div><i /><div><img src="/images/ui/stat-rank.webp" alt="" /><span>현재 순위</span><strong>{saving ? '...' : rank ? `${rank}위` : '-'}</strong></div></div>
     </section> : <section className="result-reward-card">
       <div className="reward-settlement">
-        <div className="reward-breakdown left"><span>기본 보상</span><strong>+{baseXp} XP</strong><span>기록 보너스</span><strong>+{recordBonusXp} XP</strong></div>
-        <div className="reward-medallion"><div><Icon name="spark" size={18} /><strong>+{xpGain}</strong><span>XP 획득</span></div></div>
-        <div className="reward-breakdown right"><span>사냥 보너스</span><strong>+{huntBonusXp} XP</strong><span>총 처치</span><strong>{totalKills}마리</strong></div>
+        <div className="reward-total">
+          <Icon name="spark" size={17} />
+          <small>TOTAL XP</small>
+          <strong>+{xpGain}</strong>
+          <span>경험치를 획득했어요</span>
+        </div>
+        <div className="reward-sources">
+          <div><small>기본</small><strong>+{baseXp}</strong></div>
+          <div><small>사냥</small><strong>+{huntBonusXp}</strong></div>
+          <div><small>기록</small><strong>+{recordBonusXp}</strong></div>
+        </div>
+        <p className="reward-kills">이번 사냥에서 몬스터 <strong>{totalKills}마리</strong>를 처치했어요</p>
       </div>
-      <div className="xp-progress-card">{xpProgress && <><div className="xp-level-head"><strong>LV.{xpProgress.level}</strong><span>{xpProgress.level >= 10 ? 'MAX LEVEL' : `LEVEL UP까지 ${(xpProgress.needed - xpProgress.current).toLocaleString()} XP!`}</span><b>{xpProgress.level >= 10 ? 'MAX' : `LV.${xpProgress.level + 1}`}</b></div><div className="xp-progress-line"><span><i style={{ width: `${xpProgress.percent}%` }} /></span></div><div className="xp-progress-values"><small>{xpProgress.current} / {xpProgress.needed} XP</small><small>{xpProgress.level >= 10 ? '최고 레벨 달성' : `${xpProgress.current + (xpProgress.needed - xpProgress.current)} / ${xpProgress.needed} XP`}</small></div></>}</div>
-      {nextUnlock && <div className="next-reward-card">{nextUnlockMonster ? <img src={nextUnlockMonster.image} alt="" /> : nextUnlock.image ? <img src={nextUnlock.image} alt="" /> : <span><Icon name={nextUnlock.skill ? 'sword' : 'spark'} size={27} /></span>}<div><small>다음 해금 콘텐츠</small><strong>{nextUnlock.title}</strong><p>LV.{xpProgress.level + 1}에서 해금 예정</p></div><Icon name="lock" size={20} /></div>}
+      <div className="xp-progress-card">{xpProgress && <><div className="xp-level-head"><strong>LV.{xpProgress.level}</strong><span>{xpProgress.level >= 10 ? 'MAX LEVEL' : 'LEVEL PROGRESS'}</span><b>{xpProgress.level >= 10 ? 'MAX' : `LV.${xpProgress.level + 1}`}</b></div><div className="xp-progress-line"><span><i style={{ width: `${xpProgress.percent}%` }} /></span></div><div className="xp-progress-values"><small>{xpProgress.current} / {xpProgress.needed} XP</small><small>{xpProgress.level >= 10 ? '최고 레벨 달성' : `${(xpProgress.needed - xpProgress.current).toLocaleString()} XP 남음`}</small></div></>}</div>
+      {nextUnlock && <div className="next-reward-card">{nextUnlockMonster ? <img src={nextUnlockMonster.image} alt="" /> : nextUnlock.image ? <img src={nextUnlock.image} alt="" /> : <span><Icon name={nextUnlock.skill ? 'sword' : 'spark'} size={27} /></span>}<div><small>NEXT UNLOCK · LV.{xpProgress.level + 1}</small><strong>{nextUnlock.title}</strong><p>{nextUnlock.description}</p></div><Icon name="lock" size={18} /></div>}
       {newDiscoveries.length > 0 && <div className="reward-discovery"><span>NEW</span><strong>새로운 몬스터가 도감에 등록됐어요!</strong></div>}
     </section>}
     {saving && <p className="status-copy"><span className="loader small" /> 기록을 저장하는 중...</p>}{saveError && <div className="notice notice-error">{saveError}</div>}
