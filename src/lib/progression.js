@@ -1,19 +1,19 @@
 export const LEVEL_XP = [0, 100, 250, 450, 700, 1000, 1350, 1750, 2200, 2700]
 
 export const LEVEL_UNLOCKS = {
-  1: { title: '초보 사냥터', description: '말랑 슬라임과 번개 토끼 출현', monsters: ['slime', 'rabbit'] },
+  1: { title: '초보 사냥터', description: '말랑 슬라임 출현', monsters: ['slime'] },
   2: { title: '오늘의 미션', description: '매일 새로운 미션에 도전할 수 있어요', image: '/images/rewards/level-2-daily-mission.webp' },
-  3: { title: '불꽃 여우', description: '불꽃 여우가 사냥터에 출현합니다', monsters: ['fox'] },
+  3: { title: '번개 토끼', description: '번개 토끼가 사냥터에 출현합니다', monsters: ['rabbit'] },
   4: { title: '섀도우 버스트', description: '쌍검 스킬을 충전해 사용할 수 있어요', skill: 'burst', image: '/images/ui/hunt-swords.webp' },
-  5: { title: '그림자 대왕', description: '그림자 대왕이 사냥터에 출현합니다', monsters: ['boss'] },
-  6: { title: '숙련 헌터 배지', description: '레벨 배지가 한 단계 빛납니다', image: '/images/rewards/level-6-skilled-badge.webp' },
-  7: { title: '도감 보너스', description: '몬스터 발견 보상이 증가합니다', image: '/images/rewards/level-7-collection-bonus.webp' },
-  8: { title: '엘리트 헌터 배지', description: '엘리트 헌터의 증표를 획득합니다', image: '/images/rewards/level-8-elite-badge.webp' },
-  9: { title: '랭킹 도전자', description: '랭킹 전용 칭호를 획득합니다', image: '/images/rewards/level-9-ranking-challenger.webp' },
-  10: { title: '보스 챌린지', description: '강화 보스 도전 자격을 획득합니다', image: '/images/rewards/level-10-boss-challenge.webp' },
+  5: { title: '불꽃 여우', description: '불꽃 여우가 사냥터에 출현합니다', monsters: ['fox'] },
+  6: { title: '시간 부엉이', description: '처치하면 사냥 시간이 늘어납니다', monsters: ['owl'] },
+  7: { title: '수정 고슴도치', description: '방어가 풀리는 순간을 노려보세요', monsters: ['hedgehog'] },
+  8: { title: '황금 미믹', description: '희귀한 코인 보물 몬스터가 출현합니다', monsters: ['mimic'] },
+  9: { title: '바위 골렘', description: '세 번 공격해야 하는 강적이 출현합니다', monsters: ['golem'] },
+  10: { title: '그림자 대왕', description: '그림자 대왕 보스전에 도전할 수 있어요', monsters: ['boss'], image: '/images/rewards/level-10-boss-challenge.webp' },
 }
 
-const MONSTER_LEVEL = { slime: 1, rabbit: 1, fox: 3, boss: 5 }
+const MONSTER_LEVEL = { slime: 1, rabbit: 3, fox: 5, owl: 6, hedgehog: 7, mimic: 8, golem: 9, boss: 10 }
 
 export function getLevel(xp = 0) {
   let level = 1

@@ -14,14 +14,6 @@ const POSITIONS = [
   { x: 18, y: 25 }, { x: 50, y: 20 }, { x: 82, y: 27 },
   { x: 28, y: 52 }, { x: 70, y: 52 }, { x: 50, y: 70 },
 ]
-const HP = { 일반: 1, 희귀: 1, 영웅: 1, 보스: 3 }
-const ESCAPE_DURATION = { slime: 5600, rabbit: 3600, fox: 4300, boss: 7600 }
-const ACTIONS = {
-  slime: { cue: 'TAP', hint: '한 번 터치' },
-  rabbit: { cue: '↔', hint: '좌우로 밀기' },
-  fox: { cue: '×2', hint: '빠르게 두 번' },
-  boss: { cue: 'HOLD', hint: '길게 누르기' },
-}
 let entityId = 0
 let effectId = 0
 
@@ -30,18 +22,23 @@ function makeEnemy(index = 0, randomize = false, allowedIds, occupied = []) {
   const freeIndexes = POSITIONS.map((_, positionIndex) => positionIndex).filter((positionIndex) => !occupied.includes(positionIndex))
   const positionIndex = randomize && freeIndexes.length ? freeIndexes[Math.floor(Math.random() * freeIndexes.length)] : index % POSITIONS.length
   const position = POSITIONS[positionIndex]
-  const maxHp = HP[monster.grade] || 1
+  const maxHp = monster.hp || 1
   return {
     ...monster,
     entityId: ++entityId,
     hp: maxHp,
     maxHp,
     bornAt: Date.now(),
-    escapeDuration: ESCAPE_DURATION[monster.id] || 5000,
+    escapeDuration: monster.escapeDuration || 5000,
     positionIndex,
     x: position.x + (Math.random() * 5 - 2.5),
     y: position.y + (Math.random() * 4 - 2),
   }
+}
+
+function isGuardOpen(enemy, now = Date.now()) {
+  const cycle = (now - enemy.bornAt) % 1800
+  return cycle >= 1050 && cycle <= 1530
 }
 
 export default function Game() {
@@ -62,6 +59,7 @@ export default function Game() {
   const [effects, setEffects] = useState([])
   const [lastJudge, setLastJudge] = useState('몬스터 위의 조작 표시를 확인하세요')
   const [holdingId, setHoldingId] = useState(null)
+  const [, setArenaTick] = useState(0)
 
   const scoreRef = useRef(0)
   const comboRef = useRef(0)
@@ -113,16 +111,23 @@ export default function Game() {
 
   useEffect(() => {
     if (!playing) return
+    const timer = setInterval(() => setArenaTick((value) => value + 1), 120)
+    return () => clearInterval(timer)
+  }, [playing])
+
+  useEffect(() => {
+    if (!playing) return
     const escapeWatcher = setInterval(() => {
       if (pausedRef.current) return
       const now = Date.now()
       setEnemies((items) => {
         const escaped = items.filter((enemy) => now - enemy.bornAt >= enemy.escapeDuration)
         if (!escaped.length) return items
+        const penalized = escaped.filter((enemy) => !enemy.noEscapePenalty)
         setTimeout(() => {
-          comboRef.current = Math.max(0, comboRef.current - escaped.length)
+          comboRef.current = Math.max(0, comboRef.current - penalized.length)
           setCombo(comboRef.current)
-          setLastJudge(`${escaped.length}마리가 도망갔어요!`)
+          setLastJudge(penalized.length ? `${penalized.length}마리가 도망갔어요!` : '황금 미믹이 사라졌어요')
           escaped.forEach((enemy) => addEffect(enemy.x, enemy.y, 'ESCAPE', 'miss'))
         }, 0)
         const survivors = items.filter((enemy) => now - enemy.bornAt < enemy.escapeDuration)
@@ -212,13 +217,23 @@ export default function Game() {
       return
     }
 
+    if (target.reward === 'time') {
+      setTimeLeft((value) => Math.min(GAME_TIME + 10, value + 2))
+      addEffect(target.x, target.y - 8, '+2 SEC', 'perfect')
+    }
+    if (target.reward === 'coins') {
+      const coinBonus = 50 + Math.floor(Math.random() * 101)
+      setCoins((value) => value + coinBonus)
+      addEffect(target.x, target.y - 8, `+${coinBonus} COIN`, 'boss')
+    }
+
     if (target.grade === '영웅' || target.grade === '보스') sound.rare()
     monsterCountsRef.current[target.id] = (monsterCountsRef.current[target.id] || 0) + 1
     replaceEnemy(target.entityId)
   }
 
-  function wrongGesture(target, message) {
-    comboRef.current = Math.max(0, comboRef.current - 1)
+  function wrongGesture(target, message, resetCombo = false) {
+    comboRef.current = resetCombo ? 0 : Math.max(0, comboRef.current - 1)
     setCombo(comboRef.current)
     setLastJudge(message)
     sound.miss()
@@ -230,7 +245,7 @@ export default function Game() {
     event.preventDefault()
     event.currentTarget.setPointerCapture?.(event.pointerId)
     pointerRef.current = { entityId: target.entityId, x: event.clientX, y: event.clientY, completed: false }
-    if (target.id === 'boss') {
+    if (target.gesture === 'hold') {
       setHoldingId(target.entityId)
       holdTimerRef.current = setTimeout(() => {
         if (!pointerRef.current || pointerRef.current.entityId !== target.entityId) return
@@ -252,11 +267,14 @@ export default function Game() {
     const dx = event.clientX - pointer.x
     const dy = event.clientY - pointer.y
     const distance = Math.hypot(dx, dy)
-    if (target.id === 'slime') completeGesture(target)
-    else if (target.id === 'rabbit') {
+    const hedgehogOpen = target.behavior !== 'guard-cycle' || isGuardOpen(target)
+    if (!hedgehogOpen) {
+      wrongGesture(target, '수정 가시가 내려갈 때 공격하세요', true)
+    } else if (target.gesture === 'tap') completeGesture(target)
+    else if (target.gesture === 'swipe-x') {
       if (Math.abs(dx) >= 30 && Math.abs(dx) > Math.abs(dy)) completeGesture(target)
-      else wrongGesture(target, '토끼는 좌우로 밀어주세요')
-    } else if (target.id === 'fox') {
+      else wrongGesture(target, `${target.name}은 좌우로 밀어주세요`)
+    } else if (target.gesture === 'double-tap') {
       const previous = lastTapRef.current[target.entityId] || 0
       if (Date.now() - previous <= 420 && distance < 16) {
         delete lastTapRef.current[target.entityId]
@@ -266,7 +284,7 @@ export default function Game() {
         setLastJudge('한 번 더 빠르게 터치!')
         addEffect(target.x, target.y, 'ONE MORE!', 'good')
       }
-    } else if (target.id === 'boss') wrongGesture(target, '보스는 길게 눌러주세요')
+    } else if (target.gesture === 'hold') wrongGesture(target, `${target.name}은 길게 눌러주세요`)
     pointerRef.current = null
   }
 
@@ -331,7 +349,7 @@ export default function Game() {
       <div className={`battle-combo ${combo > 0 ? 'active' : ''}`}><small>COMBO</small><strong>{combo}</strong></div>
     </header>
 
-    <div className="battle-timebar"><span style={{ width: `${(timeLeft / GAME_TIME) * 100}%` }} /></div>
+    <div className="battle-timebar"><span style={{ width: `${Math.min(100, (timeLeft / GAME_TIME) * 100)}%` }} /></div>
 
     <section className={`battle-arena ${energy >= SKILL_MAX ? 'burst-ready' : ''}`}>
       <img className="battle-background" src="/images/bg/battle-arena.webp" alt="" />
@@ -339,17 +357,18 @@ export default function Game() {
       <div className="gesture-legend"><span>TAP</span><span>↔ SWIPE</span><span>×2</span><span>HOLD</span></div>
 
       {enemies.map((enemy) => {
-        const action = ACTIONS[enemy.id]
+        const guardOpen = enemy.behavior !== 'guard-cycle' || isGuardOpen(enemy)
+        const cue = enemy.behavior === 'guard-cycle' ? (guardOpen ? 'TAP!' : 'WAIT') : enemy.cue
         return <button
           key={`${enemy.entityId}-${enemy.bornAt}`}
-          className={`battle-enemy gesture-${enemy.id} grade-${enemy.grade} ${holdingId === enemy.entityId ? 'holding' : ''}`}
+          className={`battle-enemy gesture-${enemy.id} grade-${enemy.grade} ${guardOpen ? 'state-open' : 'state-guard'} hp-${enemy.hp} ${holdingId === enemy.entityId ? 'holding' : ''}`}
           style={{ left: `${enemy.x}%`, top: `${enemy.y}%`, '--enemy-color': enemy.color, '--escape-duration': `${enemy.escapeDuration}ms` }}
           onPointerDown={(event) => handlePointerDown(event, enemy)}
           onPointerUp={(event) => handlePointerUp(event, enemy)}
           onPointerCancel={handlePointerCancel}
-          aria-label={`${enemy.name}, ${action.hint}`}
+          aria-label={`${enemy.name}, ${enemy.hint}`}
         >
-          <span className="action-cue">{action.cue}</span>
+          <span className="action-cue">{cue}</span>
           <MonsterImage monster={enemy} />
           <span className="escape-bar"><i /></span>
           {enemy.maxHp > 1 && <span className="enemy-health"><i style={{ width: `${(enemy.hp / enemy.maxHp) * 100}%` }} /></span>}

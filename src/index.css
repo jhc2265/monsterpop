@@ -592,7 +592,7 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
 }
 
 /* Game home v2 */
-.home-v2 { padding: max(22px, env(safe-area-inset-top)) 18px calc(28px + env(safe-area-inset-bottom)); }
+.home-v2 { padding: max(30px, env(safe-area-inset-top)) 18px calc(30px + env(safe-area-inset-bottom)); }
 .home-welcome { position: relative; display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
 .home-welcome h1 { margin: 0; font-size: 18px; line-height: 1.3; letter-spacing: -.5px; }
 .home-welcome h1 strong { color: #e96bcf; }
@@ -693,7 +693,7 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
 
 /* Simplified home hierarchy and shared bottom navigation */
 .page:has(.bottom-nav) { padding-bottom: calc(104px + env(safe-area-inset-bottom)); }
-.home-v2 { padding-top: max(22px, env(safe-area-inset-top)); }
+.home-v2 { padding-top: max(30px, env(safe-area-inset-top)); }
 .home-welcome { margin-bottom: 16px; }
 .home-welcome .icon-btn { width: 39px; height: 39px; border-radius: 13px; }
 .home-welcome .topbar-actions { gap: 6px; }
@@ -895,6 +895,15 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
 .my-rank-head strong { color: #fff; font-size: 13px; }
 .my-rank-card > span { display: none; }
 .my-rank-card .rank-item { min-height: 64px; }
+.my-rank-card .rank-score { display: none; }
+.my-rank-stats { display: grid; grid-template-columns: 1fr 1px 1fr; align-items: center; gap: 12px; margin: 0 13px; padding: 12px 2px 14px; border-top: 1px solid rgba(255,255,255,.08); }
+.my-rank-stats > i { width: 1px; height: 34px; background: rgba(255,255,255,.09); justify-self: center; }
+.my-rank-stats > div { min-width: 0; text-align: center; }
+.my-rank-stats small { display: block; color: #9a92ad; font-size: 10px; }
+.my-rank-stats strong { display: block; margin-top: 3px; color: #f2eef8; font-size: 17px; }
+.my-rank-stats em { display: block; margin-top: 3px; color: #817a99; font-size: 9px; font-style: normal; }
+.my-rank-stats em b { color: var(--success); font-weight: 800; }
+.my-rank-stats em b.down { color: var(--danger); }
 .rank-list { display: grid; gap: 7px; overflow: visible; margin-top: 13px; border: 0; border-radius: 0; background: transparent; }
 .rank-list .list-label { padding: 10px 5px 5px; }
 .rank-list .rank-item { min-height: 62px; border: 1px solid rgba(171,126,255,.13); border-radius: 16px; background: rgba(18,13,48,.78); }
@@ -1126,6 +1135,46 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
 .battle-arena:has(.battle-pause-overlay) .escape-bar i { animation-play-state: paused; }
 @keyframes monsterEscape { to { transform: scaleX(0); filter: hue-rotate(-60deg); } }
 @keyframes holdCharge { from { transform: rotate(0deg) scale(.9); opacity: .4; } to { transform: rotate(360deg) scale(1.06); opacity: 1; } }
+
+/* Config-driven monster states */
+.gesture-owl .action-cue { color: #79f5ff; }
+.gesture-mimic .action-cue { color: #ffe27a; }
+.gesture-hedgehog .action-cue { color: #cab2ff; }
+.gesture-golem .action-cue { color: #f2a2ff; }
+.gesture-owl img { animation: specialMonsterFloat 1.25s ease-in-out infinite; }
+.gesture-mimic img { animation: mimicTempt .42s ease-in-out infinite alternate; }
+.gesture-golem { width: 116px; height: 116px; }
+.gesture-golem img { transition: filter .2s, transform .2s; }
+.gesture-golem.hp-2 img { filter: saturate(.85) brightness(.95); transform: scale(.96) rotate(-2deg); }
+.gesture-golem.hp-1 img { filter: saturate(.65) brightness(.86); transform: scale(.91) rotate(2deg); }
+.gesture-golem.hp-2::after,
+.gesture-golem.hp-1::after {
+  content: '';
+  position: absolute;
+  z-index: 6;
+  inset: 18%;
+  background: linear-gradient(72deg, transparent 44%, rgba(255,255,255,.72) 46% 48%, transparent 50%);
+  opacity: .55;
+  pointer-events: none;
+}
+.gesture-hedgehog img { transition: filter .16s, transform .16s; }
+.gesture-hedgehog.state-guard img { filter: saturate(.78) brightness(.78); transform: scale(.96) rotate(-2deg); }
+.gesture-hedgehog.state-guard::after {
+  content: '';
+  position: absolute;
+  z-index: 6;
+  inset: 7%;
+  border: 3px solid rgba(190,160,255,.75);
+  border-radius: 50%;
+  box-shadow: inset 0 0 18px rgba(113,64,230,.58), 0 0 12px rgba(130,80,255,.48);
+  animation: guardPulse .7s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+.gesture-hedgehog.state-open img { filter: brightness(1.22); transform: scale(1.05); }
+.gesture-hedgehog.state-open .action-cue { color: #fff; background: rgba(100,54,195,.96); }
+@keyframes guardPulse { to { opacity: .55; transform: scale(.92); } }
+@keyframes specialMonsterFloat { 50% { transform: translateY(-7px) rotate(2deg); } }
+@keyframes mimicTempt { to { transform: translateY(-3px) rotate(1.5deg); filter: brightness(1.1); } }
 
 /* Hunter progression */
 .hunter-progress { margin: -2px 0 13px; padding: 10px 13px; border: 1px solid rgba(171,127,255,.15); border-radius: 14px; background: rgba(25,17,59,.56); }

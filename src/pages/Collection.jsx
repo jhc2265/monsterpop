@@ -29,7 +29,7 @@ export default function Collection() {
     </header>
     <p className="collection-intro">사냥터에서 발견한 몬스터와 특징을 확인하세요.</p>
     <section className="collection-tools" aria-label="몬스터 필터와 정렬">
-      <div className="filter-chips">{['전체', '일반', '희귀', '영웅', '보스'].map((grade) => <button key={grade} className={filter === grade ? 'active' : ''} onClick={() => setFilter(grade)}>{grade}</button>)}</div>
+      <div className="filter-chips">{['전체', '일반', '희귀', '영웅', '특수', '보스'].map((grade) => <button key={grade} className={filter === grade ? 'active' : ''} onClick={() => setFilter(grade)}>{grade}</button>)}</div>
       <select value={sort} onChange={(event) => setSort(event.target.value)} aria-label="몬스터 정렬">
         <option value="default">기본 순서</option>
         <option value="score">점수 높은 순</option>
