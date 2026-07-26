@@ -29,7 +29,6 @@ export default function Ranking() {
   }
   const podium = rows.slice(0, 3)
   const myRank = rows.findIndex((row) => row.user_id === user.id)
-  const remainingRows = rows.slice(3)
   const weekEnd = getWeekEnd()
   return <main className="page ranking-page">
     <header className="topbar ranking-topbar"><button className="icon-btn" onClick={() => navigate('/home')} aria-label="뒤로"><Icon name="back" /></button><div className="title-stack"><span className="overline">HALL OF FAME</span><h1>헌터 랭킹</h1></div><span className="topbar-spacer" /></header>
@@ -37,7 +36,7 @@ export default function Ranking() {
     {loading ? <div className="empty-state"><span className="loader" />랭킹을 집계하는 중...</div> : rows.length === 0 ? <Empty /> : <>
       <section className="ranking-hero"><div className="ranking-hero-title"><span><Icon name="spark" size={13} /> TOP HUNTERS</span><small>{tab === 'week' ? `이번 주 마감 ${weekEnd}` : `${rows.length}명의 헌터가 경쟁 중`}</small></div><div className="podium">{[podium[1], podium[0], podium[2]].map((row, index) => row ? <Podium key={row.user_id} row={row} rank={[2,1,3][index]} me={row.user_id === user.id} /> : <PodiumPlaceholder key={index} rank={[2,1,3][index]} />)}</div></section>
       {myRank >= 0 && <section className="my-rank-card"><div className="my-rank-head"><span>MY RANK</span><strong>{myRank + 1}위</strong></div><RankRow row={rows[myRank]} rank={myRank + 1} me /></section>}
-      <section className="rank-list"><div className="list-label"><span>전체 순위</span><small>{remainingRows.length > 0 ? `4위부터 ${rows.length}위` : 'TOP 3 집계 완료'}</small></div>{remainingRows.length > 0 ? remainingRows.map((row, index) => <RankRow key={row.user_id} row={row} rank={index + 4} me={row.user_id === user.id} />) : <p className="rank-list-empty">다음 순위의 주인공을 기다리고 있어요.</p>}</section>
+      <section className="rank-list"><div className="list-label"><span>전체 순위</span><small>총 {rows.length}명</small></div>{rows.map((row, index) => <RankRow key={row.user_id} row={row} rank={index + 1} me={row.user_id === user.id} />)}</section>
     </>}
     <BottomNav />
   </main>
