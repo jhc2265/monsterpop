@@ -896,12 +896,15 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
 .my-rank-card > span { display: none; }
 .my-rank-card .rank-item { min-height: 64px; }
 .my-rank-card .rank-score { display: none; }
-.my-rank-stats { display: grid; grid-template-columns: 1fr 1px 1fr; align-items: center; gap: 12px; margin: 0 13px; padding: 12px 2px 14px; border-top: 1px solid rgba(255,255,255,.08); }
-.my-rank-stats > i { width: 1px; height: 34px; background: rgba(255,255,255,.09); justify-self: center; }
-.my-rank-stats > div { min-width: 0; text-align: center; }
+.my-rank-stats { display: grid; grid-template-columns: 1fr 1px 1fr; align-items: center; gap: 10px; margin: 0 13px; padding: 12px 2px 14px; border-top: 1px solid rgba(255,255,255,.08); }
+.my-rank-stats > i { width: 1px; height: 36px; background: rgba(255,255,255,.09); justify-self: center; }
+.my-rank-stats > div { min-width: 0; display: flex; align-items: center; gap: 9px; }
+.my-rank-stats .stat-icon { flex: 0 0 auto; width: 36px; height: 36px; background: transparent; }
+.my-rank-stats .art-tile img { width: 128%; height: 128%; object-fit: contain; }
+.my-rank-stats .stat-text { min-width: 0; }
 .my-rank-stats small { display: block; color: #9a92ad; font-size: 10px; }
-.my-rank-stats strong { display: block; margin-top: 3px; color: #f2eef8; font-size: 17px; }
-.my-rank-stats em { display: block; margin-top: 3px; color: #817a99; font-size: 9px; font-style: normal; }
+.my-rank-stats strong { display: block; margin-top: 2px; color: #f2eef8; font-size: 17px; }
+.my-rank-stats em { display: block; margin-top: 2px; color: #817a99; font-size: 9px; font-style: normal; }
 .my-rank-stats em b { color: var(--success); font-weight: 800; }
 .my-rank-stats em b.down { color: var(--danger); }
 .rank-list { display: grid; gap: 7px; overflow: visible; margin-top: 13px; border: 0; border-radius: 0; background: transparent; }
