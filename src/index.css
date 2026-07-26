@@ -1450,6 +1450,75 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
 .home-v2 .boss-card .boss-start span { font-size: 15px; }
 .home-v2 .boss-card .boss-start b { font-size: 22px; }
 
+/* Clearer personal ranking summary */
+.ranking-page .my-rank-card {
+  overflow: hidden;
+  border-color: rgba(192,102,255,.34);
+  border-radius: 22px;
+  background: linear-gradient(145deg, rgba(69,30,120,.86), rgba(27,17,66,.96));
+}
+.ranking-page .my-rank-head {
+  min-height: 38px;
+  padding: 0 16px;
+  background: rgba(112,47,168,.34);
+}
+.ranking-page .my-rank-head span {
+  font-size: 11px;
+  letter-spacing: .14em;
+}
+.ranking-page .my-rank-head strong {
+  color: #fff;
+  font-size: 15px;
+}
+.ranking-page .my-rank-card .rank-item {
+  min-height: 66px;
+  gap: 11px;
+  padding: 10px 16px;
+  border: 0;
+}
+.ranking-page .my-rank-card .rank-num { display: none; }
+.ranking-page .my-rank-card .avatar {
+  width: 46px;
+  height: 46px;
+  border: 1px solid rgba(218,160,255,.3);
+  box-shadow: 0 5px 14px rgba(5,2,25,.28);
+}
+.ranking-page .my-rank-card .rank-name strong { font-size: 15px; }
+.ranking-page .my-rank-card .rank-name small {
+  margin-top: 2px;
+  color: #9e94b6;
+  font-size: 11px;
+}
+.ranking-page .my-rank-stats {
+  gap: 14px;
+  margin: 0 16px;
+  padding: 13px 0 15px;
+}
+.ranking-page .my-rank-stats > div { gap: 9px; }
+.ranking-page .my-rank-stats > i { height: 48px; }
+.ranking-page .my-rank-stats .stat-icon {
+  width: 36px;
+  height: 36px;
+}
+.ranking-page .my-rank-stats .art-tile img {
+  width: 92%;
+  height: 92%;
+}
+.ranking-page .my-rank-stats small {
+  color: #a89fba;
+  font-size: 11px;
+}
+.ranking-page .my-rank-stats strong {
+  margin-top: 1px;
+  color: #fff;
+  font-size: 21px;
+  line-height: 1.1;
+}
+.ranking-page .my-rank-stats em {
+  margin-top: 3px;
+  font-size: 10px;
+}
+
 .progress-mission { min-height: 67px; margin-top: 13px; padding-top: 13px; }
 .progress-mission > span { width: 36px; height: 36px; }
 .progress-mission em { display: block; overflow: hidden; margin-top: 3px; color: #817a98; font-size: 11px; font-style: normal; text-overflow: ellipsis; white-space: nowrap; }
