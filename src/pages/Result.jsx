@@ -81,7 +81,7 @@ export default function Result() {
     </section> : <section className="result-reward-card">
       <div className="reward-settlement">
         <div className="reward-breakdown left"><span>기본 보상</span><strong>+{baseXp} XP</strong><span>기록 보너스</span><strong>+{recordBonusXp} XP</strong></div>
-        <div className="reward-crest"><img src="/images/ui/xp-crest.webp" alt="" /><div><Icon name="spark" size={18} /><strong>+{xpGain}</strong><span>XP</span></div></div>
+        <div className="reward-medallion"><div><Icon name="spark" size={18} /><strong>+{xpGain}</strong><span>XP 획득</span></div></div>
         <div className="reward-breakdown right"><span>사냥 보너스</span><strong>+{huntBonusXp} XP</strong><span>총 처치</span><strong>{totalKills}마리</strong></div>
       </div>
       <div className="xp-progress-card">{xpProgress && <><div className="xp-level-head"><strong>LV.{xpProgress.level}</strong><span>{xpProgress.level >= 10 ? 'MAX LEVEL' : `LEVEL UP까지 ${(xpProgress.needed - xpProgress.current).toLocaleString()} XP!`}</span><b>{xpProgress.level >= 10 ? 'MAX' : `LV.${xpProgress.level + 1}`}</b></div><div className="xp-progress-line"><span><i style={{ width: `${xpProgress.percent}%` }} /></span></div><div className="xp-progress-values"><small>{xpProgress.current} / {xpProgress.needed} XP</small><small>{xpProgress.level >= 10 ? '최고 레벨 달성' : `${xpProgress.current + (xpProgress.needed - xpProgress.current)} / ${xpProgress.needed} XP`}</small></div></>}</div>
