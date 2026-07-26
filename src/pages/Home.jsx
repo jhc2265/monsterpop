@@ -63,6 +63,7 @@ export default function Home() {
       <div>
         <h1>안녕하세요, <strong>{profile?.nickname || '헌터'} 헌터님!</strong></h1>
         <p>오늘도 최고 기록에 도전해보세요.</p>
+        {best > 0 && <button className="home-best-line" onClick={() => go('/ranking')}>최고 <strong>{best.toLocaleString()}점</strong>{rank ? ` · ${rank}위` : ''} <span>›</span></button>}
       </div>
       <div className="topbar-actions">
         <button className="icon-btn" onClick={toggleMute} aria-label={muted ? '소리 켜기' : '소리 끄기'}><Icon name={muted ? 'mute' : 'sound'} /></button>
@@ -100,11 +101,6 @@ export default function Home() {
         </div>
       </div>
       <button className="boss-start" onClick={() => go('/game')}><img src="/images/ui/hunt-swords.webp" alt="" /><span>지금 사냥하기</span><b>›</b></button>
-    </section>
-
-    <section className="home-record" aria-label="나의 기록">
-      <div className="home-record-title"><span>내 기록</span><button onClick={() => go('/ranking')}>랭킹 보기 ›</button></div>
-      <div className="home-record-grid"><article><span className="stat-icon purple art-tile"><img src="/images/ui/trophy.webp" alt="" /></span><div><small>최고 점수</small><strong>{best.toLocaleString()}</strong><em>{delta === null ? '첫 기록에 도전' : <>이전 기록 대비 <b>{delta >= 0 ? '▲' : '▼'} {Math.abs(delta)}%</b></>}</em></div></article><i /><article><span className="stat-icon pink art-tile"><img src="/images/ui/crown.webp" alt="" /></span><div><small>현재 순위</small><strong>{rank ? `${rank}위` : '도전 전'}</strong><em>{rank ? `전체 ${totalPlayers.toLocaleString()}명` : '기록을 세워보세요'}</em></div></article></div>
     </section>
     <BottomNav />
   </main>
