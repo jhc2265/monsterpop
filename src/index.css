@@ -1393,6 +1393,60 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
 .bottom-nav button.primary > span { border-color: rgba(255,255,255,.58); background: var(--gradient); box-shadow: 0 8px 23px rgba(174,58,235,.52), 0 0 22px rgba(238,67,190,.22), inset 0 1px rgba(255,255,255,.34); }
 .bottom-nav button.primary > span img { opacity: 1; filter: saturate(1.08) brightness(1.12) drop-shadow(0 3px 5px rgba(70,16,121,.44)); }
 .bottom-nav button.primary small { color: #d8c9f2; }
+
+/* Compact featured hunt card */
+.home-v2 .boss-card {
+  min-height: 238px;
+  margin-bottom: 12px;
+  padding: 15px;
+  border-radius: 24px;
+}
+.home-v2 .boss-main { min-height: 154px; }
+.home-v2 .boss-card .hero-copy {
+  width: 64%;
+  padding-top: 0;
+}
+.home-v2 .boss-label { margin-bottom: 6px; }
+.home-v2 .hunt-meta {
+  gap: 4px;
+  margin-bottom: 7px;
+}
+.home-v2 .hunt-meta span {
+  padding: 3px 5px;
+  font-size: 9px;
+}
+.home-v2 .boss-card .hero-copy h2 {
+  font-size: 20px;
+  line-height: 1.15;
+}
+.home-v2 .boss-card .hero-copy p {
+  margin-top: 7px;
+  font-size: 12px;
+  line-height: 1.5;
+}
+.home-v2 .boss-main .boss-visual {
+  right: -2px;
+  width: 40%;
+  height: 145px;
+}
+.home-v2 .boss-card .hero-monster {
+  width: 140px;
+  right: 0;
+  bottom: -2px;
+}
+.home-v2 .boss-card .boss-start {
+  min-height: 46px;
+  margin-top: 7px;
+  padding: 5px 12px 5px 8px;
+  border-radius: 14px;
+}
+.home-v2 .boss-card .boss-start img {
+  width: 31px;
+  height: 31px;
+}
+.home-v2 .boss-card .boss-start span { font-size: 15px; }
+.home-v2 .boss-card .boss-start b { font-size: 22px; }
+
 .progress-mission { min-height: 67px; margin-top: 13px; padding-top: 13px; }
 .progress-mission > span { width: 36px; height: 36px; }
 .progress-mission em { display: block; overflow: hidden; margin-top: 3px; color: #817a98; font-size: 11px; font-style: normal; text-overflow: ellipsis; white-space: nowrap; }
