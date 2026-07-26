@@ -2,15 +2,15 @@ export const LEVEL_XP = [0, 100, 250, 450, 700, 1000, 1350, 1750, 2200, 2700]
 
 export const LEVEL_UNLOCKS = {
   1: { title: '초보 사냥터', description: '말랑 슬라임과 번개 토끼 출현', monsters: ['slime', 'rabbit'] },
-  2: { title: '오늘의 미션', description: '매일 새로운 미션에 도전할 수 있어요' },
+  2: { title: '오늘의 미션', description: '매일 새로운 미션에 도전할 수 있어요', image: '/images/rewards/level-2-daily-mission.png' },
   3: { title: '불꽃 여우', description: '불꽃 여우가 사냥터에 출현합니다', monsters: ['fox'] },
-  4: { title: '섀도우 버스트', description: '쌍검 스킬을 충전해 사용할 수 있어요', skill: 'burst' },
+  4: { title: '섀도우 버스트', description: '쌍검 스킬을 충전해 사용할 수 있어요', skill: 'burst', image: '/images/ui/hunt-swords.png' },
   5: { title: '그림자 대왕', description: '그림자 대왕이 사냥터에 출현합니다', monsters: ['boss'] },
-  6: { title: '숙련 헌터 배지', description: '레벨 배지가 한 단계 빛납니다' },
-  7: { title: '도감 보너스', description: '몬스터 발견 보상이 증가합니다' },
-  8: { title: '엘리트 헌터 배지', description: '엘리트 헌터의 증표를 획득합니다' },
-  9: { title: '랭킹 도전자', description: '랭킹 전용 칭호를 획득합니다' },
-  10: { title: '보스 챌린지', description: '강화 보스 도전 자격을 획득합니다' },
+  6: { title: '숙련 헌터 배지', description: '레벨 배지가 한 단계 빛납니다', image: '/images/rewards/level-6-skilled-badge.png' },
+  7: { title: '도감 보너스', description: '몬스터 발견 보상이 증가합니다', image: '/images/rewards/level-7-collection-bonus.png' },
+  8: { title: '엘리트 헌터 배지', description: '엘리트 헌터의 증표를 획득합니다', image: '/images/rewards/level-8-elite-badge.png' },
+  9: { title: '랭킹 도전자', description: '랭킹 전용 칭호를 획득합니다', image: '/images/rewards/level-9-ranking-challenger.png' },
+  10: { title: '보스 챌린지', description: '강화 보스 도전 자격을 획득합니다', image: '/images/rewards/level-10-boss-challenge.png' },
 }
 
 const MONSTER_LEVEL = { slime: 1, rabbit: 1, fox: 3, boss: 5 }

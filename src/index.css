@@ -1281,7 +1281,7 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
 .home-record-grid article:first-child .art-tile img { width: 104%; height: 104%; }
 
 /* Result summary hierarchy */
-.result-page { overflow: visible; padding-bottom: 34px; }
+.result-page { overflow: visible; padding-bottom: 34px; display: flex; flex-direction: column; justify-content: center; }
 .result-card-v2 { margin-top: 18px; padding: 17px; border-radius: 28px; }
 .result-card-v2 { background: radial-gradient(circle at 50% 23%, rgba(128,43,210,.24), transparent 36%), linear-gradient(155deg, rgba(38,25,86,.95), rgba(15,11,45,.98)); }
 .result-best-flag { position: absolute; z-index: 4; top: 20px; left: -6px; display: grid; gap: 1px; padding: 7px 11px 7px 14px; border-radius: 0 10px 10px 0; background: linear-gradient(110deg, #ee47bc, #9639f0); text-align: left; box-shadow: 0 7px 18px rgba(205,55,194,.28); }
@@ -1329,12 +1329,12 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
 /* Two-step mobile result flow */
 .result-next-wrap { display: grid; gap: 12px; margin-top: 16px; }
 .result-next-button { min-height: 62px; font-size: 18px; }
-.result-next-button span { margin-left: auto; font-size: 24px; line-height: 1; }
+.result-next-button span { font-size: 24px; line-height: 1; }
 .result-step-dots { display: flex; justify-content: center; align-items: center; gap: 7px; height: 14px; }
 .result-step-dots i,
 .result-step-dots b { width: 7px; height: 7px; border-radius: 999px; background: rgba(197,181,232,.34); }
 .result-step-dots b { width: 21px; background: linear-gradient(90deg, #8447ff, #ed45bc); box-shadow: 0 0 12px rgba(202,65,221,.35); }
-.result-header-compact { margin-top: 28px; }
+.result-header-compact { margin-top: 12px; }
 .result-header-compact h1 { margin-top: 14px; }
 .result-header-compact { position: relative; }
 .result-step-back { position: absolute; left: 0; top: 1px; width: 44px; height: 44px; display: grid; place-items: center; border: 1px solid rgba(185,137,255,.24); border-radius: 14px; background: rgba(28,17,71,.72); color: #c9a8ff; cursor: pointer; box-shadow: 0 8px 18px rgba(5,1,25,.22); transition: border-color .2s, background .2s, transform .2s; }
@@ -1402,5 +1402,18 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
   .result-step-1 .result-summary { margin-top: 9px; padding: 12px 5px; }
   .result-step-1 .result-next-wrap { margin-top: 12px; }
   .result-step-1 .result-next-button { min-height: 56px; }
+  .result-step-2 .result-header-compact { margin-top: 4px; }
+  .result-step-2 .result-header-compact h1 { margin-top: 8px; font-size: 24px; }
+  .result-step-2 .result-reward-card { margin-top: 12px; padding: 14px; border-radius: 24px; }
+  .result-step-2 .reward-settlement { min-height: 150px; grid-template-columns: 1fr 128px 1fr; margin-bottom: 10px; }
+  .result-step-2 .reward-crest { width: 128px; height: 148px; }
+  .result-step-2 .reward-crest strong { font-size: 21px; }
+  .result-step-2 .result-reward-card .xp-progress-card { padding: 11px; }
+  .result-step-2 .xp-progress-line { margin-top: 7px; }
+  .result-step-2 .next-reward-card { min-height: 68px; margin-top: 9px; padding: 8px 11px; }
+  .result-step-2 .next-reward-card > img, .result-step-2 .next-reward-card > span { flex-basis: 54px; width: 54px; height: 54px; }
+  .result-step-2 .reward-discovery { margin-top: 9px; padding: 10px; }
+  .result-step-2 .result-reward-actions { margin-top: 11px; }
+  .result-step-2 .result-reward-actions .btn { min-height: 52px; }
 }
 @keyframes resultMonsterFloat { 50% { transform: translateY(-6px); } }

@@ -83,7 +83,7 @@ export default function Result() {
         <div className="reward-breakdown right"><span>사냥 보너스</span><strong>+{huntBonusXp} XP</strong><span>총 처치</span><strong>{totalKills}마리</strong></div>
       </div>
       <div className="xp-progress-card">{xpProgress && <><div className="xp-level-head"><strong>LV.{xpProgress.level}</strong><span>{xpProgress.level >= 10 ? 'MAX LEVEL' : `LEVEL UP까지 ${(xpProgress.needed - xpProgress.current).toLocaleString()} XP!`}</span><b>{xpProgress.level >= 10 ? 'MAX' : `LV.${xpProgress.level + 1}`}</b></div><div className="xp-progress-line"><span><i style={{ width: `${xpProgress.percent}%` }} /></span></div><div className="xp-progress-values"><small>{xpProgress.current} / {xpProgress.needed} XP</small><small>{xpProgress.level >= 10 ? '최고 레벨 달성' : `${xpProgress.current + (xpProgress.needed - xpProgress.current)} / ${xpProgress.needed} XP`}</small></div></>}</div>
-      {nextUnlock && <div className="next-reward-card">{nextUnlockMonster ? <img src={nextUnlockMonster.image} alt="" /> : <span><Icon name={nextUnlock.skill ? 'sword' : 'spark'} size={27} /></span>}<div><small>다음 해금 콘텐츠</small><strong>{nextUnlock.title}</strong><p>LV.{xpProgress.level + 1}에서 해금 예정</p></div><Icon name="lock" size={20} /></div>}
+      {nextUnlock && <div className="next-reward-card">{nextUnlockMonster ? <img src={nextUnlockMonster.image} alt="" /> : nextUnlock.image ? <img src={nextUnlock.image} alt="" /> : <span><Icon name={nextUnlock.skill ? 'sword' : 'spark'} size={27} /></span>}<div><small>다음 해금 콘텐츠</small><strong>{nextUnlock.title}</strong><p>LV.{xpProgress.level + 1}에서 해금 예정</p></div><Icon name="lock" size={20} /></div>}
       {newDiscoveries.length > 0 && <div className="reward-discovery"><span>NEW</span><strong>새로운 몬스터가 도감에 등록됐어요!</strong></div>}
     </section>}
     {saving && <p className="status-copy"><span className="loader small" /> 기록을 저장하는 중...</p>}{saveError && <div className="notice notice-error">{saveError}</div>}
@@ -112,6 +112,7 @@ function LevelUpModal({ levelUp, onClose, onCollection, onTrySkill, onOpenMissio
   const monster = MONSTERS.find((item) => levelUp.unlock?.monsters?.includes(item.id))
   const isSkill = Boolean(levelUp.unlock?.skill)
   const isMission = levelUp.newLevel === 2
+  const rewardImage = levelUp.unlock?.image
   const unlockType = monster ? 'NEW MONSTER' : isSkill ? 'NEW SKILL' : isMission ? 'DAILY CONTENT' : 'NEW REWARD'
   const primaryAction = monster ? onCollection : isSkill ? onTrySkill : isMission ? onOpenMission : onClose
   const primaryLabel = monster ? '도감 확인' : isSkill ? '사용해보기' : isMission ? '미션 보러가기' : '확인'
@@ -123,7 +124,7 @@ function LevelUpModal({ levelUp, onClose, onCollection, onTrySkill, onOpenMissio
       <div className="unlock-rays" aria-hidden="true" />
       <span className="unlock-type">{unlockType}</span>
       <div className="unlock-art">
-        {monster ? <img src={monster.image} alt={monster.name} /> : isSkill ? <img src="/images/ui/hunt-swords.png" alt="섀도우 버스트 쌍검" /> : isMission ? <MissionUnlockArt /> : <Icon name="spark" size={54} />}
+        {monster ? <img src={monster.image} alt={monster.name} /> : isSkill ? <img src="/images/ui/hunt-swords.png" alt="섀도우 버스트 쌍검" /> : rewardImage ? <img src={rewardImage} alt={levelUp.unlock?.title} /> : isMission ? <MissionUnlockArt /> : <Icon name="spark" size={54} />}
       </div>
       {(isSkill || isMission) && <span className="unlock-skill-tag">{isSkill ? 'ACTIVE SKILL' : 'EVERY DAY'}</span>}
     </div>
