@@ -846,6 +846,52 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
 .rank-name em { margin-left: 6px; padding: 2px 5px; border-radius: 5px; background: rgba(240,76,189,.18); color: #ff8edb; font-size: 10px; font-style: normal; }
 .podium-item strong, .podium-item span { font-size: 12px; }
 
+/* Hall of Fame */
+.ranking-page { padding-top: 18px; }
+.ranking-topbar { margin-bottom: 18px; }
+.ranking-tabs { padding: 5px; border: 1px solid rgba(171,126,255,.17); border-radius: 18px; background: rgba(18,12,48,.72); }
+.ranking-tabs button { min-height: 42px; border-radius: 13px; color: #817a99; }
+.ranking-tabs button.active { background: linear-gradient(130deg, #7040ed, #a93ce3); box-shadow: 0 7px 18px rgba(114,51,218,.26), inset 0 1px rgba(255,255,255,.2); }
+.ranking-hero { position: relative; overflow: hidden; margin-top: 16px; padding: 15px 11px 18px; border: 1px solid rgba(186,133,255,.18); border-radius: 25px; background: radial-gradient(circle at 50% 35%, rgba(139,54,220,.25), transparent 38%), linear-gradient(155deg, rgba(35,21,83,.94), rgba(13,10,41,.96)); box-shadow: 0 20px 42px rgba(5,2,25,.3); }
+.ranking-hero::before { position: absolute; width: 250px; height: 250px; top: 38px; left: 50%; border-radius: 50%; background: repeating-conic-gradient(rgba(166,91,255,.08) 0 7deg, transparent 7deg 20deg); -webkit-mask-image: radial-gradient(circle, #000, transparent 68%); mask-image: radial-gradient(circle, #000, transparent 68%); transform: translateX(-50%); content: ''; }
+.ranking-hero-title { position: relative; z-index: 2; display: flex; align-items: center; justify-content: space-between; padding: 0 5px; }
+.ranking-hero-title > span { display: inline-flex; align-items: center; gap: 5px; color: #c18dff; font-size: 10px; font-weight: 900; letter-spacing: .12em; }
+.ranking-hero-title small { color: #77708e; font-size: 9px; }
+.podium { position: relative; z-index: 1; min-height: 210px; display: flex; align-items: flex-end; justify-content: center; gap: 0; padding: 15px 0 0; }
+.podium-item { width: 30%; min-width: 0; }
+.podium-item.rank-1 { width: 40%; order: initial; transform: translateY(-9px); }
+.podium-medal { position: relative; width: 84px; height: 84px; display: grid; place-items: center; margin: 0 auto; }
+.rank-1 .podium-medal { width: 112px; height: 112px; }
+.podium-medal .avatar { width: 61%; height: 61%; border: 0; outline: 0; box-shadow: none; }
+.rank-1 .podium-medal .avatar { width: 59%; height: 59%; border: 0; }
+.podium-medal .avatar img { width: 100%; height: 100%; object-fit: cover; }
+.podium-frame { position: absolute; z-index: 2; inset: 0; width: 100%; height: 100%; object-fit: contain; pointer-events: none; filter: drop-shadow(0 6px 10px rgba(3,1,18,.44)); }
+.podium-medal > b { position: absolute; z-index: 3; right: 50%; bottom: -5px; min-width: 25px; height: 25px; display: grid; place-items: center; border: 2px solid #b8a8d3; border-radius: 50%; background: #2c1b61; color: #ddd3ec; font-size: 11px; transform: translateX(50%); }
+.rank-1 .podium-medal > b { border-color: #ffd968; background: linear-gradient(135deg, #ffbe3c, #d96e36); color: #fff; }
+.rank-2 .podium-medal > b { border-color: #d9dcf1; }
+.rank-3 .podium-medal > b { border-color: #d78c5c; }
+.podium-item > strong { max-width: 92%; margin-top: 11px; color: #f1ecf8; font-size: 12px; }
+.podium-item > span { margin-top: 2px; color: #ffcc54; font-size: 12px; }
+.podium-item > small { margin-top: 3px; color: #787089; font-size: 8px; }
+.podium-item.me .podium-medal { filter: drop-shadow(0 0 10px rgba(244,71,194,.5)); }
+.podium-item.me .avatar { outline: 0; }
+.podium-item.placeholder { opacity: .42; }
+.my-rank-card { position: relative; margin-top: 13px; border-color: rgba(242,75,190,.34); border-radius: 20px; background: linear-gradient(110deg, rgba(90,34,142,.58), rgba(28,17,68,.94)); box-shadow: inset 3px 0 #ef4cbd, 0 12px 28px rgba(6,2,27,.2); }
+.my-rank-head { display: flex; align-items: center; justify-content: space-between; padding: 11px 15px 0; }
+.my-rank-head span { color: #fb79d3; font-size: 10px; font-weight: 900; letter-spacing: .12em; }
+.my-rank-head strong { color: #fff; font-size: 13px; }
+.my-rank-card > span { display: none; }
+.my-rank-card .rank-item { min-height: 64px; }
+.rank-list { display: grid; gap: 7px; overflow: visible; margin-top: 13px; border: 0; border-radius: 0; background: transparent; }
+.rank-list .list-label { padding: 10px 5px 5px; }
+.rank-list .rank-item { min-height: 62px; border: 1px solid rgba(171,126,255,.13); border-radius: 16px; background: rgba(18,13,48,.78); }
+.rank-list .rank-item.me { border-color: rgba(241,74,190,.28); background: linear-gradient(90deg, rgba(240,76,189,.12), rgba(124,60,255,.07)); }
+.rank-list-empty { margin: 0; padding: 22px 12px; border: 1px dashed rgba(171,126,255,.16); border-radius: 16px; color: #746d87; background: rgba(18,13,48,.5); font-size: 11px; text-align: center; }
+.ranking-page .rank-num { width: 30px; height: 30px; display: grid; place-items: center; border-radius: 10px; background: rgba(132,74,225,.12); color: #b5a9cd; }
+.ranking-page .avatar { background: #211546; }
+.ranking-page .avatar img { transform: scale(1.02); }
+.ranking-page .rank-score { color: #58e7ff; text-shadow: 0 0 11px rgba(64,220,255,.16); }
+
 .collection-tools { margin-bottom: 15px; }
 .filter-chips { display: flex; gap: 7px; overflow-x: auto; padding: 1px 1px 8px; scrollbar-width: none; }
 .filter-chips::-webkit-scrollbar { display: none; }
