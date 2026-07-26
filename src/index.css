@@ -886,7 +886,8 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
 .podium-item.me .podium-medal { filter: drop-shadow(0 0 10px rgba(244,71,194,.5)); }
 .podium-item.me .avatar { outline: 0; }
 .podium-item.placeholder { opacity: .42; }
-.my-rank-card { position: relative; margin-top: 13px; border-color: rgba(242,75,190,.34); border-radius: 20px; background: linear-gradient(110deg, rgba(90,34,142,.58), rgba(28,17,68,.94)); box-shadow: inset 3px 0 #ef4cbd, 0 12px 28px rgba(6,2,27,.2); }
+.my-rank-card { position: relative; margin-top: 13px; border-color: rgba(242,75,190,.34); border-radius: 20px; background: linear-gradient(110deg, rgba(90,34,142,.58), rgba(28,17,68,.94)); box-shadow: 0 12px 28px rgba(6,2,27,.2); }
+.my-rank-card .rank-item.me { box-shadow: none; }
 .my-rank-head { display: flex; align-items: center; justify-content: space-between; padding: 11px 15px 0; }
 .my-rank-head span { color: #fb79d3; font-size: 10px; font-weight: 900; letter-spacing: .12em; }
 .my-rank-head strong { color: #fff; font-size: 13px; }
@@ -1237,7 +1238,6 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
 .mission-track i { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #8b4dff, #ef4cbd); transition: width .4s ease; }
 .mission-item.done .mission-track i { background: linear-gradient(90deg, var(--success), var(--cyan)); }
 .mission-body em { color: #817a99; font-size: 9px; font-style: normal; }
-.my-rank-card .rank-num { display: none; }
 .progress-next { display: flex; align-items: center; gap: 8px; margin-top: 12px; padding-top: 11px; border-top: 1px solid rgba(255,255,255,.08); color: #8e86a3; font-size: 10px; }
 .boss-card { min-height: 206px; align-items: center; margin-bottom: 15px; }
 .boss-card .hero-copy { width: 61%; }
