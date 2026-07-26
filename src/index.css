@@ -75,7 +75,7 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
 
 .app-container { position: relative; width: 100%; max-width: 460px; min-height: 100vh; margin: 0 auto; overflow: hidden; background: radial-gradient(70% 32% at 50% -4%, rgba(112, 65, 255, .3), transparent 70%), linear-gradient(180deg, #0d092c 0%, var(--bg-deep) 100%); box-shadow: 0 0 80px rgba(0,0,0,.45); }
 .app-container::before { content: ''; position: absolute; inset: 0; pointer-events: none; opacity: .18; background-image: radial-gradient(circle at 20% 12%, #fff 0 1px, transparent 1.5px), radial-gradient(circle at 73% 24%, #b686ff 0 1px, transparent 1.5px), radial-gradient(circle at 44% 44%, #fff 0 .7px, transparent 1.2px); background-size: 121px 137px, 181px 163px, 97px 109px; }
-.page { position: relative; z-index: 1; min-height: 100vh; padding: max(18px, env(safe-area-inset-top)) 18px calc(24px + env(safe-area-inset-bottom)); }
+.page { position: relative; z-index: 1; min-height: 100vh; padding: max(22px, env(safe-area-inset-top)) 18px calc(24px + env(safe-area-inset-bottom)); }
 .center-screen, .empty-state { min-height: 65vh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 30px; color: var(--muted); text-align: center; }
 .empty-state h3 { color: var(--text); margin: 4px 0 0; }.empty-state p { margin: 0; font-size: 14px; line-height: 1.6; }.empty-icon { display: grid; place-items: center; width: 58px; height: 58px; color: var(--primary-light); border: 1px solid rgba(162,104,255,.25); border-radius: 19px; background: rgba(124,60,255,.1); }
 .loader { width: 22px; height: 22px; border: 2px solid rgba(255,255,255,.15); border-top-color: var(--cyan); border-radius: 50%; animation: spin .7s linear infinite; }.loader.small { width: 15px; height: 15px; display: inline-block; vertical-align: -2px; } @keyframes spin { to { transform: rotate(360deg); } }
@@ -681,7 +681,7 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
 
 /* Simplified home hierarchy and shared bottom navigation */
 .page:has(.bottom-nav) { padding-bottom: calc(104px + env(safe-area-inset-bottom)); }
-.home-v2 { padding-top: max(18px, env(safe-area-inset-top)); }
+.home-v2 { padding-top: max(22px, env(safe-area-inset-top)); }
 .home-welcome { margin-bottom: 16px; }
 .home-welcome .icon-btn { width: 39px; height: 39px; border-radius: 13px; }
 .home-welcome .topbar-actions { gap: 6px; }
@@ -1266,9 +1266,9 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
 .record-list > div > strong { color: #f2eff8; font-size: 20px; text-align: right; }
 .record-list > div > small { color: #837c95; font-size: 12px; text-align: right; }
 .record-list > div > small b { color: #f06bbb; }
-.bottom-nav button.primary:not(.active) > span { border-color: rgba(213,190,255,.34); background: linear-gradient(145deg, #3d266d, #792a82); box-shadow: 0 7px 17px rgba(68,28,112,.35), inset 0 1px rgba(255,255,255,.16); }
-.bottom-nav button.primary:not(.active) > span img { opacity: .7; filter: grayscale(.2) saturate(.68) brightness(.9) drop-shadow(0 2px 3px rgba(34,10,67,.4)); }
-.bottom-nav button.primary:not(.active) small { color: #89819d; }
+.bottom-nav button.primary > span { border-color: rgba(255,255,255,.58); background: var(--gradient); box-shadow: 0 8px 23px rgba(174,58,235,.52), 0 0 22px rgba(238,67,190,.22), inset 0 1px rgba(255,255,255,.34); }
+.bottom-nav button.primary > span img { opacity: 1; filter: saturate(1.08) brightness(1.12) drop-shadow(0 3px 5px rgba(70,16,121,.44)); }
+.bottom-nav button.primary small { color: #d8c9f2; }
 .progress-mission { min-height: 67px; margin-top: 13px; padding-top: 13px; }
 .progress-mission > span { width: 36px; height: 36px; }
 .progress-mission em { display: block; overflow: hidden; margin-top: 3px; color: #817a98; font-size: 11px; font-style: normal; text-overflow: ellipsis; white-space: nowrap; }
