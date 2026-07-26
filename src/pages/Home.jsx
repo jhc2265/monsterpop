@@ -52,10 +52,10 @@ export default function Home() {
   const missionDone = best > 0
   const progress = getLevelProgress(resolveProgress(profile, user.id).xp)
   const featured = progress.level >= 5
-    ? { label: 'TODAY’S BOSS', name: '그림자 대왕 출현!', copy: '강력한 그림자 대왕을 사냥하고 최고 기록에 도전하세요.', image: '/images/boss.png', grade: '보스 몬스터', score: '500점', difficulty: '★★★' }
+    ? { label: 'TODAY’S BOSS', name: '그림자 대왕 출현!', copy: '강력한 그림자 대왕을 사냥하고 최고 기록에 도전하세요.', image: '/images/monsters/boss.webp', grade: '보스 몬스터', score: '500점', difficulty: '★★★' }
     : progress.level >= 3
-      ? { label: 'TODAY’S HUNT', name: '불꽃 여우 출현!', copy: '고득점 몬스터 불꽃 여우를 30초 안에 사냥하세요.', image: '/images/fox.png', grade: '영웅 몬스터', score: '300점', difficulty: '★★☆' }
-      : { label: 'TODAY’S HUNT', name: '번개 토끼 출현!', copy: '빠르게 움직이는 번개 토끼를 30초 안에 사냥하세요.', image: '/images/rabbit.png', grade: '희귀 몬스터', score: '200점', difficulty: '★★☆' }
+      ? { label: 'TODAY’S HUNT', name: '불꽃 여우 출현!', copy: '고득점 몬스터 불꽃 여우를 30초 안에 사냥하세요.', image: '/images/monsters/fox.webp', grade: '영웅 몬스터', score: '300점', difficulty: '★★☆' }
+      : { label: 'TODAY’S HUNT', name: '번개 토끼 출현!', copy: '빠르게 움직이는 번개 토끼를 30초 안에 사냥하세요.', image: '/images/monsters/rabbit.webp', grade: '희귀 몬스터', score: '200점', difficulty: '★★☆' }
 
   return <main className="page home-page home-v2">
     <header className="home-welcome">
@@ -88,12 +88,12 @@ export default function Home() {
           <img className="hero-monster" src={featured.image} alt="" />
         </div>
       </div>
-      <button className="boss-start" onClick={() => go('/game')}><img src="/images/ui/hunt-swords.png" alt="" /><span>지금 사냥하기</span><b>›</b></button>
+      <button className="boss-start" onClick={() => go('/game')}><img src="/images/ui/hunt-swords.webp" alt="" /><span>지금 사냥하기</span><b>›</b></button>
     </section>
 
     <section className="home-record" aria-label="나의 기록">
       <div className="home-record-title"><span>내 기록</span><button onClick={() => go('/ranking')}>랭킹 보기 ›</button></div>
-      <div className="home-record-grid"><article><span className="stat-icon purple art-tile"><img src="/images/ui/trophy.png" alt="" /></span><div><small>최고 점수</small><strong>{best.toLocaleString()}</strong><em>{delta === null ? '첫 기록에 도전' : <>이전 기록 대비 <b>{delta >= 0 ? '▲' : '▼'} {Math.abs(delta)}%</b></>}</em></div></article><i /><article><span className="stat-icon pink art-tile"><img src="/images/ui/crown.png" alt="" /></span><div><small>현재 순위</small><strong>{rank ? `${rank}위` : '도전 전'}</strong><em>{rank ? `전체 ${totalPlayers.toLocaleString()}명` : '기록을 세워보세요'}</em></div></article></div>
+      <div className="home-record-grid"><article><span className="stat-icon purple art-tile"><img src="/images/ui/trophy.webp" alt="" /></span><div><small>최고 점수</small><strong>{best.toLocaleString()}</strong><em>{delta === null ? '첫 기록에 도전' : <>이전 기록 대비 <b>{delta >= 0 ? '▲' : '▼'} {Math.abs(delta)}%</b></>}</em></div></article><i /><article><span className="stat-icon pink art-tile"><img src="/images/ui/crown.webp" alt="" /></span><div><small>현재 순위</small><strong>{rank ? `${rank}위` : '도전 전'}</strong><em>{rank ? `전체 ${totalPlayers.toLocaleString()}명` : '기록을 세워보세요'}</em></div></article></div>
     </section>
     <BottomNav />
   </main>

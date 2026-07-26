@@ -11,7 +11,7 @@ export default function Hero() {
   }
 
   return <main className="hero-landing">
-    <img className="hero-world-art" src="/images/hero-world-v2.png" alt="" />
+    <img className="hero-world-art" src="/images/bg/hero-world.webp" alt="" />
     <div className="hero-world-shade" aria-hidden="true" />
     <div className="hero-stars" aria-hidden="true"><i /><i /><i /><i /></div>
 

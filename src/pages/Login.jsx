@@ -91,7 +91,7 @@ export default function Login({ initialMode = 'login' }) {
     <section className="auth-brand">
       <div className="auth-monster-wrap" aria-hidden="true">
         <span className="auth-monster-glow" />
-        <img src="/images/boss.png" alt="" />
+        <img src="/images/monsters/boss.webp" alt="" />
       </div>
       <h1>MONSTER<span>POP</span></h1>
       <div className="auth-welcome">

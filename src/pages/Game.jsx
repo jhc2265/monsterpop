@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { pickRandomMonster } from '../lib/monsters'
+import { pickRandomMonster, preloadMonsterImages } from '../lib/monsters'
 import MonsterImage from '../components/MonsterImage'
 import Icon from '../components/Icon'
 import { sound } from '../lib/sound'
@@ -78,6 +78,8 @@ export default function Game() {
     const next = Array.from({ length: MAX_ENEMIES }, (_, index) => makeEnemy(index, false, allowedMonsterIds))
     setEnemies(next)
   }, [playerLevel])
+
+  useEffect(() => { preloadMonsterImages() }, [])
 
   useEffect(() => {
     sound.unlock()
@@ -332,7 +334,7 @@ export default function Game() {
     <div className="battle-timebar"><span style={{ width: `${(timeLeft / GAME_TIME) * 100}%` }} /></div>
 
     <section className={`battle-arena ${energy >= SKILL_MAX ? 'burst-ready' : ''}`}>
-      <img className="battle-background" src="/images/battle-arena.png" alt="" />
+      <img className="battle-background" src="/images/bg/battle-arena.webp" alt="" />
       <div className="battle-vignette" />
       <div className="gesture-legend"><span>TAP</span><span>↔ SWIPE</span><span>×2</span><span>HOLD</span></div>
 
@@ -363,7 +365,7 @@ export default function Game() {
     <section className="battle-controls">
       <div className="timing-status"><small>REACTION HUNT</small><strong>{lastJudge}</strong><span>표시된 동작으로 도망가기 전에 사냥하세요!</span></div>
       <button className={`burst-button ${energy >= SKILL_MAX ? 'ready' : ''} ${!skillUnlocked ? 'locked' : ''}`} onClick={useBurst} disabled={!skillUnlocked || energy < SKILL_MAX} aria-label={skillUnlocked ? '섀도우 버스트' : '레벨 4에서 해금'}>
-        <img src="/images/ui/hunt-swords.png" alt="" /><small>{!skillUnlocked ? 'LV.4' : energy >= SKILL_MAX ? 'BURST!' : `${energy} / ${SKILL_MAX}`}</small>
+        <img src="/images/ui/hunt-swords.webp" alt="" /><small>{!skillUnlocked ? 'LV.4' : energy >= SKILL_MAX ? 'BURST!' : `${energy} / ${SKILL_MAX}`}</small>
       </button>
       <div className="skill-meter"><span><i style={{ width: `${skillUnlocked ? (energy / SKILL_MAX) * 100 : 0}%` }} /></span><small>{skillUnlocked ? '섀도우 버스트' : 'Lv.4에서 스킬 해금'}</small></div>
     </section>

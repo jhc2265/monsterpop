@@ -72,14 +72,14 @@ export default function Result() {
       {isBest && <div className="result-best-flag"><strong>NEW BEST!</strong><span>최고 기록 경신!</span></div>}
       <div className="result-monster-stage"><img src={representative.image} alt={representative.name} /><strong>{representative.id === 'boss' ? '그림자 대왕 격파!' : `${representative.name} ${monsterCounts[representative.id] || 0}마리 처치!`}</strong></div>
       <div className="score-panel">
-        <div className={`score-grade grade-${scoreGrade.toLowerCase()}`}><img src={`/images/ranks/rank-${scoreGrade.toLowerCase()}.png`} alt={`${scoreGrade} 랭크 배지`} /></div>
+        <div className={`score-grade grade-${scoreGrade.toLowerCase()}`}><img src={`/images/ranks/rank-${scoreGrade.toLowerCase()}.webp`} alt={`${scoreGrade} 랭크 배지`} /></div>
         <div className="score-copy"><small>FINAL SCORE</small><strong className="result-score">{score.toLocaleString()}</strong></div>
       </div>
-      <div className="result-summary"><div><img src="/images/ui/stat-combo.png" alt="" /><span>최고 콤보</span><strong>{maxCombo}</strong></div><i /><div><img src="/images/ui/stat-kills.png" alt="" /><span>처치 몬스터</span><strong>{totalKills}마리</strong></div><i /><div><img src="/images/ui/stat-rank.png" alt="" /><span>현재 순위</span><strong>{saving ? '...' : rank ? `${rank}위` : '-'}</strong></div></div>
+      <div className="result-summary"><div><img src="/images/ui/stat-combo.webp" alt="" /><span>최고 콤보</span><strong>{maxCombo}</strong></div><i /><div><img src="/images/ui/stat-kills.webp" alt="" /><span>처치 몬스터</span><strong>{totalKills}마리</strong></div><i /><div><img src="/images/ui/stat-rank.webp" alt="" /><span>현재 순위</span><strong>{saving ? '...' : rank ? `${rank}위` : '-'}</strong></div></div>
     </section> : <section className="result-reward-card">
       <div className="reward-settlement">
         <div className="reward-breakdown left"><span>기본 보상</span><strong>+{baseXp} XP</strong><span>기록 보너스</span><strong>+{recordBonusXp} XP</strong></div>
-        <div className="reward-crest"><img src="/images/ui/xp-crest.png" alt="" /><div><Icon name="spark" size={18} /><strong>+{xpGain}</strong><span>XP</span></div></div>
+        <div className="reward-crest"><img src="/images/ui/xp-crest.webp" alt="" /><div><Icon name="spark" size={18} /><strong>+{xpGain}</strong><span>XP</span></div></div>
         <div className="reward-breakdown right"><span>사냥 보너스</span><strong>+{huntBonusXp} XP</strong><span>총 처치</span><strong>{totalKills}마리</strong></div>
       </div>
       <div className="xp-progress-card">{xpProgress && <><div className="xp-level-head"><strong>LV.{xpProgress.level}</strong><span>{xpProgress.level >= 10 ? 'MAX LEVEL' : `LEVEL UP까지 ${(xpProgress.needed - xpProgress.current).toLocaleString()} XP!`}</span><b>{xpProgress.level >= 10 ? 'MAX' : `LV.${xpProgress.level + 1}`}</b></div><div className="xp-progress-line"><span><i style={{ width: `${xpProgress.percent}%` }} /></span></div><div className="xp-progress-values"><small>{xpProgress.current} / {xpProgress.needed} XP</small><small>{xpProgress.level >= 10 ? '최고 레벨 달성' : `${xpProgress.current + (xpProgress.needed - xpProgress.current)} / ${xpProgress.needed} XP`}</small></div></>}</div>
@@ -89,7 +89,7 @@ export default function Result() {
     {saving && <p className="status-copy"><span className="loader small" /> 기록을 저장하는 중...</p>}{saveError && <div className="notice notice-error">{saveError}</div>}
     {resultStep === 1 ? <div className="result-next-wrap">
       <button className="btn btn-primary result-next-button" onClick={() => { sound.button(); setResultStep(2); window.scrollTo({ top: 0, behavior: 'smooth' }) }}>보상 확인하기 <span aria-hidden="true">→</span></button>
-    </div> : <div className="result-reward-actions"><button className="btn btn-primary" onClick={() => go('/game', { replace: true })}><img src="/images/ui/hunt-swords.png" alt="" /><span>다시 사냥</span></button><button className="btn btn-secondary" onClick={() => go('/ranking')}><Icon name="trophy" size={19} /><span>랭킹</span></button><button className="btn btn-secondary" onClick={() => go('/home')}><Icon name="home" size={18} /><span>홈</span></button></div>}
+    </div> : <div className="result-reward-actions"><button className="btn btn-primary" onClick={() => go('/game', { replace: true })}><img src="/images/ui/hunt-swords.webp" alt="" /><span>다시 사냥</span></button><button className="btn btn-secondary" onClick={() => go('/ranking')}><Icon name="trophy" size={19} /><span>랭킹</span></button><button className="btn btn-secondary" onClick={() => go('/home')}><Icon name="home" size={18} /><span>홈</span></button></div>}
     {levelUp && <LevelUpModal levelUp={levelUp} onClose={() => setLevelUp(null)} onCollection={() => go('/collection')} onTrySkill={() => go('/game', { replace: true })} onOpenMission={() => go('/home')} />}
   </main>
 }
@@ -124,7 +124,7 @@ function LevelUpModal({ levelUp, onClose, onCollection, onTrySkill, onOpenMissio
       <div className="unlock-rays" aria-hidden="true" />
       <span className="unlock-type">{unlockType}</span>
       <div className="unlock-art">
-        {monster ? <img src={monster.image} alt={monster.name} /> : isSkill ? <img src="/images/ui/hunt-swords.png" alt="섀도우 버스트 쌍검" /> : rewardImage ? <img src={rewardImage} alt={levelUp.unlock?.title} /> : isMission ? <MissionUnlockArt /> : <Icon name="spark" size={54} />}
+        {monster ? <img src={monster.image} alt={monster.name} /> : isSkill ? <img src="/images/ui/hunt-swords.webp" alt="섀도우 버스트 쌍검" /> : rewardImage ? <img src={rewardImage} alt={levelUp.unlock?.title} /> : isMission ? <MissionUnlockArt /> : <Icon name="spark" size={54} />}
       </div>
       {(isSkill || isMission) && <span className="unlock-skill-tag">{isSkill ? 'ACTIVE SKILL' : 'EVERY DAY'}</span>}
     </div>

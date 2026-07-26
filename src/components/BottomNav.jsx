@@ -2,11 +2,11 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import { sound } from '../lib/sound'
 
 const items = [
-  { path: '/home', label: '홈', image: '/images/ui/home.png' },
-  { path: '/ranking', label: '랭킹', image: '/images/ui/trophy.png' },
-  { path: '/game', label: '사냥', image: '/images/ui/hunt-swords.png', primary: true },
-  { path: '/collection', label: '몬스터', image: '/images/ui/book.png' },
-  { path: '/community', label: '커뮤니티', image: '/images/ui/community.png' },
+  { path: '/home', label: '홈', image: '/images/ui/home.webp' },
+  { path: '/ranking', label: '랭킹', image: '/images/ui/trophy.webp' },
+  { path: '/game', label: '사냥', image: '/images/ui/hunt-swords.webp', primary: true },
+  { path: '/collection', label: '몬스터', image: '/images/ui/book.webp' },
+  { path: '/community', label: '커뮤니티', image: '/images/ui/community.webp' },
 ]
 
 export default function BottomNav() {
