@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Typography audit harness</title>
+<!-- vite dev 서버가 프로젝트 루트를 서빙하므로 소스 CSS 를 그대로 참조한다 -->
+<link rel="stylesheet" href="/src/index.css">
+</head><body><div id="root"><div class="app-container">
+<!--
+  10개 화면의 실제 마크업. 각 화면은 data-s 로 이름을 단다.
+  JSX 를 바꿔 새 텍스트 요소가 생기면 여기에도 추가해야 검사에 걸린다.
+  아이콘 자리는 <svg> 로 둔다 — 텍스트를 넣으면 오탐이 난다.
+-->
+
+<main class="hero-landing" data-s="히어로"><img class="hero-world-art" src="/images/bg/hero-world.webp" alt=""><div class="hero-world-shade"></div><div class="hero-stars"><i></i></div>
+ <section class="hero-landing-content"><div class="hero-landing-kicker"><span>&#9889;</span> 30초 몬스터 헌팅</div>
+ <div class="hero-copy-block"><h1>MONSTER <span>POP</span></h1><p>몬스터를 잡고, 콤보를 쌓아<br><strong>랭킹을 정복하세요.</strong></p></div>
+ <div class="hero-actions"><button class="hero-start-button"><span>지금 사냥 시작하기</span><b>&#8594;</b></button>
+ <button class="hero-login-link">이미 계정이 있나요? <strong>로그인</strong> <span>&#8250;</span></button></div></section></main>
+
+<main class="page login-page auth-page" data-s="로그인"><div class="login-ambient"><span class="login-grid"></span><span class="login-glow login-glow-left"></span></div>
+ <section class="auth-brand"><div class="auth-monster-wrap"><span class="auth-monster-glow"></span><img src="/images/monsters/boss.webp" alt=""></div>
+ <h1>MONSTER<span>POP</span></h1><div class="auth-welcome"><h2>다시 오셨군요!</h2><p>사냥 기록을 이어가세요.</p></div></section>
+ <form class="auth-form"><div class="field"><label>닉네임</label><div class="auth-input"><svg width="19" height="19"></svg><input placeholder="헌터 닉네임"></div></div>
+ <div class="field"><label>이메일</label><div class="auth-input"><span class="auth-at">@</span><input type="email" placeholder="you@example.com"></div></div>
+ <div class="auth-options"><label class="remember-check"><input type="checkbox"><span><svg width="16" height="16"></svg></span> 로그인 상태 유지</label><button type="button">비밀번호 찾기 <b>&#8250;</b></button></div>
+ <div class="notice notice-error">이메일 또는 비밀번호가 올바르지 않습니다.</div><div class="notice notice-info">재설정 메일을 보냈습니다.</div>
+ <button class="auth-submit"><span>로그인하고 사냥하기</span><b>&#8594;</b></button></form>
+ <button class="auth-route-link">처음이신가요? <strong>회원가입</strong> <span>&#8250;</span></button></main>
+
+<main class="page home-page home-v2" data-s="홈">
+ <header class="home-welcome"><div><h1>안녕하세요, <strong>조현채 헌터님!</strong></h1><p>오늘도 최고 기록에 도전해보세요.</p>
+ <button class="home-best-line">최고 <strong>1,240점</strong> · 27위 <span>&#8250;</span></button></div>
+ <div class="topbar-actions"><button class="icon-btn"><svg width="20" height="20"></svg></button><button class="icon-btn"><svg width="20" height="20"></svg></button></div></header>
+ <section class="hunter-progress"><div class="hunter-progress-head"><span>LV.3</span><div><strong>조현채 · 성장 중인 헌터</strong></div><b>120 / 300 XP</b></div>
+ <div class="hunter-xp-bar"><i style="width:40%"></i></div>
+ <div class="mission-list"><div class="mission-list-head"><small>오늘의 미션</small><span>1/3 완료</span></div>
+ <div class="mission-item done"><span class="mission-check"><svg width="15" height="15"></svg></span><div class="mission-body"><div class="mission-body-top"><strong>사냥 3회 완료</strong><b>완료</b></div><div class="mission-track"><i style="width:100%"></i></div><em>3 / 3</em></div></div>
+ <div class="mission-item"><span class="mission-check"><svg width="15" height="15"></svg></span><div class="mission-body"><div class="mission-body-top"><strong>한 판에서 콤보 30 달성</strong><b>+40 XP</b></div><div class="mission-track"><i style="width:20%"></i></div><em>6 / 30</em></div></div></div></section>
+ <section class="hunter-progress"><div class="progress-mission locked"><span><svg width="17" height="17"></svg></span><div><small>오늘의 미션</small><strong>일일 미션 준비 중</strong><em>Lv.2부터 매일 새로운 성장 목표가 열려요</em></div><b>LV.2</b></div></section>
+ <section class="hero-card boss-card"><div class="boss-main"><div class="hero-copy"><span class="boss-label">TODAY&#8217;S HUNT</span>
+ <div class="hunt-meta"><span>영웅 몬스터</span><span>+300점</span><span>난이도 &#9733;&#9733;&#9734;</span></div>
+ <h2>불꽃 여우 출현!</h2><p>고득점 몬스터 불꽃 여우를 30초 안에 사냥하세요.</p></div>
+ <div class="boss-visual"><span></span><img class="hero-monster" src="/images/monsters/fox.webp" alt=""></div></div>
+ <button class="boss-start"><img src="/images/ui/hunt-swords.webp" alt=""><span>지금 사냥하기</span><b>&#8250;</b></button></section></main>
+
+<main class="battle-page" data-s="배틀">
+ <header class="battle-hud"><button class="battle-pause"><svg width="18" height="18"></svg></button>
+ <div class="battle-score"><small>SCORE</small><strong>18,420</strong><span>&#9679; 128</span></div>
+ <div class="battle-timer"><span>&#9719;</span><strong>00:17</strong></div>
+ <div class="battle-combo active"><small>COMBO</small><strong>42</strong></div></header>
+ <div class="battle-timebar"><span style="width:57%"></span></div>
+ <section class="battle-arena burst-ready"><img class="battle-background" src="/images/bg/battle-arena.webp" alt=""><div class="battle-vignette"></div>
+ <div class="gesture-legend"><span>TAP</span><span>SWIPE</span><span>&#215;2</span><span>HOLD</span></div>
+ <button class="battle-enemy gesture-fox grade-영웅 state-open hp-2" style="left:50%;top:38%;--enemy-color:#ff8a5c"><span class="action-cue">TAP!</span><img src="/images/monsters/fox.webp" alt=""><span class="escape-bar"><i></i></span><span class="enemy-health"><i style="width:60%"></i></span></button>
+ <div class="battle-countdown"><span>REACTION HUNT</span><strong>3</strong><p>표시를 보고 탭 · 스와이프 · 더블 탭 · 길게 누르기</p></div></section>
+ <section class="battle-controls"><div class="timing-status"><small>REACTION HUNT</small><strong>PERFECT!</strong><span>표시된 동작으로 도망가기 전에 사냥하세요!</span></div>
+ <button class="burst-button ready"><img src="/images/ui/hunt-swords.webp" alt=""><small>BURST!</small></button>
+ <div class="skill-meter"><span><i style="width:100%"></i></span><small>섀도우 버스트</small></div></section></main>
+
+<main class="page result-page result-step-1" data-s="결과1"><div class="result-burst"><span></span></div>
+ <section class="result-header"><span class="eyebrow">HUNT COMPLETE</span><h1>사냥 완료!</h1><p>최고 기록을 경신했어요, 헌터!</p></section>
+ <section class="result-card result-card-v2"><div class="result-best-flag"><strong>NEW BEST!</strong><span>최고 기록 경신!</span></div>
+ <div class="result-monster-stage"><img src="/images/monsters/fox.webp" alt=""><strong>불꽃 여우 12마리 처치!</strong></div>
+ <div class="score-panel"><div class="score-grade grade-s"><img src="/images/ranks/rank-s.webp" alt=""></div><div class="score-copy"><small>FINAL SCORE</small><strong class="result-score">14,280</strong></div></div>
+ <div class="result-summary"><div><img src="/images/ui/stat-combo.webp" alt=""><span>최고 콤보</span><strong>42</strong></div><i></i><div><img src="/images/ui/stat-kills.webp" alt=""><span>처치 몬스터</span><strong>31마리</strong></div><i></i><div><img src="/images/ui/stat-rank.webp" alt=""><span>현재 순위</span><strong>7위</strong></div></div></section>
+ <p class="status-copy"><span class="loader small"></span> 기록을 저장하는 중...</p>
+ <div class="result-next-wrap"><button class="btn btn-primary result-next-button">보상 확인하기 <span>&#8594;</span></button></div></main>
+
+<main class="page result-page result-step-2" data-s="결과2">
+ <section class="result-header result-header-compact"><button class="result-step-back"><svg width="23" height="23"></svg></button><span class="eyebrow">REWARD COMPLETE</span><h1>보상 정산 완료!</h1><p>이번 사냥으로 한층 더 성장했어요!</p></section>
+ <section class="result-reward-card"><div class="reward-settlement">
+ <div class="reward-total"><small>TOTAL XP</small><strong>+86</strong><span>경험치를 획득했어요</span></div>
+ <div class="reward-sources"><div><small>기본</small><strong>+20</strong></div><div><small>사냥</small><strong>+51</strong></div><div><small>기록</small><strong>+15</strong></div></div>
+ <p class="reward-kills">이번 사냥에서 몬스터 <strong>31마리</strong>를 처치했어요</p></div>
+ <div class="xp-progress-card"><div class="xp-level-head"><strong>LV.3</strong><span>LEVEL PROGRESS</span><b>LV.4</b></div>
+ <div class="xp-progress-line"><span><i style="width:62%"></i></span></div>
+ <div class="xp-progress-values"><small>186 / 300 XP</small><small>114 XP 남음</small></div></div>
+ <div class="next-reward-card"><img src="/images/monsters/boss.webp" alt=""><div><small>NEXT UNLOCK · LV.4</small><strong>섀도우 버스트</strong><p>화면의 모든 몬스터를 한 번에 처치하는 스킬</p></div></div>
+ <div class="reward-discovery"><span>NEW</span><strong>새로운 몬스터가 도감에 등록됐어요!</strong></div></section>
+ <div class="result-reward-actions"><button class="btn btn-primary"><img src="/images/ui/hunt-swords.webp" alt=""><span>다시 사냥</span></button><button class="btn btn-secondary"><span>랭킹</span></button><button class="btn btn-secondary"><span>홈</span></button></div>
+ <div class="modal-overlay level-up-overlay"><section class="level-up-modal skill-unlock"><div class="level-up-confetti"><i></i></div>
+ <span class="level-up-kicker">LEVEL UP</span><h2><span>Lv.3</span><i>&#8594;</i><strong>Lv.4</strong></h2>
+ <div class="unlock-showcase"><div class="unlock-rays"></div><span class="unlock-type">NEW SKILL</span><div class="unlock-art"><img src="/images/ui/hunt-swords.webp" alt=""></div><span class="unlock-skill-tag">ACTIVE SKILL</span></div>
+ <div class="unlock-copy"><small>새로운 힘을 획득했어요</small><strong>섀도우 버스트</strong><p>화면의 모든 몬스터를 한 번에 처치합니다</p></div>
+ <div class="btn-row"><button class="btn btn-secondary">계속하기</button><button class="btn btn-primary">사용해보기</button></div></section></div></main>
+
+<main class="page ranking-page" data-s="랭킹">
+ <header class="topbar ranking-topbar topbar-plain"><div class="title-stack"><span class="overline">HALL OF FAME</span><h1>헌터 랭킹</h1></div></header>
+ <p class="ranking-intro">실시간 랭킹으로 최고의 헌터에 도전하세요.</p>
+ <div class="tabs ranking-tabs"><button class="active">전체</button><button>오늘</button><button>주간</button></div>
+ <section class="ranking-hero"><div class="ranking-hero-title"><span>TOP HUNTERS</span><small>이번 주 마감 3일 12시간 후</small></div>
+ <div class="podium"><article class="podium-item rank-2"><div class="podium-medal"><div class="avatar"><img src="/images/ranking/default-hunter.png" alt=""></div><b>2</b></div><strong>불꽃사냥꾼</strong><span>8,140점</span><small>최고 콤보 31</small></article>
+ <article class="podium-item rank-1 me"><div class="podium-medal"><div class="avatar"><img src="/images/ranking/default-hunter.png" alt=""></div><b>1</b></div><strong>그림자헌터</strong><span>12,480점</span><small>최고 콤보 52</small></article>
+ <article class="podium-item rank-3 placeholder"><div class="podium-medal"><div class="avatar"><img src="/images/ranking/default-hunter.png" alt=""></div><b>3</b></div><strong>도전자를 기다려요</strong><span>-</span></article></div></section>
+ <section class="my-rank-card"><div class="my-rank-head"><span>MY RANK</span><strong>7위</strong></div>
+ <article class="rank-item me"><b class="rank-num">7</b><div class="avatar"><img src="/images/ranking/default-hunter.png" alt=""></div><div class="rank-name"><strong>조현채<em>나</em></strong><small>최고 콤보 24</small></div><b class="rank-score">1,240점</b></article>
+ <div class="my-rank-stats"><div><span class="stat-icon purple art-tile"><img src="/images/ui/trophy.webp" alt=""></span><div class="stat-text"><small>최고 점수</small><strong>1,240</strong><em>이전 대비 <b class="down">8%</b></em></div></div><i></i>
+ <div><span class="stat-icon pink art-tile"><img src="/images/ui/crown.webp" alt=""></span><div class="stat-text"><small>전체 순위</small><strong>7위</strong><em>전체 42명</em></div></div></div></section>
+ <section class="rank-list"><div class="list-label"><span>전체 순위</span><small>총 42명</small></div>
+ <article class="rank-item"><b class="rank-num">1</b><div class="avatar"><img src="/images/ranking/default-hunter.png" alt=""></div><div class="rank-name"><strong>그림자헌터</strong><small>최고 콤보 52</small></div><b class="rank-score">12,480점</b></article></section></main>
+
+<main class="page collection-page" data-s="도감">
+ <header class="topbar topbar-plain"><div class="title-stack"><span class="overline">MONSTER ARCHIVE</span><h1>몬스터 도감</h1></div></header>
+ <p class="collection-intro">사냥터에서 발견한 몬스터와 특징을 확인하세요.</p>
+ <section class="collection-tools"><div class="filter-chips"><button class="active">전체</button><button>일반</button><button>희귀</button></div><select><option>기본 순서</option></select></section>
+ <section class="collection-grid"><button class="collection-card" style="--monster-color:#ff8a5c"><span class="collection-grade">희귀</span><img src="/images/monsters/fox.webp" alt=""><div><h2>불꽃 여우</h2><p>처치 점수 <strong>300</strong></p><small>출현 확률 18%</small></div></button>
+ <button class="collection-card undiscovered" style="--monster-color:#8b7fd4"><span class="collection-grade">보스</span><img src="/images/monsters/boss.webp" alt=""><div><h2>???</h2><p>흔적이 발견되었습니다</p><small>사냥터에서 직접 만나보세요</small></div></button></section>
+ <div class="modal-overlay monster-detail-overlay"><section class="modal monster-detail" style="--monster-color:#ff8a5c"><div class="modal-handle"></div><button class="monster-detail-close">&#215;</button>
+ <span class="collection-grade">희귀</span><img src="/images/monsters/fox.webp" alt=""><h2>불꽃 여우</h2><p>꼬리에 불꽃을 두른 여우. 빠르게 움직입니다.</p>
+ <div class="monster-facts"><div><small>처치 점수</small><strong>300점</strong></div><div><small>이동 속도</small><strong>빠름</strong></div><div><small>출현 확률</small><strong>18%</strong></div></div>
+ <button class="btn btn-primary">이 몬스터 사냥하러 가기</button></section></div></main>
+
+<main class="page community-page" data-s="커뮤니티">
+ <header class="topbar topbar-plain"><div class="title-stack"><span class="overline">HUNTER LOUNGE</span><h1>커뮤니티</h1></div></header>
+ <p class="community-intro">기록과 공략을 다른 헌터들과 공유해보세요.</p>
+ <div class="community-search"><svg width="18" height="18"></svg><input placeholder="제목이나 헌터 이름 검색"></div>
+ <div class="filter-chips community-categories"><button class="active">전체</button><button>인기</button><button>공략</button></div>
+ <section class="post-list"><article class="post-item"><div class="post-head"><div class="avatar small">조</div><div><strong>조현채</strong><small>1시간 전</small></div><span class="pill post-category">공략</span><span class="pill pill-best">BEST</span></div>
+ <h2>콤보 30 넘기는 타이밍 정리해봤습니다</h2><p>스와이프는 미리 손을 올려두고, 홀드는 링이 반쯤 찼을 때 떼는 게 좋습니다.</p>
+ <div class="post-footer"><button class="liked">12</button><span>이야기 보기</span><b>&#8250;</b></div></article></section>
+ <button class="fab"><svg width="25" height="25"></svg></button>
+ <div class="modal-overlay"><section class="modal"><div class="modal-handle"></div>
+ <div class="modal-title"><div><span class="overline">NEW STORY</span><h2>새 글 작성</h2></div><button class="text-button">닫기</button></div>
+ <div class="field"><label>분류</label><select><option>공략</option></select></div>
+ <div class="field"><label>제목</label><input placeholder="어떤 이야기를 나눌까요?"></div>
+ <div class="field"><label>내용</label><textarea rows="4" placeholder="공략, 기록 모두 좋아요."></textarea></div>
+ <div class="btn-row"><button class="btn btn-secondary">취소</button><button class="btn btn-primary">게시하기</button></div></section></div></main>
+
+<main class="page post-detail-page" data-s="글상세">
+ <header class="topbar"><button class="icon-btn"><svg width="20" height="20"></svg></button><div class="title-stack"><span class="overline">HUNTER STORY</span><h1>게시글</h1></div><span class="topbar-spacer"></span></header>
+ <article class="detail-card"><div class="post-head"><div class="avatar small">조</div><div><strong>조현채</strong><small>1시간 전</small></div></div>
+ <h2>콤보 30 넘기는 타이밍 정리해봤습니다</h2><p>스와이프는 미리 손을 올려두고, 홀드는 링이 반쯤 찼을 때 떼는 게 가장 안정적이었어요.</p>
+ <div class="detail-actions"><button class="detail-like liked"><span class="detail-like-heart">&#9829;</span> 12</button><button class="text-button danger">게시글 삭제</button></div></article>
+ <section class="comments-section"><div class="section-heading"><h2>댓글 <span>2</span></h2></div>
+ <p class="muted">첫 댓글을 남겨보세요.</p>
+ <article class="comment"><div class="avatar tiny">A</div><div><div class="comment-meta"><strong>헌터A</strong><span>30분 전</span></div><p>덕분에 콤보 40 찍었습니다!</p></div></article></section>
+ <div class="comment-composer"><input placeholder="댓글을 입력하세요"><button><svg width="19" height="19"></svg></button></div></main>
+
+<main class="page settings-page" data-s="설정">
+ <header class="topbar"><button class="icon-btn"><svg width="20" height="20"></svg></button><div class="title-stack"><span class="overline">PREFERENCES</span><h1>설정</h1></div><span class="topbar-spacer"></span></header>
+ <section class="settings-profile"><div class="avatar">조</div><div><strong>조현채 헌터님</strong><span>zip.dooly@gmail.com</span></div></section>
+ <section class="settings-section"><h2>게임</h2><div class="settings-card">
+ <div class="setting-row"><span>배경음악</span><button class="switch on"><i></i></button></div>
+ <div class="setting-row"><span>애니메이션 줄이기</span><button class="switch"><i></i></button></div></div></section>
+ <section class="settings-section"><h2>정보</h2><div class="settings-card">
+ <button class="setting-row action"><span>이용약관</span><b>준비 중</b></button>
+ <button class="setting-row action"><span>앱 버전</span><b>1.0.0</b></button></div></section>
+ <div class="notice">비밀번호 변경 링크를 이메일로 보냈어요.</div></main>
+
+<!-- 화면 밖으로 밀어 겹침 없이 검사만 하는 공통 요소들 -->
+<div style="position:absolute;left:-9999px;top:0;width:375px" data-s="공통">
+ <div class="empty-state"><span class="empty-icon"><svg width="28" height="28"></svg></span><h3>아직 기록이 없어요</h3><p>첫 번째 헌터가 되어 순위를 차지해 보세요.</p></div>
+ <div class="battle-page"><section class="battle-arena">
+ <div class="battle-effect">+240</div><div class="battle-effect perfect">PERFECT!</div><div class="battle-effect burst">BURST!</div><div class="battle-effect miss">MISS</div>
+ <div class="battle-pause-overlay"><span class="eyebrow">GAME PAUSED</span><h2>잠시 쉬어갈까요?</h2><button class="btn btn-primary">계속하기</button><button class="btn btn-secondary">그만하기</button></div></section></div>
+ <nav class="bottom-nav"><button class="active"><span><img src="/images/ui/home.webp" alt=""></span><small>홈</small></button><button class="primary"><span><img src="/images/ui/hunt-swords.webp" alt=""></span><small>사냥</small></button></nav>
+</div>
+
+</div></div></body></html>
