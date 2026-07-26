@@ -38,6 +38,7 @@ export default function Ranking() {
   const weekEnd = getWeekEnd()
   return <main className="page ranking-page">
     <header className="topbar ranking-topbar topbar-plain"><div className="title-stack"><span className="overline">HALL OF FAME</span><h1>헌터 랭킹</h1></div></header>
+    <p className="ranking-intro">실시간 랭킹으로 최고의 헌터에 도전하세요.</p>
     <div className="tabs ranking-tabs"><button className={tab === 'all' ? 'active' : ''} onClick={() => setTab('all')}>전체</button><button className={tab === 'today' ? 'active' : ''} onClick={() => setTab('today')}>오늘</button><button className={tab === 'week' ? 'active' : ''} onClick={() => setTab('week')}>주간</button></div>
     {loading ? <div className="empty-state"><span className="loader" />랭킹을 집계하는 중...</div> : rows.length === 0 ? <Empty /> : <>
       <section className="ranking-hero"><div className="ranking-hero-title"><span><Icon name="spark" size={13} /> TOP HUNTERS</span><small>{tab === 'week' ? `이번 주 마감 ${weekEnd}` : `${rows.length}명의 헌터가 경쟁 중`}</small></div><div className="podium">{[podium[1], podium[0], podium[2]].map((row, index) => row ? <Podium key={row.user_id} row={row} rank={[2,1,3][index]} me={row.user_id === user.id} /> : <PodiumPlaceholder key={index} rank={[2,1,3][index]} />)}</div></section>
