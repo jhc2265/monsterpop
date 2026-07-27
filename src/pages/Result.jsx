@@ -105,7 +105,7 @@ export default function Result() {
   const nextUnlock = xpProgress && LEVEL_UNLOCKS[xpProgress.level + 1]
   const nextUnlockMonster = MONSTERS.find((item) => nextUnlock?.monsters?.includes(item.id))
   return <main
-    className={`page result-page result-step-${resultStep}${isBossMode ? ` boss-result boss-result-${activeBoss.id}` : ''}`}
+    className={`page result-page result-step-${resultStep}${isBossMode ? ` boss-result boss-result-${activeBoss.id} ${bossClear ? 'boss-cleared' : 'boss-escaped'}` : ''}`}
     style={isBossMode ? { '--result-boss-accent': activeBoss.color } : undefined}
   >
     <div className="result-burst" aria-hidden="true"><span /><span /><span /></div>
@@ -115,9 +115,14 @@ export default function Result() {
     </section>
     {resultStep === 1 ? <section className="result-card result-card-v2">
       {isBest && <div className="result-best-flag"><strong>NEW BEST!</strong><span>최고 기록 경신!</span></div>}
-      <div className="result-monster-stage"><img src={representative.image} alt={representative.name} /><strong>{isBossMode
+      <div className="result-monster-stage">
+        {isBossMode && <span className="result-boss-aura" aria-hidden="true">
+          {Array.from({ length: 8 }, (_, index) => <i key={index} />)}
+        </span>}
+        <img src={representative.image} alt={representative.name} /><strong>{isBossMode
           ? bossClear ? `${representative.name} 격파!` : bossDamage >= bossMaxHp * 0.75 ? '한 걸음 남았어요!' : '다시 도전해 볼까요?'
-          : `${representative.name} ${monsterCounts[representative.id] || 0}마리 처치!`}</strong></div>
+          : `${representative.name} ${monsterCounts[representative.id] || 0}마리 처치!`}</strong>
+      </div>
       <div className="score-panel">
         <div className={`score-grade grade-${scoreGrade.toLowerCase()}`}><img src={`/images/ranks/rank-${scoreGrade.toLowerCase()}.webp`} alt={`${scoreGrade} 랭크 배지`} /></div>
         <div className="score-copy"><small>FINAL SCORE</small><strong className="result-score">{score.toLocaleString()}</strong></div>

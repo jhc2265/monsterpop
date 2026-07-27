@@ -1196,16 +1196,102 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
   border-color: color-mix(in srgb, var(--result-boss-accent) 32%, transparent);
 }
 .boss-result .result-monster-stage::before {
-  background: radial-gradient(circle, color-mix(in srgb, var(--result-boss-accent) 30%, transparent), transparent 70%);
-  box-shadow: 0 0 36px color-mix(in srgb, var(--result-boss-accent) 18%, transparent);
+  width: 168px;
+  height: 168px;
+  top: 6px;
+  background: radial-gradient(circle, color-mix(in srgb, var(--result-boss-accent) 25%, transparent), transparent 68%);
+  box-shadow: none;
+  filter: blur(17px);
+  opacity: .58;
+}
+.boss-result .result-monster-stage::after {
+  content: '';
+  position: absolute;
+  z-index: 0;
+  left: 50%;
+  bottom: 31px;
+  width: 118px;
+  height: 18px;
+  border-radius: 50%;
+  background: rgba(1,8,24,.52);
+  filter: blur(7px);
+  transform: translateX(-50%);
 }
 .boss-result .result-monster-stage > strong {
   border-color: color-mix(in srgb, var(--result-boss-accent) 30%, transparent);
 }
+.result-boss-aura {
+  position: absolute;
+  z-index: 0;
+  left: 50%;
+  top: 47%;
+  width: 185px;
+  height: 152px;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+}
+.result-boss-aura i { position: absolute; display: block; }
+
+/* 글리치 킹: 원형 프레임 대신 불규칙한 데이터 픽셀만 남긴다. */
+.boss-result-glitch-king-slime .result-boss-aura i {
+  width: 6px;
+  height: 6px;
+  border-radius: 1px;
+  background: #55f5ca;
+  box-shadow: 0 0 7px rgba(85,245,202,.52);
+  animation: resultPixelBlink 2.8s steps(1) infinite;
+}
+.boss-result-glitch-king-slime .result-boss-aura i:nth-child(1) { left: 8%; top: 23%; animation-delay: -.3s; }
+.boss-result-glitch-king-slime .result-boss-aura i:nth-child(2) { left: 3%; top: 61%; width: 4px; height: 4px; animation-delay: -1.7s; }
+.boss-result-glitch-king-slime .result-boss-aura i:nth-child(3) { left: 19%; top: 82%; background: #b9ff36; animation-delay: -2.1s; }
+.boss-result-glitch-king-slime .result-boss-aura i:nth-child(4) { left: 34%; top: 5%; width: 4px; height: 4px; animation-delay: -.9s; }
+.boss-result-glitch-king-slime .result-boss-aura i:nth-child(5) { right: 11%; top: 18%; background: #49d8ff; animation-delay: -1.2s; }
+.boss-result-glitch-king-slime .result-boss-aura i:nth-child(6) { right: 3%; top: 57%; width: 5px; height: 5px; animation-delay: -2.5s; }
+.boss-result-glitch-king-slime .result-boss-aura i:nth-child(7) { right: 20%; top: 85%; background: #b9ff36; animation-delay: -.6s; }
+.boss-result-glitch-king-slime .result-boss-aura i:nth-child(8) { right: 35%; top: 2%; width: 3px; height: 3px; animation-delay: -1.9s; }
+
+/* 네온 나이트메어: 타원 대신 낮게 번지는 그림자 연무와 소수의 수정광. */
+.boss-result-neon-nightmare .result-monster-stage::before {
+  background:
+    radial-gradient(circle at 42% 55%, rgba(237,66,224,.25), transparent 45%),
+    radial-gradient(circle at 62% 38%, rgba(114,57,221,.3), transparent 55%);
+  filter: blur(21px);
+}
+.boss-result-neon-nightmare .result-boss-aura {
+  width: 205px;
+  height: 168px;
+}
+.boss-result-neon-nightmare .result-boss-aura i {
+  width: 18px;
+  height: 18px;
+  background: url('/images/effects/boss-neon-gem.webp') center / contain no-repeat;
+  filter: drop-shadow(0 0 5px rgba(238,68,235,.48));
+  opacity: .42;
+  animation: resultGemDrift 4.8s ease-in-out infinite;
+}
+.boss-result-neon-nightmare .result-boss-aura i:nth-child(1) { left: 3%; top: 25%; animation-delay: -.4s; }
+.boss-result-neon-nightmare .result-boss-aura i:nth-child(2) { left: 12%; top: 71%; width: 11px; animation-delay: -2.1s; }
+.boss-result-neon-nightmare .result-boss-aura i:nth-child(3) { left: 31%; top: 3%; width: 9px; animation-delay: -3.2s; }
+.boss-result-neon-nightmare .result-boss-aura i:nth-child(4) { display: none; }
+.boss-result-neon-nightmare .result-boss-aura i:nth-child(5) { right: 4%; top: 31%; animation-delay: -1.4s; }
+.boss-result-neon-nightmare .result-boss-aura i:nth-child(6) { right: 13%; top: 74%; width: 10px; animation-delay: -3.7s; }
+.boss-result-neon-nightmare .result-boss-aura i:nth-child(7) { right: 31%; top: 5%; width: 8px; animation-delay: -2.7s; }
+.boss-result-neon-nightmare .result-boss-aura i:nth-child(8) { display: none; }
+.boss-result.boss-escaped .result-boss-aura,
+.boss-result.boss-escaped .result-monster-stage::before { opacity: .38; }
 .boss-result-glitch-king-slime .result-card-v2 {
   background:
     radial-gradient(circle at 50% 23%, rgba(41,208,198,.2), transparent 38%),
     linear-gradient(155deg, rgba(14,50,67,.96), rgba(7,18,38,.99));
+}
+@keyframes resultPixelBlink {
+  0%, 18%, 42%, 100% { opacity: .15; transform: translate(0, 0); }
+  19%, 32% { opacity: .78; transform: translate(4px, -2px); }
+  43%, 54% { opacity: .45; transform: translate(-3px, 2px); }
+}
+@keyframes resultGemDrift {
+  0%, 100% { transform: translateY(2px) rotate(-7deg); opacity: .22; }
+  50% { transform: translateY(-7px) rotate(8deg); opacity: .55; }
 }
 .score-panel { min-height: 112px; display: grid; grid-template-columns: 100px minmax(0,1fr); align-items: center; gap: 12px; padding: 11px 19px 11px 10px; border: 1px solid rgba(200,126,255,.24); border-radius: 18px; background: linear-gradient(120deg, rgba(17,11,54,.78), rgba(58,20,94,.42)); text-align: left; }
 .score-copy { min-width: 0; }
