@@ -546,7 +546,7 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
 /* Information architecture refresh */
 .bottom-nav button.active::after { display: none; }
 .bottom-nav button.primary small { margin-top: 0; }
-.page:has(.bottom-nav) { padding-bottom: calc(112px + env(safe-area-inset-bottom)); }
+.page:has(.bottom-nav) { padding-bottom: calc(88px + env(safe-area-inset-bottom)); }
 
 .ranking-tabs { max-width: 330px; margin-left: auto; margin-right: auto; }
 .ranking-tabs button { min-height: 38px; }
@@ -995,7 +995,7 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
 .progress-mission > b { color: var(--gold); white-space: nowrap; }
 .progress-mission.complete > span { background: rgba(70,229,255,.12); color: var(--cyan); }
 .progress-mission.complete > b { color: var(--cyan); }
-.mission-list { margin-top: 12px; padding-top: 11px; border-top: 1px solid rgba(255,255,255,.08); display: grid; gap: 10px; }
+.mission-list { margin-top: 12px; padding-top: 11px; border-top: 1px solid rgba(255,255,255,.08); display: grid; gap: 17px; }
 .mission-list-head { display: flex; align-items: center; justify-content: space-between; }
 .mission-list-head small { color: #bd8cff; }
 .mission-list-head span { color: #9f97b6; }
