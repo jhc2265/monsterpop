@@ -54,7 +54,6 @@ export default function Game() {
   const [timeLeft, setTimeLeft] = useState(GAME_TIME)
   const [score, setScore] = useState(0)
   const [combo, setCombo] = useState(0)
-  const [coins, setCoins] = useState(0)
   const [energy, setEnergy] = useState(0)
   const [enemies, setEnemies] = useState([])
   const [effects, setEffects] = useState([])
@@ -218,7 +217,6 @@ export default function Game() {
     scoreRef.current += gained
     setScore(scoreRef.current)
     setCombo(nextCombo)
-    setCoins((value) => value + Math.max(1, Math.round(gained / 100)))
     addEffect(target.x, target.y + 7, `+${gained}`, target.grade === '보스' ? 'boss' : 'score')
     if (nextCombo > 0 && nextCombo % 5 === 0) sound.combo()
 
@@ -231,10 +229,11 @@ export default function Game() {
       setTimeLeft((value) => Math.min(GAME_TIME + 10, value + 2))
       addEffect(target.x, target.y - 8, '+2 SEC', 'perfect')
     }
-    if (target.reward === 'coins') {
-      const coinBonus = 50 + Math.floor(Math.random() * 101)
-      setCoins((value) => value + coinBonus)
-      addEffect(target.x, target.y - 8, `+${coinBonus} COIN`, 'boss')
+    if (target.reward === 'burst' && skillUnlocked) {
+      // 미믹은 Lv.8 해금이라 이 시점엔 버스트(Lv.4)가 항상 열려 있다.
+      energyRef.current = SKILL_MAX
+      setEnergy(SKILL_MAX)
+      addEffect(target.x, target.y - 8, 'BURST READY!', 'burst')
     }
     if (target.reward === 'combo' && forcePerfect) addEffect(target.x, target.y - 8, '+3 COMBO', 'perfect')
 
@@ -332,7 +331,6 @@ export default function Game() {
     })
     scoreRef.current += bonus
     setScore(scoreRef.current)
-    setCoins((value) => value + defeated.length)
     energyRef.current = 0
     setEnergy(0)
     setLastJudge('SHADOW BURST!')
@@ -367,7 +365,7 @@ export default function Game() {
       <button className="battle-pause" onClick={togglePause} aria-label={paused ? '계속하기' : '일시정지'}>
         <Icon name={paused ? 'play' : 'pause'} size={18} />
       </button>
-      <div className="battle-score"><small>SCORE</small><strong>{score.toLocaleString()}</strong><span>● {coins}</span></div>
+      <div className="battle-score"><small>SCORE</small><strong>{score.toLocaleString()}</strong></div>
       <div className="battle-timer"><span>◷</span><strong>00:{String(timeLeft).padStart(2, '0')}</strong></div>
       <div className={`battle-combo ${combo > 0 ? 'active' : ''}`}><small>COMBO</small><strong>{combo}</strong></div>
     </header>

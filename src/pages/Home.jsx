@@ -54,7 +54,7 @@ export default function Home() {
   const missions = progress.level >= 2 ? getDailyMissions(user.id) : []
   // 보스 카드는 최고 레벨이 아니라 보스 해금 레벨(MONSTER_LEVEL.boss)을 따른다
   const featured = progress.level >= getMonsterUnlockLevel('boss')
-    ? { label: 'TODAY’S BOSS', name: '네온 나이트메어 출현!', copy: '깨진 네온 왕관의 지배자를 사냥하고 최고 기록에 도전하세요.', image: '/images/monsters/boss-neon-nightmare.webp', grade: '일일 보스', score: '500 코인', difficulty: '★★★', path: '/boss' }
+    ? { label: 'TODAY’S BOSS', name: '네온 나이트메어 출현!', copy: '깨진 네온 왕관의 지배자를 사냥하고 최고 기록에 도전하세요.', image: '/images/monsters/boss-neon-nightmare.webp', grade: '일일 보스', score: '120 XP', difficulty: '★★★', path: '/boss' }
     : progress.level >= 3
       ? { label: 'TODAY’S HUNT', name: '불꽃 여우 출현!', copy: '고득점 몬스터 불꽃 여우를 30초 안에 사냥하세요.', image: '/images/monsters/fox.webp', grade: '영웅 몬스터', score: '300점', difficulty: '★★☆', path: '/game' }
       : { label: 'TODAY’S HUNT', name: '번개 토끼 출현!', copy: '빠르게 움직이는 번개 토끼를 30초 안에 사냥하세요.', image: '/images/monsters/rabbit.webp', grade: '희귀 몬스터', score: '200점', difficulty: '★★☆', path: '/game' }

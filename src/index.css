@@ -822,15 +822,24 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
 .boss-healthbar > span { display: block; height: 13px; overflow: hidden; border: 1px solid rgba(255, 139, 231, .38); border-radius: 999px; background: rgba(7, 3, 25, .8); box-shadow: inset 0 0 12px rgba(0, 0, 0, .55); }
 .boss-healthbar i { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #ff497d, #f04cbd 52%, #a268ff); box-shadow: 0 0 16px rgba(240, 76, 189, .7); transition: width .2s ease; }
 .boss-arena { display: grid; place-items: center; padding-bottom: 0; }
-.boss-arena::before { content: ''; position: absolute; width: 88%; aspect-ratio: 1; border-radius: 50%; background: radial-gradient(circle, rgba(229, 70, 255, .2), rgba(108, 44, 214, .06) 52%, transparent 70%); animation: bossAura 2.4s ease-in-out infinite; }
+.boss-arena::before { display: none; }
 .boss-gem-rain { position: absolute; z-index: 2; inset: -18% 0 0; overflow: hidden; pointer-events: none; }
-.boss-gem-rain i { position: absolute; left: var(--gem-x); top: -12%; width: var(--gem-size); height: calc(var(--gem-size) * 1.45); border: 1px solid rgba(255, 224, 255, .9); background: linear-gradient(145deg, #fff 0 8%, #ff82ed 9% 32%, #9d35ff 34% 66%, #351084 68% 100%); clip-path: polygon(50% 0, 100% 35%, 77% 100%, 23% 100%, 0 35%); box-shadow: 0 0 8px #ff55df, 0 0 17px rgba(160, 61, 255, .72); opacity: .7; transform: translateY(-20%) rotate(18deg); animation: gemFall var(--gem-duration) var(--gem-delay) linear infinite; }
-.boss-gem-rain i:nth-child(3n) { background: linear-gradient(145deg, #fff, #7ff2ff 28%, #844cff 65%, #24116d); box-shadow: 0 0 9px #61e9ff, 0 0 18px rgba(103, 84, 255, .68); }
-.boss-gem-rain i:nth-child(4n) { opacity: .42; filter: blur(.35px); }
+.boss-gem-rain i { position: absolute; left: var(--gem-x); top: -12%; width: calc(var(--gem-size) * 2.25); height: calc(var(--gem-size) * 2.25); background: url('/images/effects/boss-neon-gem.webp') center / contain no-repeat; opacity: .72; filter: drop-shadow(0 0 7px rgba(239, 71, 255, .7)); transform: translateY(-20%) rotate(18deg); animation: gemFall var(--gem-duration) var(--gem-delay) linear infinite; }
+.boss-gem-rain i:nth-child(3n) { filter: hue-rotate(48deg) drop-shadow(0 0 8px rgba(78, 225, 255, .72)); }
+.boss-gem-rain i:nth-child(4n) { opacity: .4; filter: blur(.45px) drop-shadow(0 0 5px rgba(239, 71, 255, .58)); }
 .boss-crown-glow { position: absolute; top: 9%; width: 58%; height: 24%; border-radius: 50%; background: radial-gradient(circle, rgba(255, 77, 226, .28), transparent 70%); filter: blur(8px); animation: crownPulse 1.8s ease-in-out infinite; }
-.boss-crown-glow::before, .boss-crown-glow::after { content: ''; position: absolute; inset: -18%; border: 1px solid rgba(255, 119, 231, .22); border-radius: 50%; animation: bossOrbit 6s linear infinite; }
-.boss-crown-glow::before { box-shadow: 65px 18px 0 -5px rgba(237, 89, 255, .85), -54px 42px 0 -6px rgba(147, 88, 255, .8), 8px -36px 0 -7px rgba(255, 210, 94, .8); }
-.boss-crown-glow::after { inset: -34%; animation-direction: reverse; animation-duration: 9s; box-shadow: 82px 34px 0 -7px rgba(255, 91, 210, .72), -77px -11px 0 -6px rgba(105, 227, 255, .64); }
+.boss-crown-glow::before, .boss-crown-glow::after { content: ''; position: absolute; left: 50%; top: 50%; width: 38px; height: 38px; background: url('/images/effects/boss-neon-gem.webp') center / contain no-repeat; filter: drop-shadow(0 0 8px rgba(242, 72, 255, .82)); animation: gemOrbitNear 5.8s linear infinite; }
+.boss-crown-glow::after { width: 27px; height: 27px; filter: hue-rotate(45deg) drop-shadow(0 0 8px rgba(83, 225, 255, .78)); animation-name: gemOrbitFar; animation-duration: 8.4s; animation-direction: reverse; }
+.boss-aurora-ring { position: absolute; left: 50%; top: 53%; width: min(108%, 520px); aspect-ratio: 3 / 2; pointer-events: none; transform: translate(-50%, -50%); transform-origin: center; animation: auroraRingIdle 4.8s ease-in-out infinite; }
+.boss-aurora-ring img { width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 0 8px rgba(212, 70, 255, .55)); }
+.boss-aurora-ring.ring-back { z-index: 2; clip-path: inset(0 0 49% 0); opacity: .72; }
+.boss-aurora-ring.ring-front { z-index: 4; clip-path: inset(48% 0 0 0); opacity: .94; }
+.boss-aurora-ring.ring-front img { filter: drop-shadow(0 0 10px rgba(238, 75, 255, .72)); }
+.boss-battle.phase-2 .boss-aurora-ring { animation-duration: 3.1s; }
+.boss-battle.phase-2 .boss-aurora-ring.ring-back::after, .boss-battle.phase-3 .boss-aurora-ring.ring-back::after { content: ''; position: absolute; inset: 8%; background: url('/images/effects/boss-aurora-ring.webp') center / contain no-repeat; opacity: .34; transform: rotate(-3deg) scale(.88); filter: hue-rotate(32deg) drop-shadow(0 0 8px rgba(79, 221, 255, .5)); }
+.boss-battle.phase-3 .boss-aurora-ring { animation: auroraRingFinal 1.15s ease-in-out infinite; }
+.boss-arena:has(.boss-target.react-hit) .boss-aurora-ring, .boss-arena:has(.boss-target.react-rush) .boss-aurora-ring { animation: auroraRingHit .32s ease both; }
+.boss-arena:has(.boss-target.holding) .boss-aurora-ring img { filter: brightness(1.28) saturate(1.2) drop-shadow(0 0 14px rgba(255, 196, 79, .58)); }
 .boss-target { position: relative; z-index: 3; width: min(92%, 430px); max-height: 76%; padding: 0; border: 0; background: transparent; cursor: pointer; touch-action: none; user-select: none; transition: transform .12s, filter .16s; animation: bossEntrance .72s cubic-bezier(.15, 1.35, .35, 1) both, bossIdle 3.1s .72s ease-in-out infinite; }
 .boss-target:active { transform: scale(.96); filter: brightness(1.18); }
 .boss-target img { width: 100%; max-height: 58vh; object-fit: contain; pointer-events: none; filter: drop-shadow(0 18px 24px rgba(2, 0, 16, .72)); }
@@ -857,7 +866,11 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
 @keyframes bossEntrance { from { opacity: 0; transform: translateY(48px) scale(.55) rotate(-4deg); filter: brightness(1.5) blur(5px); } to { opacity: 1; transform: translateY(0) scale(1); filter: none; } }
 @keyframes bossIdle { 0%, 100% { transform: translateY(0) rotate(-.7deg); } 50% { transform: translateY(-11px) rotate(.7deg) scale(1.018); } }
 @keyframes crownPulse { 0%, 100% { opacity: .55; transform: scale(.9); } 50% { opacity: 1; transform: scale(1.12); } }
-@keyframes bossOrbit { to { transform: rotate(360deg); } }
+@keyframes gemOrbitNear { from { transform: translate(-50%, -50%) rotate(0deg) translateX(92px) rotate(0deg); } to { transform: translate(-50%, -50%) rotate(360deg) translateX(92px) rotate(-360deg); } }
+@keyframes gemOrbitFar { from { transform: translate(-50%, -50%) rotate(0deg) translateX(128px) rotate(0deg); } to { transform: translate(-50%, -50%) rotate(360deg) translateX(128px) rotate(-360deg); } }
+@keyframes auroraRingIdle { 0%, 100% { transform: translate(-50%, -50%) rotate(-1.3deg) scale(.97); filter: hue-rotate(-5deg); } 50% { transform: translate(-50%, -51.5%) rotate(1.3deg) scale(1.025); filter: hue-rotate(8deg) brightness(1.08); } }
+@keyframes auroraRingFinal { 0%, 100% { transform: translate(-50%, -50%) scale(1.01); filter: brightness(1.08) saturate(1.18); } 50% { transform: translate(-50%, -51%) scale(1.08); filter: brightness(1.32) saturate(1.4) hue-rotate(12deg); } }
+@keyframes auroraRingHit { 0% { transform: translate(-50%, -50%) scale(1); } 42% { transform: translate(-50%, -50%) scaleX(1.09) scaleY(.82); filter: brightness(1.6); } 100% { transform: translate(-50%, -50%) scale(1); } }
 @keyframes gemFall { 0% { transform: translate3d(0, -15%, 0) rotate(15deg) scale(.7); opacity: 0; } 12% { opacity: .78; } 82% { opacity: .68; } 100% { transform: translate3d(var(--gem-drift), 1250%, 0) rotate(310deg) scale(1.08); opacity: 0; } }
 @keyframes holdRing { to { transform: rotate(360deg); } }
 @keyframes bossDamage { 0% { transform: translateX(0) scale(1); } 25% { transform: translateX(-13px) scale(.95); filter: brightness(1.65); } 55% { transform: translateX(10px) scale(1.03); } 100% { transform: translateX(0) scale(1); } }
@@ -2641,4 +2654,73 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
   font-size: var(--fs-body-sm);
   font-weight: var(--fw-regular);
   line-height: var(--lh-normal);
+}
+
+/* Boss v2 — 신호별 상태와 홀드 피드백 */
+/* 홀드 신호일 때 도는 기본 링. 실제로 누르기 시작하면 진행 링에 자리를 내준다. */
+.boss-target.holding.action-hold::after { display: none; }
+.boss-target.action-swipe .action-cue { border-color: rgba(121, 220, 255, .62); color: #79dcff; }
+.boss-target.action-shield .action-cue { border-color: rgba(255, 97, 120, .68); color: #ff8b9c; }
+.boss-target.action-shield img { filter: drop-shadow(0 18px 24px rgba(2, 0, 16, .72)) saturate(.55) brightness(.72); }
+.boss-target.action-shield::after {
+  content: ''; position: absolute; z-index: 4; inset: 10%;
+  border: 3px dashed rgba(255, 97, 120, .6); border-radius: 50%;
+  box-shadow: inset 0 0 34px rgba(255, 60, 100, .28);
+  animation: bossShield .9s ease-in-out infinite;
+}
+.boss-target.action-idle .action-cue { display: none; }
+.boss-target.phase-break img { filter: drop-shadow(0 18px 24px rgba(2, 0, 16, .72)) brightness(1.35) saturate(1.2); }
+
+/* 홀드 진행 링 — conic-gradient 로 --hold-progress(0~1) 만큼 채운다.
+   "누르는 중"과 "다 찼다"를 확실히 구분해야 언제 떼야 할지 알 수 있다. */
+.boss-hold-ring {
+  position: absolute; z-index: 6; left: 50%; top: 50%;
+  width: min(70%, 330px); aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+/* 채워지는 링은 의사요소에만 마스크를 건다.
+   컨테이너에 걸면 링 밖에 놓인 라벨까지 잘려서 안 보인다. */
+.boss-hold-ring::before {
+  content: ''; position: absolute; inset: 0; border-radius: 50%;
+  background: conic-gradient(#ffd45b calc(var(--hold-progress, 0) * 360deg), rgba(255, 212, 91, .12) 0);
+  mask: radial-gradient(transparent 63%, #000 65%);
+  -webkit-mask: radial-gradient(transparent 63%, #000 65%);
+}
+.boss-hold-ring b {
+  position: absolute; bottom: -6%; left: 50%;
+  padding: 4px 10px; border-radius: 999px;
+  background: rgba(8, 3, 27, .88); color: var(--gold);
+  font-size: var(--fs-caption); font-weight: var(--fw-black);
+  line-height: 1; letter-spacing: var(--ls-caps); white-space: nowrap;
+  transform: translateX(-50%);
+}
+.boss-hold-ring.ready::before {
+  background: conic-gradient(#7dffd0 360deg, #7dffd0 0);
+  filter: drop-shadow(0 0 12px rgba(125, 255, 208, .75));
+  animation: bossHoldReady .5s ease-in-out infinite;
+}
+.boss-hold-ring.ready b { color: #0b3f2f; background: #7dffd0; }
+.boss-target.hold-ready .action-cue { border-color: rgba(125, 255, 208, .8); color: #7dffd0; }
+
+/* 페이즈 전환 배너 — 규칙이 바뀌는 순간을 알려준다 */
+.boss-phase-banner {
+  position: absolute; z-index: 12; left: 50%; top: 42%;
+  display: grid; justify-items: center; gap: 5px;
+  padding: 13px 22px; border: 1px solid rgba(255, 139, 231, .4); border-radius: 18px;
+  background: rgba(10, 4, 34, .88); text-align: center;
+  transform: translate(-50%, -50%);
+  animation: bossPhaseBanner .9s ease both;
+  pointer-events: none;
+}
+.boss-phase-banner span { color: var(--pink); font-size: var(--fs-label); font-weight: var(--fw-black); line-height: 1; letter-spacing: var(--ls-caps); }
+.boss-phase-banner strong { color: #fff; font-size: var(--fs-h3); font-weight: var(--fw-black); line-height: var(--lh-snug); letter-spacing: var(--ls-tight); }
+
+@keyframes bossShield { 50% { transform: scale(1.05); opacity: .6; } }
+@keyframes bossHoldReady { 50% { transform: scale(1.05); } }
+@keyframes bossPhaseBanner {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(.8); }
+  22% { opacity: 1; transform: translate(-50%, -50%) scale(1.04); }
+  78% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(.96); }
 }

@@ -1,25 +1,219 @@
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { getDailyBoss } from '../lib/bosses'
 import { sound } from '../lib/sound'
 import Icon from '../components/Icon'
 
+// 페이즈가 오를수록 "동작이 정해지는" 게 아니라 "선택지가 늘고 반응 시간이 짧아진다".
+// 순서를 외우는 게 아니라 매번 화면을 봐야 하도록 만드는 것이 목적.
+const PHASES = {
+  1: { pool: ['tap'], window: 2600, shieldRate: 0 },
+  2: { pool: ['tap', 'hold'], window: 2100, shieldRate: 0.18 },
+  3: { pool: ['tap', 'hold', 'swipe'], window: 1700, shieldRate: 0.22 },
+}
+
+const HOLD_MS = 620          // 홀드 성공에 필요한 시간
+const TAP_MAX_MS = 320       // 이보다 오래 누르면 탭으로 인정하지 않는다
+const SWIPE_MIN_PX = 34
+const MISS_TIME_PENALTY = 3  // 반격 — 이게 있어야 제한 시간이 실제 압박이 된다
+const SHIELD_MS = 900        // 방어막이 올라와 있는 시간
+const PHASE_BREAK_MS = 900   // 페이즈 전환 무적 연출
+
+const CUE_LABEL = { tap: 'TAP', hold: 'HOLD', swipe: 'SWIPE', shield: 'WAIT' }
+const CUE_HINT = {
+  tap: '방어막이 열렸어요. 빠르게 터치하세요',
+  hold: '왕관이 빛나요. 길게 눌러 힘을 모으세요',
+  swipe: '틈이 생겼어요. 좌우로 밀어내세요',
+  shield: '방어막이 올라왔어요. 건드리지 마세요',
+}
+
 export default function Boss() {
   const navigate = useNavigate()
-  const boss = getDailyBoss()
+  const [boss] = useState(() => getDailyBoss())
+
   const [countdown, setCountdown] = useState(3)
   const [timeLeft, setTimeLeft] = useState(boss.timeLimit)
   const [hp, setHp] = useState(boss.maxHp)
   const [combo, setCombo] = useState(0)
-  const [attackCount, setAttackCount] = useState(0)
+  const [cue, setCue] = useState(null)          // { type, id }
+  const [holdProgress, setHoldProgress] = useState(0)
+  const [holdReady, setHoldReady] = useState(false)
+  const [phaseBreak, setPhaseBreak] = useState(false)
   const [judge, setJudge] = useState('보스의 공격 신호를 확인하세요')
   const [effect, setEffect] = useState(null)
+
   const playingRef = useRef(false)
-  const pointerDownRef = useRef(0)
+  const comboRef = useRef(0)
   const maxComboRef = useRef(0)
+  const pointerRef = useRef(null)
+  const cueTimerRef = useRef(null)
+  const holdRafRef = useRef(null)
+  const punishRef = useRef(null)
+  const phaseRef = useRef(1)
+  const hpRef = useRef(boss.maxHp)
+  const timeRef = useRef(boss.timeLimit)
 
   const phase = hp > boss.maxHp * 0.7 ? 1 : hp > boss.maxHp * 0.4 ? 2 : 3
-  const action = phase === 1 ? 'tap' : phase === 2 ? 'hold' : attackCount % 2 === 0 ? 'tap' : 'hold'
+
+  function flash(text, type) {
+    setEffect({ text, type, id: Date.now() + Math.random() })
+    setTimeout(() => setEffect(null), 520)
+  }
+
+  const clearTimers = useCallback(() => {
+    if (cueTimerRef.current) { clearTimeout(cueTimerRef.current); cueTimerRef.current = null }
+    if (holdRafRef.current) { cancelAnimationFrame(holdRafRef.current); holdRafRef.current = null }
+  }, [])
+
+  const resetHold = useCallback(() => {
+    if (holdRafRef.current) { cancelAnimationFrame(holdRafRef.current); holdRafRef.current = null }
+    pointerRef.current = null
+    setHoldProgress(0)
+    setHoldReady(false)
+  }, [])
+
+  // 다음 신호를 띄운다. 제한 시간 안에 반응하지 못하면 보스의 반격으로 이어진다.
+  const nextCue = useCallback((delay = 300) => {
+    clearTimers()
+    cueTimerRef.current = setTimeout(() => {
+      if (!playingRef.current) return
+      const settings = PHASES[phaseRef.current]
+      const type = Math.random() < settings.shieldRate
+        ? 'shield'
+        : settings.pool[Math.floor(Math.random() * settings.pool.length)]
+      setCue({ type, id: Date.now() })
+      resetHold()
+
+      // 방어막은 버티면 통과, 나머지는 시간 내 반응하지 못하면 실패.
+      cueTimerRef.current = setTimeout(() => {
+        if (!playingRef.current) return
+        if (type === 'shield') {
+          comboRef.current += 1
+          maxComboRef.current = Math.max(maxComboRef.current, comboRef.current)
+          setCombo(comboRef.current)
+          setJudge('잘 버텼어요!')
+          nextCue(240)
+        } else {
+          punishRef.current('반응이 늦었어요!')
+        }
+      }, type === 'shield' ? SHIELD_MS : settings.window)
+    }, delay)
+  }, [clearTimers, resetHold])
+
+  // 실패 처리 — 콤보를 끊고 제한 시간을 깎는다.
+  function punish(message) {
+    comboRef.current = 0
+    setCombo(0)
+    sound.miss()
+    setJudge(message)
+    flash(`MISS  -${MISS_TIME_PENALTY}초`, 'miss')
+    timeRef.current = Math.max(0, timeRef.current - MISS_TIME_PENALTY)
+    setTimeLeft(timeRef.current)
+    resetHold()
+    if (timeRef.current <= 0) { finish(false); return }
+    nextCue(460)
+  }
+
+  punishRef.current = punish
+
+  function hit(label) {
+    const nextHp = Math.max(0, hpRef.current - 1)
+    const nextCombo = comboRef.current + 1
+    comboRef.current = nextCombo
+    hpRef.current = nextHp
+    setHp(nextHp)
+    setCombo(nextCombo)
+    maxComboRef.current = Math.max(maxComboRef.current, nextCombo)
+    sound.hit(nextCombo)
+    setJudge(label)
+    flash(`-1`, phaseRef.current === 3 ? 'rush' : 'hit')
+    resetHold()
+
+    if (nextHp === 0) { finish(true); return }
+
+    // 페이즈가 바뀌면 잠깐 멈추고 신호를 준다 — 조용히 규칙이 바뀌면 억울한 실패가 된다.
+    const nextPhase = nextHp > boss.maxHp * 0.7 ? 1 : nextHp > boss.maxHp * 0.4 ? 2 : 3
+    if (nextPhase !== phaseRef.current) {
+      phaseRef.current = nextPhase
+      clearTimers()
+      setCue(null)
+      setPhaseBreak(true)
+      setJudge(nextPhase === 3 ? 'FINAL PHASE!' : `PHASE ${nextPhase}`)
+      sound.bossAlert()
+      setTimeout(() => { setPhaseBreak(false); nextCue(220) }, PHASE_BREAK_MS)
+      return
+    }
+    nextCue()
+  }
+
+  function handlePointerDown(event) {
+    if (!playingRef.current || !cue || phaseBreak) return
+    event.preventDefault()
+    event.currentTarget.setPointerCapture?.(event.pointerId)
+
+    if (cue.type === 'shield') { punish('방어막을 쳤어요!'); return }
+
+    pointerRef.current = { at: Date.now(), x: event.clientX, y: event.clientY }
+
+    if (cue.type === 'hold') {
+      const step = () => {
+        if (!pointerRef.current) return
+        const ratio = Math.min(1, (Date.now() - pointerRef.current.at) / HOLD_MS)
+        setHoldProgress(ratio)
+        if (ratio >= 1) { setHoldReady(true); return }
+        holdRafRef.current = requestAnimationFrame(step)
+      }
+      holdRafRef.current = requestAnimationFrame(step)
+    }
+  }
+
+  function handlePointerUp(event) {
+    if (!playingRef.current || !cue || !pointerRef.current || phaseBreak) return
+    event.preventDefault()
+    const pointer = pointerRef.current
+    const heldFor = Date.now() - pointer.at
+    const dx = event.clientX - pointer.x
+    const dy = event.clientY - pointer.y
+
+    if (cue.type === 'tap') {
+      if (heldFor <= TAP_MAX_MS) hit('NICE!')
+      else punish('너무 오래 눌렀어요!')
+    } else if (cue.type === 'hold') {
+      if (heldFor >= HOLD_MS) hit('PERFECT!')
+      else punish('더 길게 눌러주세요!')
+    } else if (cue.type === 'swipe') {
+      if (Math.abs(dx) >= SWIPE_MIN_PX && Math.abs(dx) > Math.abs(dy)) hit('SLASH!')
+      else punish('좌우로 밀어주세요!')
+    }
+  }
+
+  function finish(cleared) {
+    if (!playingRef.current) return
+    playingRef.current = false
+    clearTimers()
+    sound.stopBossBGM()
+    if (!cleared) sound.over()
+    navigate('/result', {
+      replace: true,
+      state: {
+        score: cleared ? 15000 + timeRef.current * 250 : Math.max(0, (boss.maxHp - hpRef.current) * 300),
+        maxCombo: maxComboRef.current,
+        monsterCounts: cleared ? { boss: 1 } : {},
+        mode: 'boss',
+        bossClear: cleared,
+        bossTimeLeft: timeRef.current,
+        bossDamage: boss.maxHp - hpRef.current,
+        bossMaxHp: boss.maxHp,
+      },
+    })
+  }
+
+  function quit() {
+    playingRef.current = false
+    clearTimers()
+    sound.stopBossBGM()
+    navigate('/home', { replace: true })
+  }
 
   useEffect(() => {
     sound.unlock()
@@ -33,93 +227,29 @@ export default function Boss() {
     playingRef.current = true
     sound.bossAlert()
     const musicTimer = setTimeout(() => sound.startBossBGM(), 550)
+    nextCue(900)
     return () => clearTimeout(musicTimer)
-  }, [countdown])
+  }, [countdown, nextCue])
 
   useEffect(() => {
-    if (!playingRef.current || hp <= 0) return
+    if (countdown !== 0) return
     const timer = setInterval(() => {
-      setTimeLeft((value) => {
-        if (value > 1) return value - 1
-        clearInterval(timer)
-        finish(false)
-        return 0
-      })
+      if (!playingRef.current) return
+      timeRef.current -= 1
+      setTimeLeft(timeRef.current)
+      if (timeRef.current <= 0) finish(false)
     }, 1000)
     return () => clearInterval(timer)
-  }, [countdown, hp])
+  }, [countdown])
 
-  useEffect(() => () => sound.stopBossBGM(), [])
+  useEffect(() => () => { clearTimers(); sound.stopBossBGM() }, [clearTimers])
 
-  function flash(text, type) {
-    setEffect({ text, type, id: Date.now() })
-    setTimeout(() => setEffect(null), 500)
-  }
-
-  function hit() {
-    if (!playingRef.current) return
-    const nextHp = Math.max(0, hp - 1)
-    const nextCombo = combo + 1
-    setHp(nextHp)
-    setCombo(nextCombo)
-    setAttackCount((value) => value + 1)
-    maxComboRef.current = Math.max(maxComboRef.current, nextCombo)
-    sound.hit(nextCombo)
-    setJudge(phase === 3 ? 'FINAL RUSH!' : 'NICE!')
-    flash(`-${boss.maxHp - nextHp}`, phase === 3 ? 'rush' : 'hit')
-    if (nextHp === 0) finish(true)
-  }
-
-  function miss(message) {
-    setCombo(0)
-    sound.miss()
-    setJudge(message)
-    flash('MISS', 'miss')
-  }
-
-  function handlePointerDown(event) {
-    if (!playingRef.current) return
-    event.preventDefault()
-    pointerDownRef.current = Date.now()
-  }
-
-  function handlePointerUp(event) {
-    if (!playingRef.current) return
-    event.preventDefault()
-    const heldFor = Date.now() - pointerDownRef.current
-    if (action === 'tap' && heldFor < 350) hit()
-    else if (action === 'hold' && heldFor >= 600) hit()
-    else miss(action === 'hold' ? '더 길게 눌러주세요!' : '빠르게 터치하세요!')
-  }
-
-  function finish(cleared) {
-    if (!playingRef.current) return
-    playingRef.current = false
-    sound.stopBossBGM()
-    if (!cleared) sound.over()
-    navigate('/result', {
-      replace: true,
-      state: {
-        score: cleared ? 15000 + timeLeft * 250 : Math.max(0, (boss.maxHp - hp) * 300),
-        maxCombo: maxComboRef.current,
-        monsterCounts: cleared ? { boss: 1 } : {},
-        mode: 'boss',
-        bossClear: cleared,
-      },
-    })
-  }
-
-  function quit() {
-    playingRef.current = false
-    sound.stopBossBGM()
-    navigate('/home', { replace: true })
-  }
-
+  const cueType = phaseBreak ? null : cue?.type
   return <main className={`battle-page boss-battle phase-${phase}`}>
     <header className="battle-hud boss-hud">
       <button className="battle-pause" onClick={quit} aria-label="보스전 나가기"><Icon name="back" size={18} /></button>
       <div className="battle-score"><small>DAILY BOSS</small><strong>{boss.name}</strong><span>{boss.element}</span></div>
-      <div className="battle-timer"><span>◆</span><strong>00:{String(timeLeft).padStart(2, '0')}</strong></div>
+      <div className="battle-timer"><span>◆</span><strong>00:{String(Math.max(0, timeLeft)).padStart(2, '0')}</strong></div>
       <div className={`battle-combo ${combo > 0 ? 'active' : ''}`}><small>COMBO</small><strong>{combo}</strong></div>
     </header>
 
@@ -138,18 +268,32 @@ export default function Boss() {
         }} />)}
       </div>
       <div className="boss-crown-glow" />
-      <button className={`boss-target action-${action} ${effect ? `react-${effect.type}` : ''}`} onPointerDown={handlePointerDown} onPointerUp={handlePointerUp} onPointerCancel={() => { pointerDownRef.current = 0 }}>
-        <span className="action-cue">{action === 'hold' ? 'HOLD' : 'TAP'}</span>
+      <div className="boss-aurora-ring ring-back" aria-hidden="true"><img src="/images/effects/boss-aurora-ring.webp" alt="" /></div>
+      <button
+        className={`boss-target ${cueType ? `action-${cueType}` : 'action-idle'} ${effect ? `react-${effect.type}` : ''} ${holdProgress > 0 ? 'holding' : ''} ${holdReady ? 'hold-ready' : ''} ${phaseBreak ? 'phase-break' : ''}`}
+        style={{ '--hold-progress': holdProgress }}
+        onPointerDown={handlePointerDown}
+        onPointerUp={handlePointerUp}
+        onPointerCancel={resetHold}
+      >
+        {cueType && <span className="action-cue">{CUE_LABEL[cueType]}</span>}
         <img src={boss.image} alt={boss.name} draggable="false" />
       </button>
+      <div className="boss-aurora-ring ring-front" aria-hidden="true"><img src="/images/effects/boss-aurora-ring.webp" alt="" /></div>
+      {/* 홀드 링은 boss-target 밖에 둔다 — 안에 두면 오로라 ring-front(z-index 4)가
+          boss-target(z-index 3) 통째로 덮어서 진행 표시가 가려진다. */}
+      {cue?.type === 'hold' && holdProgress > 0 && <div className={`boss-hold-ring ${holdReady ? 'ready' : ''}`} style={{ '--hold-progress': holdProgress }} aria-hidden="true">
+        <b>{holdReady ? '지금 떼세요!' : '유지'}</b>
+      </div>}
       {effect && <div key={effect.id} className={`boss-hit-effect ${effect.type}`}>{effect.text}</div>}
+      {phaseBreak && <div className="boss-phase-banner"><span>PHASE {phase}</span><strong>{phase === 3 ? '마지막 단계' : '패턴이 늘어납니다'}</strong></div>}
       {countdown > 0 && <div className="battle-countdown"><span>DAILY BOSS</span><strong key={countdown}>{countdown}</strong><p>{boss.title}</p></div>}
     </section>
 
     <section className="boss-command">
       <small>{phase === 3 ? 'FINAL PHASE' : `PHASE ${phase}`}</small>
       <strong>{judge}</strong>
-      <span>{action === 'hold' ? '왕관이 빛날 때 길게 누르세요' : '방어막이 열릴 때 빠르게 터치하세요'}</span>
+      <span>{cueType ? CUE_HINT[cueType] : '다음 신호를 기다리세요'}</span>
     </section>
   </main>
 }
