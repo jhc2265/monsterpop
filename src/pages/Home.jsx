@@ -5,7 +5,7 @@ import { useAuth } from '../context/AuthContext'
 import { sound } from '../lib/sound'
 import Icon from '../components/Icon'
 import BottomNav from '../components/BottomNav'
-import { getHunterTitle, getLevelProgress, getMonsterUnlockLevel, isMaxLevel, resolveProgress } from '../lib/progression'
+import { getLevelProgress, getMonsterUnlockLevel, resolveProgress } from '../lib/progression'
 import { getDailyMissions } from '../lib/missions'
 import { getDailyBoss } from '../lib/bosses'
 
@@ -74,7 +74,11 @@ export default function Home() {
 
   return <main className="page home-page home-v2">
     <header className="home-welcome">
-      <div>
+      <button className="home-welcome-profile" onClick={() => go('/profile')} aria-label="내 프로필 보기">
+        <img src={profile?.avatar_url || '/images/monsters/slime.webp'} alt="" />
+        <em>LV.{progress.level}</em>
+      </button>
+      <div className="home-welcome-copy">
         <h1>안녕하세요, <strong>{profile?.nickname || '헌터'} 헌터님!</strong></h1>
         <p>오늘도 최고 기록에 도전해보세요.</p>
         {best > 0 && <button className="home-best-line" onClick={() => go('/ranking')}>최고 <strong>{best.toLocaleString()}점</strong>{rank ? ` · ${rank}위` : ''} <span>›</span></button>}
@@ -85,16 +89,7 @@ export default function Home() {
       </div>
     </header>
 
-    <section className="hunter-progress profile-link" aria-label="내 프로필 보기" role="button" tabIndex={0} onClick={() => go('/profile')} onKeyDown={(event) => { if (event.key === 'Enter' || event.key === ' ') go('/profile') }}>
-      <div className="hunter-progress-head">
-        <span className="home-profile-avatar">
-          <img src={profile?.avatar_url || '/images/monsters/slime.webp'} alt="" />
-          <em>LV.{progress.level}</em>
-        </span>
-        <div><small>MY PARTNER</small><strong>{profile?.nickname || '헌터'} · {getHunterTitle(progress.level)}</strong></div>
-        <b>{isMaxLevel(progress.level) ? `${progress.total.toLocaleString()} XP` : `${progress.current.toLocaleString()} / ${progress.needed.toLocaleString()} XP`}<small>프로필 ›</small></b>
-      </div>
-      <div className="hunter-xp-bar"><i style={{ width: `${progress.percent}%` }} /></div>
+    <section className="hunter-progress mission-card" aria-label="오늘의 미션">
       {progress.level >= 2 ? <div className="mission-list">
         <div className="mission-list-head"><small>오늘의 미션</small><span>{missions.filter((m) => m.done).length}/{missions.length} 완료</span></div>
         {missions.map((mission) => <div key={mission.id} className={`mission-item ${mission.done ? 'done' : ''}`}>
