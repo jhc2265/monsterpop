@@ -5,6 +5,7 @@ import Login from './pages/Login'
 import Hero from './pages/Hero'
 import Home from './pages/Home'
 import Game from './pages/Game'
+import Boss from './pages/Boss'
 import Result from './pages/Result'
 import Ranking from './pages/Ranking'
 import Community from './pages/Community'
@@ -46,6 +47,7 @@ export default function App() {
     <Route path="/signup" element={<Login initialMode="signup" />} />
     <Route path="/home" element={<Protected><Home /></Protected>} />
     <Route path="/game" element={<Protected><Game /></Protected>} />
+    <Route path="/boss" element={<Protected><Boss /></Protected>} />
     <Route path="/result" element={<Protected><Result /></Protected>} />
     <Route path="/ranking" element={<Protected><Ranking /></Protected>} />
     <Route path="/collection" element={<Protected><Collection /></Protected>} />

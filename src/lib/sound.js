@@ -14,6 +14,7 @@ let rewardAudio = null
 let resultAudio = null
 let bossAlertAudio = null
 let battleAudio = null
+let bossBattleAudio = null
 let sceneRequested = 'silent'
 let lobbyNeedsIntro = true
 
@@ -189,6 +190,22 @@ export const sound = {
       battleAudio.currentTime = 0
     }
   },
+  startBossBGM() {
+    if (muted || !bgmEnabled) return
+    if (!bossBattleAudio) {
+      bossBattleAudio = new Audio('/audio/soundtrack/boss-loop.mp3')
+      bossBattleAudio.loop = true
+      bossBattleAudio.preload = 'auto'
+      bossBattleAudio.volume = 0.21
+    }
+    bossBattleAudio.currentTime = 0
+    bossBattleAudio.play().catch(() => {})
+  },
+  stopBossBGM() {
+    if (!bossBattleAudio) return
+    bossBattleAudio.pause()
+    bossBattleAudio.currentTime = 0
+  },
   setScene(scene) {
     const previousScene = sceneRequested
     sceneRequested = scene
@@ -213,6 +230,7 @@ export const sound = {
       if (rewardAudio) rewardAudio.pause()
       if (resultAudio) resultAudio.pause()
       if (bossAlertAudio) bossAlertAudio.pause()
+      if (bossBattleAudio) bossBattleAudio.pause()
     }
     if (masterGain) masterGain.gain.value = value ? 0 : 0.5
     syncSceneBGM()
@@ -220,7 +238,10 @@ export const sound = {
   isMuted() { return muted },
   setBgmEnabled(value) {
     bgmEnabled = value
-    if (!value) this.stopBGM()
+    if (!value) {
+      this.stopBGM()
+      this.stopBossBGM()
+    }
     syncSceneBGM()
   },
   setEffectsEnabled(value) { effectsEnabled = value },

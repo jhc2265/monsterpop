@@ -811,6 +811,60 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
 .battle-countdown p { max-width: 250px; margin: 12px 0 0; color: #d0c8e7; text-align: center; }
 .battle-arena:has(.battle-pause-overlay) .escape-bar i { animation-play-state: paused; }
 @keyframes monsterEscape { to { transform: scaleX(0); filter: hue-rotate(-60deg); } }
+
+/* Daily boss battle */
+.boss-battle { background: radial-gradient(circle at 50% 38%, rgba(157, 42, 203, .2), transparent 45%), #08051d; }
+.boss-hud { grid-template-columns: 43px minmax(0, 1fr) auto 62px; }
+.boss-hud .battle-score strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.boss-healthbar { flex: 0 0 auto; padding: 2px 6px 5px; }
+.boss-healthbar > div { display: flex; justify-content: space-between; margin-bottom: 6px; color: #f3d9ff; }
+.boss-healthbar small { color: var(--pink); letter-spacing: .09em; }
+.boss-healthbar > span { display: block; height: 13px; overflow: hidden; border: 1px solid rgba(255, 139, 231, .38); border-radius: 999px; background: rgba(7, 3, 25, .8); box-shadow: inset 0 0 12px rgba(0, 0, 0, .55); }
+.boss-healthbar i { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #ff497d, #f04cbd 52%, #a268ff); box-shadow: 0 0 16px rgba(240, 76, 189, .7); transition: width .2s ease; }
+.boss-arena { display: grid; place-items: center; padding-bottom: 0; }
+.boss-arena::before { content: ''; position: absolute; width: 88%; aspect-ratio: 1; border-radius: 50%; background: radial-gradient(circle, rgba(229, 70, 255, .2), rgba(108, 44, 214, .06) 52%, transparent 70%); animation: bossAura 2.4s ease-in-out infinite; }
+.boss-gem-rain { position: absolute; z-index: 2; inset: -18% 0 0; overflow: hidden; pointer-events: none; }
+.boss-gem-rain i { position: absolute; left: var(--gem-x); top: -12%; width: var(--gem-size); height: calc(var(--gem-size) * 1.45); border: 1px solid rgba(255, 224, 255, .9); background: linear-gradient(145deg, #fff 0 8%, #ff82ed 9% 32%, #9d35ff 34% 66%, #351084 68% 100%); clip-path: polygon(50% 0, 100% 35%, 77% 100%, 23% 100%, 0 35%); box-shadow: 0 0 8px #ff55df, 0 0 17px rgba(160, 61, 255, .72); opacity: .7; transform: translateY(-20%) rotate(18deg); animation: gemFall var(--gem-duration) var(--gem-delay) linear infinite; }
+.boss-gem-rain i:nth-child(3n) { background: linear-gradient(145deg, #fff, #7ff2ff 28%, #844cff 65%, #24116d); box-shadow: 0 0 9px #61e9ff, 0 0 18px rgba(103, 84, 255, .68); }
+.boss-gem-rain i:nth-child(4n) { opacity: .42; filter: blur(.35px); }
+.boss-crown-glow { position: absolute; top: 9%; width: 58%; height: 24%; border-radius: 50%; background: radial-gradient(circle, rgba(255, 77, 226, .28), transparent 70%); filter: blur(8px); animation: crownPulse 1.8s ease-in-out infinite; }
+.boss-crown-glow::before, .boss-crown-glow::after { content: ''; position: absolute; inset: -18%; border: 1px solid rgba(255, 119, 231, .22); border-radius: 50%; animation: bossOrbit 6s linear infinite; }
+.boss-crown-glow::before { box-shadow: 65px 18px 0 -5px rgba(237, 89, 255, .85), -54px 42px 0 -6px rgba(147, 88, 255, .8), 8px -36px 0 -7px rgba(255, 210, 94, .8); }
+.boss-crown-glow::after { inset: -34%; animation-direction: reverse; animation-duration: 9s; box-shadow: 82px 34px 0 -7px rgba(255, 91, 210, .72), -77px -11px 0 -6px rgba(105, 227, 255, .64); }
+.boss-target { position: relative; z-index: 3; width: min(92%, 430px); max-height: 76%; padding: 0; border: 0; background: transparent; cursor: pointer; touch-action: none; user-select: none; transition: transform .12s, filter .16s; animation: bossEntrance .72s cubic-bezier(.15, 1.35, .35, 1) both, bossIdle 3.1s .72s ease-in-out infinite; }
+.boss-target:active { transform: scale(.96); filter: brightness(1.18); }
+.boss-target img { width: 100%; max-height: 58vh; object-fit: contain; pointer-events: none; filter: drop-shadow(0 18px 24px rgba(2, 0, 16, .72)); }
+.boss-target .action-cue { top: 45%; left: 50%; min-width: 74px; padding: 8px 13px; transform: translate(-50%, -50%); background: rgba(8, 3, 27, .82); color: #fff; box-shadow: 0 0 22px rgba(240, 76, 189, .5); }
+.boss-target.action-hold .action-cue { border-color: rgba(255, 199, 87, .62); color: var(--gold); }
+.boss-target.action-hold::after { content: ''; position: absolute; z-index: 4; inset: 18%; border: 3px solid rgba(255, 206, 93, .78); border-left-color: transparent; border-radius: 50%; box-shadow: 0 0 18px rgba(255, 195, 74, .48), inset 0 0 18px rgba(255, 195, 74, .18); pointer-events: none; animation: holdRing 1.2s linear infinite; }
+.boss-target.react-hit { animation: bossDamage .3s ease both; }
+.boss-target.react-rush { animation: bossDamageRush .34s ease both; }
+.boss-target.react-miss { animation: bossDodge .34s ease both; filter: saturate(.55) brightness(.82); }
+.boss-hit-effect { position: absolute; z-index: 8; left: 50%; top: 45%; color: #fff; text-shadow: 0 0 8px var(--pink), 0 0 22px var(--pink); transform: translate(-50%, -50%); animation: bossHit .5s ease forwards; pointer-events: none; }
+.boss-hit-effect.miss { color: #aaa2c5; text-shadow: 0 2px #21183e; }
+.boss-hit-effect.rush { color: var(--gold); text-shadow: 0 0 8px #ff5bcb, 0 0 26px #ff5bcb; }
+.boss-command { flex: 0 0 82px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 8px 14px; border: 1px solid rgba(190, 142, 255, .18); border-radius: 20px; background: rgba(12, 8, 39, .92); text-align: center; }
+.boss-command small { color: var(--pink); letter-spacing: .12em; }
+.boss-command strong { margin: 3px 0; color: #fff; }
+.boss-command span { color: var(--text-2); }
+.boss-battle.phase-3 .boss-arena { box-shadow: inset 0 0 52px rgba(255, 54, 153, .27), 0 12px 35px rgba(2, 0, 15, .32); }
+.boss-battle.phase-2 .boss-target:not(.react-hit):not(.react-rush):not(.react-miss) { animation: bossPhaseTwo 2.2s ease-in-out infinite; }
+.boss-battle.phase-3 .boss-target:not(.react-hit):not(.react-rush):not(.react-miss) { animation: bossFinal .72s ease-in-out infinite; }
+.boss-battle.phase-3 .boss-crown-glow { animation-duration: .72s; filter: blur(5px) saturate(1.35); }
+.boss-battle.phase-3 .boss-gem-rain i { animation-duration: calc(var(--gem-duration) * .56); opacity: .92; filter: saturate(1.35); }
+@keyframes bossAura { 50% { opacity: .6; transform: scale(1.08); } }
+@keyframes bossHit { to { opacity: 0; transform: translate(-50%, -95%) scale(1.35); } }
+@keyframes bossEntrance { from { opacity: 0; transform: translateY(48px) scale(.55) rotate(-4deg); filter: brightness(1.5) blur(5px); } to { opacity: 1; transform: translateY(0) scale(1); filter: none; } }
+@keyframes bossIdle { 0%, 100% { transform: translateY(0) rotate(-.7deg); } 50% { transform: translateY(-11px) rotate(.7deg) scale(1.018); } }
+@keyframes crownPulse { 0%, 100% { opacity: .55; transform: scale(.9); } 50% { opacity: 1; transform: scale(1.12); } }
+@keyframes bossOrbit { to { transform: rotate(360deg); } }
+@keyframes gemFall { 0% { transform: translate3d(0, -15%, 0) rotate(15deg) scale(.7); opacity: 0; } 12% { opacity: .78; } 82% { opacity: .68; } 100% { transform: translate3d(var(--gem-drift), 1250%, 0) rotate(310deg) scale(1.08); opacity: 0; } }
+@keyframes holdRing { to { transform: rotate(360deg); } }
+@keyframes bossDamage { 0% { transform: translateX(0) scale(1); } 25% { transform: translateX(-13px) scale(.95); filter: brightness(1.65); } 55% { transform: translateX(10px) scale(1.03); } 100% { transform: translateX(0) scale(1); } }
+@keyframes bossDamageRush { 0% { transform: scale(1); } 40% { transform: scale(.91) rotate(-3deg); filter: brightness(1.8) saturate(1.4); } 70% { transform: scale(1.07) rotate(2deg); } 100% { transform: scale(1); } }
+@keyframes bossDodge { 40% { transform: translateX(22px) rotate(4deg) scale(.96); } }
+@keyframes bossPhaseTwo { 0%, 100% { transform: translateY(0) rotate(-1deg); } 50% { transform: translateY(-9px) rotate(1deg) scale(1.035); filter: brightness(1.08); } }
+@keyframes bossFinal { 0%, 100% { transform: translate(0, 0) scale(1.025); filter: brightness(1.12) saturate(1.2); } 25% { transform: translate(-3px, 1px) scale(1.045); } 50% { transform: translate(3px, -2px) scale(1.02); filter: brightness(1.3) saturate(1.35); } 75% { transform: translate(-2px, -1px) scale(1.05); } }
 @keyframes holdCharge { from { transform: rotate(0deg) scale(.9); opacity: .4; } to { transform: rotate(360deg) scale(1.06); opacity: 1; } }
 
 /* Config-driven monster states */

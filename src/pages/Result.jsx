@@ -4,12 +4,12 @@ import { supabase } from '../lib/supabase'
 import { useAuth } from '../context/AuthContext'
 import { sound } from '../lib/sound'
 import Icon from '../components/Icon'
-import { getLevel, getLevelProgress, LEVEL_UNLOCKS, resolveProgress, saveStoredProgress } from '../lib/progression'
+import { getLevel, getLevelProgress, isMaxLevel, LEVEL_UNLOCKS, resolveProgress, saveStoredProgress } from '../lib/progression'
 import { recordGameForMissions } from '../lib/missions'
 import { MONSTERS } from '../lib/monsters'
 
 export default function Result() {
-  const { user, refreshProfile } = useAuth(); const navigate = useNavigate(); const location = useLocation(); const { score = 0, maxCombo = 0, monsterCounts = {} } = location.state || {}
+  const { user, refreshProfile } = useAuth(); const navigate = useNavigate(); const location = useLocation(); const { score = 0, maxCombo = 0, monsterCounts = {}, bossClear = false } = location.state || {}
   const [saving, setSaving] = useState(true); const [isBest, setIsBest] = useState(false); const [rank, setRank] = useState(null); const [saveError, setSaveError] = useState(''); const [xpGain, setXpGain] = useState(0); const [xpProgress, setXpProgress] = useState(null); const [newDiscoveries, setNewDiscoveries] = useState([]); const [levelUp, setLevelUp] = useState(null); const savedRef = useRef(false)
   const rewardThemePlayedRef = useRef(false)
   const [resultStep, setResultStep] = useState(1)
@@ -19,10 +19,10 @@ export default function Result() {
     if (!savedRef.current) { savedRef.current = true; saveAndRank() }
   }, [])
   useEffect(() => {
-    if (rewardThemePlayedRef.current || (!isBest && !levelUp && newDiscoveries.length === 0)) return
+    if (rewardThemePlayedRef.current || (!bossClear && !isBest && !levelUp && newDiscoveries.length === 0)) return
     rewardThemePlayedRef.current = true
     sound.rewardTheme()
-  }, [isBest, levelUp, newDiscoveries])
+  }, [bossClear, isBest, levelUp, newDiscoveries])
   async function saveAndRank() {
     try {
       const { data: prev } = await supabase.from('scores').select('score').eq('user_id', user.id).order('score', { ascending: false }).limit(1); const prevBest = prev?.[0]?.score ?? 0
@@ -103,7 +103,7 @@ export default function Result() {
         </div>
         <p className="reward-kills">이번 사냥에서 몬스터 <strong>{totalKills}마리</strong>를 처치했어요</p>
       </div>
-      <div className="xp-progress-card">{xpProgress && <><div className="xp-level-head"><strong>LV.{xpProgress.level}</strong><span>{xpProgress.level >= 10 ? 'MAX LEVEL' : 'LEVEL PROGRESS'}</span><b>{xpProgress.level >= 10 ? 'MAX' : `LV.${xpProgress.level + 1}`}</b></div><div className="xp-progress-line"><span><i style={{ width: `${xpProgress.percent}%` }} /></span></div><div className="xp-progress-values"><small>{xpProgress.current} / {xpProgress.needed} XP</small><small>{xpProgress.level >= 10 ? '최고 레벨 달성' : `${(xpProgress.needed - xpProgress.current).toLocaleString()} XP 남음`}</small></div></>}</div>
+      <div className="xp-progress-card">{xpProgress && <><div className="xp-level-head"><strong>LV.{xpProgress.level}</strong><span>{isMaxLevel(xpProgress.level) ? 'MAX LEVEL' : 'LEVEL PROGRESS'}</span><b>{isMaxLevel(xpProgress.level) ? 'MAX' : `LV.${xpProgress.level + 1}`}</b></div><div className="xp-progress-line"><span><i style={{ width: `${xpProgress.percent}%` }} /></span></div><div className="xp-progress-values"><small>{xpProgress.current} / {xpProgress.needed} XP</small><small>{isMaxLevel(xpProgress.level) ? '최고 레벨 달성' : `${(xpProgress.needed - xpProgress.current).toLocaleString()} XP 남음`}</small></div></>}</div>
       {nextUnlock && <div className="next-reward-card">{nextUnlockMonster ? <img src={nextUnlockMonster.image} alt="" /> : nextUnlock.image ? <img src={nextUnlock.image} alt="" /> : <span><Icon name={nextUnlock.skill ? 'sword' : 'spark'} size={27} /></span>}<div><small>NEXT UNLOCK · LV.{xpProgress.level + 1}</small><strong>{nextUnlock.title}</strong><p>{nextUnlock.description}</p></div><Icon name="lock" size={18} /></div>}
       {newDiscoveries.length > 0 && <div className="reward-discovery"><span>NEW</span><strong>새로운 몬스터가 도감에 등록됐어요!</strong></div>}
     </section>}

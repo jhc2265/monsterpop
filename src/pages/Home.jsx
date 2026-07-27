@@ -5,7 +5,7 @@ import { useAuth } from '../context/AuthContext'
 import { sound } from '../lib/sound'
 import Icon from '../components/Icon'
 import BottomNav from '../components/BottomNav'
-import { getLevelProgress, resolveProgress } from '../lib/progression'
+import { getHunterTitle, getLevelProgress, getMonsterUnlockLevel, isMaxLevel, resolveProgress } from '../lib/progression'
 import { getDailyMissions } from '../lib/missions'
 
 export default function Home() {
@@ -52,11 +52,12 @@ export default function Home() {
 
   const progress = getLevelProgress(resolveProgress(profile, user.id).xp)
   const missions = progress.level >= 2 ? getDailyMissions(user.id) : []
-  const featured = progress.level >= 5
-    ? { label: 'TODAY’S BOSS', name: '그림자 대왕 출현!', copy: '강력한 그림자 대왕을 사냥하고 최고 기록에 도전하세요.', image: '/images/monsters/boss.webp', grade: '보스 몬스터', score: '500점', difficulty: '★★★' }
+  // 보스 카드는 최고 레벨이 아니라 보스 해금 레벨(MONSTER_LEVEL.boss)을 따른다
+  const featured = progress.level >= getMonsterUnlockLevel('boss')
+    ? { label: 'TODAY’S BOSS', name: '네온 나이트메어 출현!', copy: '깨진 네온 왕관의 지배자를 사냥하고 최고 기록에 도전하세요.', image: '/images/monsters/boss-neon-nightmare.webp', grade: '일일 보스', score: '500 코인', difficulty: '★★★', path: '/boss' }
     : progress.level >= 3
-      ? { label: 'TODAY’S HUNT', name: '불꽃 여우 출현!', copy: '고득점 몬스터 불꽃 여우를 30초 안에 사냥하세요.', image: '/images/monsters/fox.webp', grade: '영웅 몬스터', score: '300점', difficulty: '★★☆' }
-      : { label: 'TODAY’S HUNT', name: '번개 토끼 출현!', copy: '빠르게 움직이는 번개 토끼를 30초 안에 사냥하세요.', image: '/images/monsters/rabbit.webp', grade: '희귀 몬스터', score: '200점', difficulty: '★★☆' }
+      ? { label: 'TODAY’S HUNT', name: '불꽃 여우 출현!', copy: '고득점 몬스터 불꽃 여우를 30초 안에 사냥하세요.', image: '/images/monsters/fox.webp', grade: '영웅 몬스터', score: '300점', difficulty: '★★☆', path: '/game' }
+      : { label: 'TODAY’S HUNT', name: '번개 토끼 출현!', copy: '빠르게 움직이는 번개 토끼를 30초 안에 사냥하세요.', image: '/images/monsters/rabbit.webp', grade: '희귀 몬스터', score: '200점', difficulty: '★★☆', path: '/game' }
 
   return <main className="page home-page home-v2">
     <header className="home-welcome">
@@ -72,7 +73,7 @@ export default function Home() {
     </header>
 
     <section className="hunter-progress" aria-label="헌터 레벨">
-      <div className="hunter-progress-head"><span>LV.{progress.level}</span><div><strong>{profile?.nickname || '헌터'} · {progress.level >= 10 ? '마스터 헌터' : '성장 중인 헌터'}</strong></div><b>{progress.level >= 10 ? `${progress.total.toLocaleString()} XP` : `${progress.current.toLocaleString()} / ${progress.needed.toLocaleString()} XP`}</b></div>
+      <div className="hunter-progress-head"><span>LV.{progress.level}</span><div><strong>{profile?.nickname || '헌터'} · {getHunterTitle(progress.level)}</strong></div><b>{isMaxLevel(progress.level) ? `${progress.total.toLocaleString()} XP` : `${progress.current.toLocaleString()} / ${progress.needed.toLocaleString()} XP`}</b></div>
       <div className="hunter-xp-bar"><i style={{ width: `${progress.percent}%` }} /></div>
       {progress.level >= 2 ? <div className="mission-list">
         <div className="mission-list-head"><small>오늘의 미션</small><span>{missions.filter((m) => m.done).length}/{missions.length} 완료</span></div>
@@ -99,7 +100,7 @@ export default function Home() {
           <img className="hero-monster" src={featured.image} alt="" />
         </div>
       </div>
-      <button className="boss-start" onClick={() => go('/game')}><img src="/images/ui/hunt-swords.webp" alt="" /><span>지금 사냥하기</span><b>›</b></button>
+      <button className="boss-start" onClick={() => go(featured.path)}><img src="/images/ui/hunt-swords.webp" alt="" /><span>{featured.path === '/boss' ? '보스 도전하기' : '지금 사냥하기'}</span><b>›</b></button>
     </section>
     <BottomNav />
   </main>

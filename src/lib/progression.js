@@ -10,7 +10,7 @@ export const LEVEL_UNLOCKS = {
   7: { title: '수정 고슴도치', description: '방어가 풀리는 순간을 노려보세요', monsters: ['hedgehog'] },
   8: { title: '황금 미믹', description: '희귀한 코인 보물 몬스터가 출현합니다', monsters: ['mimic'] },
   9: { title: '바위 골렘', description: '세 번 공격해야 하는 강적이 출현합니다', monsters: ['golem'] },
-  10: { title: '그림자 대왕', description: '그림자 대왕 보스전에 도전할 수 있어요', monsters: ['boss'], image: '/images/rewards/level-10-boss-challenge.webp' },
+  10: { title: '네온 나이트메어', description: '매일 바뀌는 보스전에 도전할 수 있어요', monsters: ['boss'], image: '/images/rewards/level-10-boss-challenge.webp' },
   11: { title: '얼음 펭귄', description: '사냥터를 얼리는 몬스터가 출현합니다', monsters: ['penguin'] },
   12: { title: '별빛 해파리', description: '정확한 타이밍으로 콤보 보너스를 노려보세요', monsters: ['jellyfish'] },
   13: { title: '환영 고양이', description: '분신 속에서 진짜 본체를 찾아보세요', monsters: ['cat'] },
@@ -18,6 +18,27 @@ export const LEVEL_UNLOCKS = {
 }
 
 const MONSTER_LEVEL = { slime: 1, rabbit: 3, fox: 5, owl: 6, hedgehog: 7, mimic: 8, golem: 9, boss: 10, penguin: 11, jellyfish: 12, cat: 13, wolf: 14 }
+
+// 최고 레벨. 레벨을 더 늘리면 LEVEL_XP 만 고치면 되도록 길이에서 파생시킨다.
+export const MAX_LEVEL = LEVEL_XP.length
+
+// 칭호 구간 — 경계는 해금 이정표에 맞춘다.
+//   4 섀도우 버스트 · 7 수정 고슴도치 · 10 보스전 · 14 최고 레벨
+const HUNTER_TITLES = [
+  { from: 14, title: '마스터 헌터' },
+  { from: 10, title: '정예 헌터' },
+  { from: 7, title: '숙련 헌터' },
+  { from: 4, title: '정식 헌터' },
+  { from: 1, title: '견습 헌터' },
+]
+
+export function getHunterTitle(level = 1) {
+  return (HUNTER_TITLES.find((tier) => level >= tier.from) || HUNTER_TITLES[HUNTER_TITLES.length - 1]).title
+}
+
+export function isMaxLevel(level = 1) {
+  return level >= MAX_LEVEL
+}
 
 export function getLevel(xp = 0) {
   let level = 1
