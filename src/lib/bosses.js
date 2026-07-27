@@ -15,6 +15,7 @@ export const DAILY_BOSSES = [
     mechanics: ['shield', 'mixed-gestures', 'final-rush'],
     description: '깨진 네온 왕관으로 그림자 포털을 지배하는 첫 번째 일일 보스예요.',
     cardCopy: '깨진 네온 왕관의 지배자를 사냥하고 최고 기록에 도전하세요.',
+    holdHint: '왕관이 빛나요. 길게 눌러 힘을 모으세요',
   },
   {
     id: 'glitch-king-slime',
@@ -32,6 +33,25 @@ export const DAILY_BOSSES = [
     mechanics: ['shield', 'mixed-gestures', 'final-rush'],
     description: '픽셀 왕관에서 쏟아지는 오류로 사냥터를 뒤틀어 버리는 두 번째 일일 보스예요.',
     cardCopy: '멈춰 버린 표정 뒤에 숨은 시스템 오류를 빠르게 정리하세요.',
+    holdHint: '몸 안의 코어가 열렸어요. 길게 눌러 오류를 멈추세요',
+  },
+  {
+    id: 'solar-eclipse-phoenix',
+    name: '이클립스 피닉스',
+    title: '꺼진 태양의 잠든 불새',
+    element: '일식',
+    image: '/images/monsters/boss-solar-eclipse-phoenix-v4.webp',
+    background: '/images/bg/battle-arena-solar-eclipse.webp',
+    color: '#ff8a2a',
+    timeLimit: 40,
+    maxHp: 36,
+    unlockLevel: 10,
+    difficulty: 4,
+    firstClearXp: 140,
+    mechanics: ['shield', 'mixed-gestures', 'final-rush'],
+    description: '검은 태양 파편을 품고 잿빛 사냥터에 잠든 세 번째 일일 보스예요.',
+    cardCopy: '잠든 불새가 눈을 뜨기 전에 검은 태양 파편을 식혀 주세요.',
+    holdHint: '불꽃이 잦아들었어요. 길게 눌러 열기를 흡수하세요',
   },
 ]
 

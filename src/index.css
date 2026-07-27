@@ -1277,6 +1277,35 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
 .boss-result-neon-nightmare .result-boss-aura i:nth-child(6) { right: 13%; top: 74%; width: 10px; animation-delay: -3.7s; }
 .boss-result-neon-nightmare .result-boss-aura i:nth-child(7) { right: 31%; top: 5%; width: 8px; animation-delay: -2.7s; }
 .boss-result-neon-nightmare .result-boss-aura i:nth-child(8) { display: none; }
+
+/* 이클립스 피닉스: 캐릭터의 태양 파편과 겹치지 않는 잔불과 재만 흩뿌린다. */
+.boss-result-solar-eclipse-phoenix .result-card-v2 {
+  background:
+    radial-gradient(circle at 50% 23%, rgba(225,91,27,.2), transparent 38%),
+    linear-gradient(155deg, rgba(67,29,22,.96), rgba(20,12,24,.99));
+}
+.boss-result-solar-eclipse-phoenix .result-monster-stage::before {
+  background:
+    radial-gradient(circle at 45% 48%, rgba(255,137,48,.25), transparent 46%),
+    radial-gradient(circle at 62% 60%, rgba(132,38,22,.22), transparent 58%);
+  filter: blur(20px);
+}
+.boss-result-solar-eclipse-phoenix .result-boss-aura i {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #ff9b35;
+  box-shadow: 0 0 7px rgba(255,116,33,.6);
+  animation: resultEmberDrift 4.2s ease-in-out infinite;
+}
+.boss-result-solar-eclipse-phoenix .result-boss-aura i:nth-child(1) { left: 7%; top: 30%; animation-delay: -.4s; }
+.boss-result-solar-eclipse-phoenix .result-boss-aura i:nth-child(2) { left: 17%; top: 72%; width: 3px; height: 3px; animation-delay: -2.3s; }
+.boss-result-solar-eclipse-phoenix .result-boss-aura i:nth-child(3) { left: 34%; top: 8%; animation-delay: -1.5s; }
+.boss-result-solar-eclipse-phoenix .result-boss-aura i:nth-child(4) { left: 43%; top: 89%; width: 2px; height: 2px; animation-delay: -3.4s; }
+.boss-result-solar-eclipse-phoenix .result-boss-aura i:nth-child(5) { right: 8%; top: 27%; animation-delay: -2.8s; }
+.boss-result-solar-eclipse-phoenix .result-boss-aura i:nth-child(6) { right: 16%; top: 70%; width: 3px; height: 3px; animation-delay: -.9s; }
+.boss-result-solar-eclipse-phoenix .result-boss-aura i:nth-child(7) { right: 32%; top: 5%; width: 2px; height: 2px; animation-delay: -3.7s; }
+.boss-result-solar-eclipse-phoenix .result-boss-aura i:nth-child(8) { right: 38%; top: 88%; animation-delay: -1.9s; }
 .boss-result.boss-escaped .result-boss-aura,
 .boss-result.boss-escaped .result-monster-stage::before { opacity: .38; }
 .boss-result-glitch-king-slime .result-card-v2 {
@@ -1292,6 +1321,11 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
 @keyframes resultGemDrift {
   0%, 100% { transform: translateY(2px) rotate(-7deg); opacity: .22; }
   50% { transform: translateY(-7px) rotate(8deg); opacity: .55; }
+}
+@keyframes resultEmberDrift {
+  0%, 100% { transform: translate(0, 5px) scale(.7); opacity: .15; }
+  45% { transform: translate(3px, -8px) scale(1); opacity: .72; }
+  65% { transform: translate(-2px, -12px) scale(.65); opacity: .3; }
 }
 .score-panel { min-height: 112px; display: grid; grid-template-columns: 100px minmax(0,1fr); align-items: center; gap: 12px; padding: 11px 19px 11px 10px; border: 1px solid rgba(200,126,255,.24); border-radius: 18px; background: linear-gradient(120deg, rgba(17,11,54,.78), rgba(58,20,94,.42)); text-align: left; }
 .score-copy { min-width: 0; }
@@ -2952,4 +2986,23 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
   0%, 20% { opacity: 0; transform: rotateX(67deg) scale(.96); }
   21%, 62% { opacity: .48; transform: rotateX(67deg) scale(1); }
   63%, 100% { opacity: .08; transform: rotateX(67deg) scale(1.025); }
+}
+
+/* 이클립스 피닉스는 링이나 보석비 대신 낮은 열기와 재만 사용한다. */
+.boss-solar-eclipse-phoenix .boss-gem-rain { display: none; }
+.boss-solar-eclipse-phoenix .boss-aurora-ring { display: none; }
+.boss-solar-eclipse-phoenix .boss-crown-glow {
+  top: 24%;
+  width: 68%;
+  height: 44%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,126,37,.2), rgba(120,34,22,.1) 42%, transparent 70%);
+  filter: blur(17px);
+  animation: solarHeatPulse 3.8s ease-in-out infinite;
+}
+.boss-solar-eclipse-phoenix .boss-crown-glow::before,
+.boss-solar-eclipse-phoenix .boss-crown-glow::after { display: none; }
+@keyframes solarHeatPulse {
+  0%, 100% { opacity: .45; transform: scale(.95); }
+  50% { opacity: .72; transform: scale(1.04); }
 }

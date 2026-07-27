@@ -303,7 +303,7 @@ export default function Boss() {
     <section className="boss-command">
       <small>{phase === 3 ? 'FINAL PHASE' : `PHASE ${phase}`}</small>
       <strong>{judge}</strong>
-      <span>{cueType ? CUE_HINT[cueType] : '다음 신호를 기다리세요'}</span>
+      <span>{cueType ? (cueType === 'hold' && boss.holdHint ? boss.holdHint : CUE_HINT[cueType]) : '다음 신호를 기다리세요'}</span>
     </section>
   </main>
 }
