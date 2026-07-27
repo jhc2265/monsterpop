@@ -2,7 +2,8 @@
 export const DAILY_MISSIONS = [
   { id: 'play', title: '사냥 3회 완료', metric: 'games', goal: 3, rewardXp: 30 },
   { id: 'kills', title: '몬스터 30마리 처치', metric: 'kills', goal: 30, rewardXp: 30 },
-  { id: 'combo', title: '한 판에서 콤보 30 달성', metric: 'combo', goal: 30, rewardXp: 40 },
+  // 제목은 320px 화면에서 한 줄에 들어가야 한다 (가용폭 131px). "한 판에서" 는 142px 로 넘쳐 줄이 접혔다.
+  { id: 'combo', title: '한 판 콤보 30 달성', metric: 'combo', goal: 30, rewardXp: 40 },
 ]
 
 const today = () => new Date().toISOString().slice(0, 10)

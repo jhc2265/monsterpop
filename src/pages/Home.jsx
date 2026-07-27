@@ -79,9 +79,8 @@ export default function Home() {
         {missions.map((mission) => <div key={mission.id} className={`mission-item ${mission.done ? 'done' : ''}`}>
           <span className="mission-check"><Icon name={mission.done ? 'check' : 'spark'} size={15} /></span>
           <div className="mission-body">
-            <div className="mission-body-top"><strong>{mission.title}</strong><b>{mission.done ? '완료' : `+${mission.rewardXp} XP`}</b></div>
+            <div className="mission-body-top"><strong>{mission.title}</strong><em>{mission.value}/{mission.goal}</em><b>{mission.done ? '완료' : `+${mission.rewardXp} XP`}</b></div>
             <div className="mission-track"><i style={{ width: `${mission.percent}%` }} /></div>
-            <em>{mission.value} / {mission.goal}</em>
           </div>
         </div>)}
       </div> : <div className="progress-mission locked"><span><Icon name="lock" size={17} /></span><div><small>오늘의 미션</small><strong>일일 미션 준비 중</strong><em>Lv.2부터 매일 새로운 성장 목표가 열려요</em></div><b>LV.2</b></div>}
