@@ -86,7 +86,14 @@ export default function Home() {
     </header>
 
     <section className="hunter-progress profile-link" aria-label="내 프로필 보기" role="button" tabIndex={0} onClick={() => go('/profile')} onKeyDown={(event) => { if (event.key === 'Enter' || event.key === ' ') go('/profile') }}>
-      <div className="hunter-progress-head"><span>LV.{progress.level}</span><div><strong>{profile?.nickname || '헌터'} · {getHunterTitle(progress.level)}</strong></div><b>{isMaxLevel(progress.level) ? `${progress.total.toLocaleString()} XP` : `${progress.current.toLocaleString()} / ${progress.needed.toLocaleString()} XP`}</b></div>
+      <div className="hunter-progress-head">
+        <span className="home-profile-avatar">
+          <img src={profile?.avatar_url || '/images/monsters/slime.webp'} alt="" />
+          <em>LV.{progress.level}</em>
+        </span>
+        <div><small>MY PARTNER</small><strong>{profile?.nickname || '헌터'} · {getHunterTitle(progress.level)}</strong></div>
+        <b>{isMaxLevel(progress.level) ? `${progress.total.toLocaleString()} XP` : `${progress.current.toLocaleString()} / ${progress.needed.toLocaleString()} XP`}<small>프로필 ›</small></b>
+      </div>
       <div className="hunter-xp-bar"><i style={{ width: `${progress.percent}%` }} /></div>
       {progress.level >= 2 ? <div className="mission-list">
         <div className="mission-list-head"><small>오늘의 미션</small><span>{missions.filter((m) => m.done).length}/{missions.length} 완료</span></div>
