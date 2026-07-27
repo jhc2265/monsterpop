@@ -53,6 +53,24 @@ export const DAILY_BOSSES = [
     cardCopy: '잠든 불새가 눈을 뜨기 전에 검은 태양 파편을 식혀 주세요.',
     holdHint: '불꽃이 잦아들었어요. 길게 눌러 열기를 흡수하세요',
   },
+  {
+    id: 'polar-pod',
+    name: '폴라포드',
+    title: '미래를 본 빙하의 예언자',
+    element: '빙결',
+    image: '/images/monsters/boss-polar-pod-v2.webp',
+    background: '/images/bg/battle-arena-polar-pod.webp',
+    color: '#7fc9ff',
+    timeLimit: 40,
+    maxHp: 38,
+    unlockLevel: 10,
+    difficulty: 4,
+    firstClearXp: 150,
+    mechanics: ['shield', 'mixed-gestures', 'final-rush'],
+    description: '얼어붙은 시계 조각으로 사냥터의 시간을 늦추는 네 번째 일일 보스예요.',
+    cardCopy: '불안한 예언자의 외눈을 피해 얼어붙은 시간을 다시 움직이세요.',
+    holdHint: '시계가 멈췄어요. 길게 눌러 얼음을 녹이세요',
+  },
 ]
 
 // 보스는 한국시간 자정에 바뀐다. 클리어 기록도 같은 기준을 써야 해서 함수로 뺐다.

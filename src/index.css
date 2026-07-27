@@ -3331,3 +3331,64 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
   .boss-select-card { grid-template-columns: 68px 1fr 14px; gap: 10px; padding: 11px 12px; }
   .boss-select-body strong { font-size: var(--fs-h3); }
 }
+
+/* ============================================================
+   POLAR POD — 전투, 결과, 보상 정산 전용 연출
+   ============================================================ */
+.boss-polar-pod .boss-gem-rain,
+.boss-polar-pod .boss-aurora-ring { display: none; }
+.boss-polar-pod .boss-crown-glow {
+  top: 24%;
+  width: 70%;
+  height: 46%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(155,218,255,.2), rgba(56,99,179,.1) 44%, transparent 72%);
+  filter: blur(18px);
+  animation: polarColdPulse 4.6s ease-in-out infinite;
+}
+.boss-polar-pod .boss-crown-glow::before,
+.boss-polar-pod .boss-crown-glow::after { display: none; }
+
+.boss-result-polar-pod {
+  --reward-accent: #7fc9ff;
+  --reward-accent-2: #d9f3ff;
+  --reward-panel: #102b54;
+  --reward-panel-deep: #07152f;
+}
+.boss-result-polar-pod .result-card-v2 {
+  background:
+    radial-gradient(circle at 50% 23%, rgba(103,173,239,.2), transparent 38%),
+    linear-gradient(155deg, rgba(16,43,84,.96), rgba(7,17,45,.99));
+}
+.boss-result-polar-pod .result-monster-stage::before {
+  background:
+    radial-gradient(circle at 46% 48%, rgba(167,222,255,.24), transparent 47%),
+    radial-gradient(circle at 62% 62%, rgba(71,113,197,.2), transparent 58%);
+  filter: blur(21px);
+}
+.boss-result-polar-pod .result-boss-aura i {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #e8f8ff;
+  box-shadow: 0 0 6px rgba(126,202,255,.58);
+  animation: resultSnowDrift 5.2s ease-in-out infinite;
+}
+.boss-result-polar-pod .result-boss-aura i:nth-child(1) { left: 7%; top: 22%; animation-delay: -.5s; }
+.boss-result-polar-pod .result-boss-aura i:nth-child(2) { left: 15%; top: 68%; width: 3px; height: 3px; animation-delay: -2.4s; }
+.boss-result-polar-pod .result-boss-aura i:nth-child(3) { left: 32%; top: 5%; animation-delay: -3.6s; }
+.boss-result-polar-pod .result-boss-aura i:nth-child(4) { left: 41%; top: 88%; width: 2px; height: 2px; animation-delay: -1.1s; }
+.boss-result-polar-pod .result-boss-aura i:nth-child(5) { right: 8%; top: 27%; animation-delay: -2.9s; }
+.boss-result-polar-pod .result-boss-aura i:nth-child(6) { right: 16%; top: 72%; width: 3px; height: 3px; animation-delay: -.8s; }
+.boss-result-polar-pod .result-boss-aura i:nth-child(7) { right: 31%; top: 4%; width: 2px; height: 2px; animation-delay: -4.2s; }
+.boss-result-polar-pod .result-boss-aura i:nth-child(8) { right: 39%; top: 89%; animation-delay: -1.8s; }
+
+@keyframes polarColdPulse {
+  0%, 100% { opacity: .42; transform: scale(.96); }
+  50% { opacity: .68; transform: scale(1.035); }
+}
+@keyframes resultSnowDrift {
+  0%, 100% { transform: translate(0, -5px); opacity: .14; }
+  48% { transform: translate(4px, 7px); opacity: .68; }
+  72% { transform: translate(-2px, 11px); opacity: .28; }
+}
