@@ -7,7 +7,7 @@ export const DAILY_BOSSES = [
     image: '/images/monsters/boss-neon-nightmare.webp',
     color: '#f04cbd',
     timeLimit: 40,
-    maxHp: 24,
+    maxHp: 32,
     unlockLevel: 10,
     difficulty: 3,
     firstClearXp: 120,

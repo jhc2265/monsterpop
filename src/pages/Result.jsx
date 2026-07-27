@@ -111,12 +111,14 @@ export default function Result() {
     </section>
     {resultStep === 1 ? <section className="result-card result-card-v2">
       {isBest && <div className="result-best-flag"><strong>NEW BEST!</strong><span>최고 기록 경신!</span></div>}
-      <div className="result-monster-stage"><img src={representative.image} alt={representative.name} /><strong>{isBossMode ? (bossClear ? `${representative.name} 격파!` : `${representative.name} ${bossDamage} 피해`) : `${representative.name} ${monsterCounts[representative.id] || 0}마리 처치!`}</strong></div>
+      <div className="result-monster-stage"><img src={representative.image} alt={representative.name} /><strong>{isBossMode
+          ? bossClear ? `${representative.name} 격파!` : bossDamage >= bossMaxHp * 0.75 ? '한 걸음 남았어요!' : '다시 도전해 볼까요?'
+          : `${representative.name} ${monsterCounts[representative.id] || 0}마리 처치!`}</strong></div>
       <div className="score-panel">
         <div className={`score-grade grade-${scoreGrade.toLowerCase()}`}><img src={`/images/ranks/rank-${scoreGrade.toLowerCase()}.webp`} alt={`${scoreGrade} 랭크 배지`} /></div>
         <div className="score-copy"><small>FINAL SCORE</small><strong className="result-score">{score.toLocaleString()}</strong></div>
       </div>
-      {isBossMode ? <div className="result-summary"><div><img src="/images/ui/stat-combo.webp" alt="" /><span>최고 콤보</span><strong>{maxCombo}</strong></div><i /><div><img src="/images/ui/stat-kills.webp" alt="" /><span>{bossClear ? '처치 시간' : '가한 피해'}</span><strong>{bossClear ? `${40 - bossTimeLeft}초` : `${bossDamage}/${bossMaxHp}`}</strong></div><i /><div><img src="/images/ui/stat-rank.webp" alt="" /><span>남은 시간</span><strong>{bossClear ? `${bossTimeLeft}초` : '실패'}</strong></div></div> : <div className="result-summary"><div><img src="/images/ui/stat-combo.webp" alt="" /><span>최고 콤보</span><strong>{maxCombo}</strong></div><i /><div><img src="/images/ui/stat-kills.webp" alt="" /><span>처치 몬스터</span><strong>{totalKills}마리</strong></div><i /><div><img src="/images/ui/stat-rank.webp" alt="" /><span>현재 순위</span><strong>{saving ? '...' : rank ? `${rank}위` : '-'}</strong></div></div>}
+      {isBossMode ? <div className="result-summary"><div><img src="/images/ui/stat-combo.webp" alt="" /><span>최고 콤보</span><strong>{maxCombo}</strong></div><i /><div><img src="/images/ui/stat-kills.webp" alt="" /><span>{bossClear ? '처치 시간' : '가한 피해'}</span><strong>{bossClear ? `${40 - bossTimeLeft}초` : `${bossDamage}/${bossMaxHp}`}</strong></div><i /><div><img src="/images/ui/stat-rank.webp" alt="" /><span>{bossClear ? '남은 시간' : '진행도'}</span><strong>{bossClear ? `${bossTimeLeft}초` : `${Math.round((bossDamage / Math.max(1, bossMaxHp)) * 100)}%`}</strong></div></div> : <div className="result-summary"><div><img src="/images/ui/stat-combo.webp" alt="" /><span>최고 콤보</span><strong>{maxCombo}</strong></div><i /><div><img src="/images/ui/stat-kills.webp" alt="" /><span>처치 몬스터</span><strong>{totalKills}마리</strong></div><i /><div><img src="/images/ui/stat-rank.webp" alt="" /><span>현재 순위</span><strong>{saving ? '...' : rank ? `${rank}위` : '-'}</strong></div></div>}
     </section> : <section className="result-reward-card">
       <div className="reward-settlement">
         <div className="reward-total">

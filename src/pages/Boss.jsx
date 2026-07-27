@@ -4,18 +4,29 @@ import { getDailyBoss } from '../lib/bosses'
 import { sound } from '../lib/sound'
 import Icon from '../components/Icon'
 
-// 페이즈가 오를수록 "동작이 정해지는" 게 아니라 "선택지가 늘고 반응 시간이 짧아진다".
-// 순서를 외우는 게 아니라 매번 화면을 봐야 하도록 만드는 것이 목적.
+// 모든 페이즈에서 최소 2종이 나오게 한다. 1페이즈를 tap 만으로 두니
+// 10히트 내내 같은 신호가 나와 지루했고, 실수하면 HP 가 안 줄어 더 길어졌다.
+// 페이즈는 "새 동작 추가"가 아니라 "비중 이동 + 반응 시간 단축"으로 조인다.
 const PHASES = {
-  1: { pool: ['tap'], window: 2600, shieldRate: 0 },
-  2: { pool: ['tap', 'hold'], window: 2100, shieldRate: 0.18 },
-  3: { pool: ['tap', 'hold', 'swipe'], window: 1700, shieldRate: 0.22 },
+  1: { weights: { tap: 60, hold: 40 }, window: 2600 },
+  2: { weights: { tap: 35, hold: 30, swipe: 20, shield: 15 }, window: 2100 },
+  3: { weights: { tap: 26, hold: 26, swipe: 26, shield: 22 }, window: 1600 },
+}
+
+function pickCue(weights) {
+  const total = Object.values(weights).reduce((sum, weight) => sum + weight, 0)
+  let roll = Math.random() * total
+  for (const [type, weight] of Object.entries(weights)) {
+    roll -= weight
+    if (roll < 0) return type
+  }
+  return 'tap'
 }
 
 const HOLD_MS = 620          // 홀드 성공에 필요한 시간
 const TAP_MAX_MS = 320       // 이보다 오래 누르면 탭으로 인정하지 않는다
 const SWIPE_MIN_PX = 34
-const MISS_TIME_PENALTY = 3  // 반격 — 이게 있어야 제한 시간이 실제 압박이 된다
+const MISS_TIME_PENALTY = 2  // 반격 — 이게 있어야 제한 시간이 실제 압박이 된다
 const SHIELD_MS = 900        // 방어막이 올라와 있는 시간
 const PHASE_BREAK_MS = 900   // 페이즈 전환 무적 연출
 
@@ -78,9 +89,7 @@ export default function Boss() {
     cueTimerRef.current = setTimeout(() => {
       if (!playingRef.current) return
       const settings = PHASES[phaseRef.current]
-      const type = Math.random() < settings.shieldRate
-        ? 'shield'
-        : settings.pool[Math.floor(Math.random() * settings.pool.length)]
+      const type = pickCue(settings.weights)
       setCue({ type, id: Date.now() })
       resetHold()
 

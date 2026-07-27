@@ -831,11 +831,14 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
 .boss-crown-glow::before, .boss-crown-glow::after { content: ''; position: absolute; left: 50%; top: 50%; width: 38px; height: 38px; background: url('/images/effects/boss-neon-gem.webp') center / contain no-repeat; filter: drop-shadow(0 0 8px rgba(242, 72, 255, .82)); animation: gemOrbitNear 5.8s linear infinite; }
 .boss-crown-glow::after { width: 27px; height: 27px; filter: hue-rotate(45deg) drop-shadow(0 0 8px rgba(83, 225, 255, .78)); animation-name: gemOrbitFar; animation-duration: 8.4s; animation-direction: reverse; }
 .boss-aurora-ring { position: absolute; left: 50%; top: 53%; width: min(108%, 520px); aspect-ratio: 3 / 2; pointer-events: none; transform: translate(-50%, -50%); transform-origin: center; animation: auroraRingIdle 4.8s ease-in-out infinite; }
-.boss-aurora-ring img { width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 0 8px rgba(212, 70, 255, .55)); }
+.boss-aurora-ring img { width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 0 8px rgba(212, 70, 255, .55)); animation: auroraSpin 9s linear infinite; }
 .boss-aurora-ring.ring-back { z-index: 2; clip-path: inset(0 0 49% 0); opacity: .72; }
 .boss-aurora-ring.ring-front { z-index: 4; clip-path: inset(48% 0 0 0); opacity: .94; }
 .boss-aurora-ring.ring-front img { filter: drop-shadow(0 0 10px rgba(238, 75, 255, .72)); }
 .boss-battle.phase-2 .boss-aurora-ring { animation-duration: 3.1s; }
+.boss-battle.phase-2 .boss-aurora-ring img { animation-duration: 6s; }
+.boss-battle.phase-3 .boss-aurora-ring img { animation-duration: 3.4s; }
+.boss-arena:has(.boss-target.holding) .boss-aurora-ring img { animation-duration: 1.9s; }
 .boss-battle.phase-2 .boss-aurora-ring.ring-back::after, .boss-battle.phase-3 .boss-aurora-ring.ring-back::after { content: ''; position: absolute; inset: 8%; background: url('/images/effects/boss-aurora-ring.webp') center / contain no-repeat; opacity: .34; transform: rotate(-3deg) scale(.88); filter: hue-rotate(32deg) drop-shadow(0 0 8px rgba(79, 221, 255, .5)); }
 .boss-battle.phase-3 .boss-aurora-ring { animation: auroraRingFinal 1.15s ease-in-out infinite; }
 .boss-arena:has(.boss-target.react-hit) .boss-aurora-ring, .boss-arena:has(.boss-target.react-rush) .boss-aurora-ring { animation: auroraRingHit .32s ease both; }
@@ -2724,3 +2727,5 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
   78% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
   100% { opacity: 0; transform: translate(-50%, -50%) scale(.96); }
 }
+
+@keyframes auroraSpin { to { transform: rotate(360deg); } }
