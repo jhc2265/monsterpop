@@ -1226,6 +1226,50 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
 }
 @keyframes resultMonsterFloat { 50% { transform: translateY(-6px); } }
 
+/* Advanced monster behaviors */
+.battle-arena.frozen-field::after {
+  content: '';
+  position: absolute;
+  z-index: 5;
+  inset: 0;
+  border: 10px solid rgba(177,241,255,.2);
+  background:
+    linear-gradient(135deg, rgba(207,249,255,.12), transparent 25% 70%, rgba(193,235,255,.12)),
+    radial-gradient(circle at 12% 18%, rgba(235,253,255,.2), transparent 18%);
+  box-shadow: inset 0 0 38px rgba(158,226,255,.26);
+  pointer-events: none;
+}
+.gesture-penguin .action-cue { color: #aef4ff; }
+.gesture-penguin img { filter: drop-shadow(0 0 9px rgba(139,233,255,.52)); }
+.gesture-jellyfish img { animation: specialMonsterFloat 1.45s ease-in-out infinite; }
+.gesture-jellyfish.holding::after {
+  animation-duration: .82s;
+  border-top-color: #fff3a1;
+  border-right-color: #7ee7ff;
+}
+.gesture-cat { z-index: 8; }
+.illusion-clone {
+  position: absolute;
+  z-index: 1;
+  width: 76%;
+  height: 76%;
+  display: block;
+  opacity: .42;
+  filter: grayscale(.55) hue-rotate(24deg);
+  pointer-events: auto;
+}
+.illusion-clone img { width: 100%; height: 100%; object-fit: contain; }
+.illusion-clone.clone-left { left: -48%; top: 17%; transform: rotate(-9deg); }
+.illusion-clone.clone-right { right: -48%; top: 17%; transform: rotate(9deg); }
+.gesture-cat > img { position: relative; z-index: 2; filter: drop-shadow(0 0 10px rgba(255,77,220,.5)); }
+.gesture-wolf {
+  transition: left .18s ease-out, top .18s ease-out, transform .15s, filter .15s;
+}
+.gesture-wolf > img {
+  filter: drop-shadow(calc(var(--dash-direction, 1) * -10px) 0 5px rgba(91,214,255,.32));
+}
+.gesture-wolf .action-cue { color: #94edff; }
+
 /* Reward screen: one clear vertical story */
 .result-step-2 .result-reward-card {
   margin-top: 22px;

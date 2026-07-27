@@ -1,4 +1,4 @@
-export const LEVEL_XP = [0, 100, 250, 450, 700, 1000, 1350, 1750, 2200, 2700]
+export const LEVEL_XP = [0, 100, 250, 450, 700, 1000, 1350, 1750, 2200, 2700, 3300, 3950, 4650, 5400]
 
 export const LEVEL_UNLOCKS = {
   1: { title: '초보 사냥터', description: '말랑 슬라임 출현', monsters: ['slime'] },
@@ -11,9 +11,13 @@ export const LEVEL_UNLOCKS = {
   8: { title: '황금 미믹', description: '희귀한 코인 보물 몬스터가 출현합니다', monsters: ['mimic'] },
   9: { title: '바위 골렘', description: '세 번 공격해야 하는 강적이 출현합니다', monsters: ['golem'] },
   10: { title: '그림자 대왕', description: '그림자 대왕 보스전에 도전할 수 있어요', monsters: ['boss'], image: '/images/rewards/level-10-boss-challenge.webp' },
+  11: { title: '얼음 펭귄', description: '사냥터를 얼리는 몬스터가 출현합니다', monsters: ['penguin'] },
+  12: { title: '별빛 해파리', description: '정확한 타이밍으로 콤보 보너스를 노려보세요', monsters: ['jellyfish'] },
+  13: { title: '환영 고양이', description: '분신 속에서 진짜 본체를 찾아보세요', monsters: ['cat'] },
+  14: { title: '달빛 늑대', description: '잔상을 예측하는 상위 속도형 몬스터가 출현합니다', monsters: ['wolf'] },
 }
 
-const MONSTER_LEVEL = { slime: 1, rabbit: 3, fox: 5, owl: 6, hedgehog: 7, mimic: 8, golem: 9, boss: 10 }
+const MONSTER_LEVEL = { slime: 1, rabbit: 3, fox: 5, owl: 6, hedgehog: 7, mimic: 8, golem: 9, boss: 10, penguin: 11, jellyfish: 12, cat: 13, wolf: 14 }
 
 export function getLevel(xp = 0) {
   let level = 1

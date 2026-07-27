@@ -33,6 +33,7 @@ function makeEnemy(index = 0, randomize = false, allowedIds, occupied = []) {
     positionIndex,
     x: position.x + (Math.random() * 5 - 2.5),
     y: position.y + (Math.random() * 4 - 2),
+    swipeDirection: Math.random() > .5 ? 1 : -1,
   }
 }
 
@@ -151,13 +152,14 @@ export default function Game() {
       setEnemies((items) => {
         const occupied = new Set(items.map((enemy) => enemy.positionIndex))
         return items.map((enemy) => {
-          if (enemy.id !== 'rabbit' || Math.random() > .55) return enemy
+          const moves = enemy.behavior === 'teleport' || enemy.behavior === 'predict-dash'
+          if (!moves || Math.random() > (enemy.behavior === 'predict-dash' ? .72 : .55)) return enemy
           occupied.delete(enemy.positionIndex)
           const freeIndexes = POSITIONS.map((_, index) => index).filter((index) => !occupied.has(index))
           const positionIndex = freeIndexes[Math.floor(Math.random() * freeIndexes.length)] ?? enemy.positionIndex
           occupied.add(positionIndex)
           const position = POSITIONS[positionIndex]
-          return { ...enemy, positionIndex, x: position.x, y: position.y, bornAt: Date.now() }
+          return { ...enemy, positionIndex, x: position.x, y: position.y, swipeDirection: position.x >= enemy.x ? 1 : -1, bornAt: enemy.behavior === 'teleport' ? Date.now() : enemy.bornAt }
         })
       })
     }, 900)
@@ -186,14 +188,15 @@ export default function Game() {
     setTimeout(() => setEnemies((current) => [...current, makeEnemy(deadId, true, allowedMonsterIds, current.map((enemy) => enemy.positionIndex))]), 320)
   }
 
-  function completeGesture(target) {
+  function completeGesture(target, forcePerfect = false) {
     if (!playing || paused || !target) return
-    const quick = Date.now() - target.bornAt < target.escapeDuration * .45
-    const label = quick ? 'QUICK!' : 'NICE!'
+    const quick = forcePerfect || Date.now() - target.bornAt < target.escapeDuration * .45
+    const label = forcePerfect ? 'PERFECT!' : quick ? 'QUICK!' : 'NICE!'
     const multiplier = quick ? 1.3 : 1
     const damage = 1
     const remaining = target.hp - damage
-    const nextCombo = comboRef.current + (quick ? 2 : 1)
+    const comboGain = target.reward === 'combo' && forcePerfect ? 3 : quick ? 2 : 1
+    const nextCombo = comboRef.current + comboGain
     comboRef.current = nextCombo
     maxComboRef.current = Math.max(maxComboRef.current, nextCombo)
     const killed = remaining <= 0
@@ -226,6 +229,7 @@ export default function Game() {
       setCoins((value) => value + coinBonus)
       addEffect(target.x, target.y - 8, `+${coinBonus} COIN`, 'boss')
     }
+    if (target.reward === 'combo' && forcePerfect) addEffect(target.x, target.y - 8, '+3 COMBO', 'perfect')
 
     if (target.grade === '영웅' || target.grade === '보스') sound.rare()
     monsterCountsRef.current[target.id] = (monsterCountsRef.current[target.id] || 0) + 1
@@ -244,7 +248,7 @@ export default function Game() {
     if (!playing || paused) return
     event.preventDefault()
     event.currentTarget.setPointerCapture?.(event.pointerId)
-    pointerRef.current = { entityId: target.entityId, x: event.clientX, y: event.clientY, completed: false }
+    pointerRef.current = { entityId: target.entityId, x: event.clientX, y: event.clientY, downAt: Date.now(), completed: false }
     if (target.gesture === 'hold') {
       setHoldingId(target.entityId)
       holdTimerRef.current = setTimeout(() => {
@@ -254,6 +258,7 @@ export default function Game() {
         completeGesture(target)
       }, 620)
     }
+    if (target.gesture === 'release-perfect') setHoldingId(target.entityId)
   }
 
   function handlePointerUp(event, target) {
@@ -267,6 +272,7 @@ export default function Game() {
     const dx = event.clientX - pointer.x
     const dy = event.clientY - pointer.y
     const distance = Math.hypot(dx, dy)
+    const heldFor = Date.now() - pointer.downAt
     const hedgehogOpen = target.behavior !== 'guard-cycle' || isGuardOpen(target)
     if (!hedgehogOpen) {
       wrongGesture(target, '수정 가시가 내려갈 때 공격하세요', true)
@@ -274,6 +280,13 @@ export default function Game() {
     else if (target.gesture === 'swipe-x') {
       if (Math.abs(dx) >= 30 && Math.abs(dx) > Math.abs(dy)) completeGesture(target)
       else wrongGesture(target, `${target.name}은 좌우로 밀어주세요`)
+    } else if (target.gesture === 'swipe-y') {
+      if (dy <= -30 && Math.abs(dy) > Math.abs(dx)) completeGesture(target)
+      else wrongGesture(target, `${target.name}은 위로 밀어주세요`)
+    } else if (target.gesture === 'swipe-direction') {
+      const correctDirection = Math.abs(dx) >= 30 && Math.abs(dx) > Math.abs(dy) && Math.sign(dx) === target.swipeDirection
+      if (correctDirection) completeGesture(target)
+      else wrongGesture(target, `잔상이 향한 ${target.swipeDirection > 0 ? '오른쪽' : '왼쪽'}으로 밀어주세요`)
     } else if (target.gesture === 'double-tap') {
       const previous = lastTapRef.current[target.entityId] || 0
       if (Date.now() - previous <= 420 && distance < 16) {
@@ -284,6 +297,9 @@ export default function Game() {
         setLastJudge('한 번 더 빠르게 터치!')
         addEffect(target.x, target.y, 'ONE MORE!', 'good')
       }
+    } else if (target.gesture === 'release-perfect') {
+      if (heldFor >= 520 && heldFor <= 900) completeGesture(target, true)
+      else wrongGesture(target, heldFor < 520 ? '별빛이 모일 때까지 기다리세요' : '빛이 지나가기 전에 손을 떼세요')
     } else if (target.gesture === 'hold') wrongGesture(target, `${target.name}은 길게 눌러주세요`)
     pointerRef.current = null
   }
@@ -351,24 +367,28 @@ export default function Game() {
 
     <div className="battle-timebar"><span style={{ width: `${Math.min(100, (timeLeft / GAME_TIME) * 100)}%` }} /></div>
 
-    <section className={`battle-arena ${energy >= SKILL_MAX ? 'burst-ready' : ''}`}>
+    <section className={`battle-arena ${energy >= SKILL_MAX ? 'burst-ready' : ''} ${enemies.some((enemy) => enemy.behavior === 'freeze-field') ? 'frozen-field' : ''}`}>
       <img className="battle-background" src="/images/bg/battle-arena.webp" alt="" />
       <div className="battle-vignette" />
       <div className="gesture-legend"><span>TAP</span><span>↔ SWIPE</span><span>×2</span><span>HOLD</span></div>
 
       {enemies.map((enemy) => {
         const guardOpen = enemy.behavior !== 'guard-cycle' || isGuardOpen(enemy)
-        const cue = enemy.behavior === 'guard-cycle' ? (guardOpen ? 'TAP!' : 'WAIT') : enemy.cue
+        const cue = enemy.behavior === 'guard-cycle' ? (guardOpen ? 'TAP!' : 'WAIT') : enemy.behavior === 'predict-dash' ? (enemy.swipeDirection > 0 ? '→×2' : '←×2') : enemy.cue
         return <button
           key={`${enemy.entityId}-${enemy.bornAt}`}
           className={`battle-enemy gesture-${enemy.id} grade-${enemy.grade} ${guardOpen ? 'state-open' : 'state-guard'} hp-${enemy.hp} ${holdingId === enemy.entityId ? 'holding' : ''}`}
-          style={{ left: `${enemy.x}%`, top: `${enemy.y}%`, '--enemy-color': enemy.color, '--escape-duration': `${enemy.escapeDuration}ms` }}
+          style={{ left: `${enemy.x}%`, top: `${enemy.y}%`, '--enemy-color': enemy.color, '--escape-duration': `${enemy.escapeDuration}ms`, '--dash-direction': enemy.swipeDirection }}
           onPointerDown={(event) => handlePointerDown(event, enemy)}
           onPointerUp={(event) => handlePointerUp(event, enemy)}
           onPointerCancel={handlePointerCancel}
           aria-label={`${enemy.name}, ${enemy.hint}`}
         >
           <span className="action-cue">{cue}</span>
+          {enemy.behavior === 'illusion' && <>
+            <span className="illusion-clone clone-left" onPointerDown={(event) => { event.preventDefault(); event.stopPropagation(); wrongGesture(enemy, '분신이에요! 다이아 눈동자를 찾으세요', true) }}><MonsterImage monster={enemy} /></span>
+            <span className="illusion-clone clone-right" onPointerDown={(event) => { event.preventDefault(); event.stopPropagation(); wrongGesture(enemy, '분신이에요! 꼬리 룬을 확인하세요', true) }}><MonsterImage monster={enemy} /></span>
+          </>}
           <MonsterImage monster={enemy} />
           <span className="escape-bar"><i /></span>
           {enemy.maxHp > 1 && <span className="enemy-health"><i style={{ width: `${(enemy.hp / enemy.maxHp) * 100}%` }} /></span>}
