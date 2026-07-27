@@ -3156,6 +3156,26 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
   filter: drop-shadow(0 0 6px color-mix(in srgb, var(--reward-accent) 55%, transparent));
 }
 
+/* 점수 배지는 성적 고유색을 유지하고, 패널과 숫자만 보스 팔레트로 맞춘다. */
+.boss-result.result-step-1 .score-panel {
+  border-color: color-mix(in srgb, var(--reward-accent) 30%, transparent);
+  background: linear-gradient(
+    120deg,
+    color-mix(in srgb, var(--reward-panel-deep) 88%, transparent),
+    color-mix(in srgb, var(--reward-panel) 72%, transparent)
+  );
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--reward-accent-2) 10%, transparent);
+}
+.boss-result.result-step-1 .score-copy > small {
+  color: color-mix(in srgb, var(--reward-accent-2) 66%, #fff);
+}
+.boss-result.result-step-1 .score-panel .result-score {
+  background: linear-gradient(135deg, #fff 8%, var(--reward-accent-2) 62%, var(--reward-accent));
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 5px 12px color-mix(in srgb, var(--reward-accent) 18%, transparent));
+}
+
 /* ============================================================
    BOSS SELECT — 보스 도전 전 선택 화면
    홈의 "보스 도전하기"가 바로 전투로 들어가던 것을 한 단계 앞에 둔다.
