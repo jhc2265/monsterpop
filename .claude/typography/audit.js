@@ -119,6 +119,29 @@
     return x.scrollWidth > x.clientWidth + 1 && x.textContent.trim().length
   }).map((x) => x.className)
 
+  // 8. 공백 없는 짧은 토큰이 여러 줄로 접히는지.
+  //    body 의 overflow-wrap: anywhere 는 min-content 를 한 글자로 만든다.
+  //    shrink-to-fit(절대배치·flex·grid) 컨테이너에서 "TAP!" 이 "TA / P!" 로 접혔다.
+  //    줄 수는 Range 로 센다 — 높이/line-height 로 계산하면 패딩 때문에 오탐이 난다.
+  const lineCount = (el) => {
+    const t = [...el.childNodes].find((n) => n.nodeType === 3 && n.textContent.trim())
+    if (!t) return 0
+    const r = document.createRange()
+    r.selectNodeContents(t)
+    return new Set([...r.getClientRects()].map((x) => Math.round(x.top))).size
+  }
+  const wrapped = []
+  for (const e of document.querySelectorAll('#root *')) {
+    const t = [...e.childNodes].filter((n) => n.nodeType === 3).map((n) => n.textContent).join('').trim()
+    if (!t || /\s/.test(t) || t.length > 14) continue          // 공백 없는 짧은 토큰만
+    const c = getComputedStyle(e)
+    if (c.whiteSpace === 'nowrap' || c.whiteSpace === 'pre') continue
+    if (lineCount(e) > 1) {
+      const screen = (e.closest('[data-s]') || { dataset: { s: '?' } }).dataset.s
+      wrapped.push(`${screen} · ${e.tagName.toLowerCase()}.${(e.className || '').toString().split(' ')[0]} "${t}"`)
+    }
+  }
+
   const line = (n, a) => `${n.padEnd(26)}${a.length ? `❌ ${a.length}건\n    ${a.join('\n    ')}` : '✅'}`
   const report = [
     '━━━ 타이포그래피 검사 ━━━',
@@ -132,6 +155,7 @@
     line('5. 상속 스케일 이탈', offscale),
     line('6. 텍스트 잘림', clip),
     `${'7. 가로 오버플로'.padEnd(26)}${document.documentElement.scrollWidth > document.documentElement.clientWidth ? '❌' : '✅'}`,
+    line('8. 단일 토큰 접힘', wrapped),
   ].join('\n')
 
   console.log(report)

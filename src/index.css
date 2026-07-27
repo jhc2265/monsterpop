@@ -1900,6 +1900,10 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
   font-weight: var(--fw-black);
   line-height: 1;
   letter-spacing: .04em;
+  /* 절대배치 + shrink-to-fit 이라 폭이 min-content 로 정해지는데,
+     body 의 overflow-wrap: anywhere 가 min-content 를 한 글자로 만들어
+     "TAP!" 이 "TA / P!" 로 접혔다. 한 토큰짜리 배지는 접히면 안 된다. */
+  white-space: nowrap;
 }
 .battle-effect {                        /* 플로팅 전투 텍스트 */
   font-size: var(--fs-h3);
