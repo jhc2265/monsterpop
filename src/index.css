@@ -453,7 +453,7 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
 .collection-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 .collection-card { position: relative; overflow: hidden; min-height: 213px; padding: 14px; border: 1px solid color-mix(in srgb, var(--monster-color) 35%, transparent); border-radius: 22px; background: radial-gradient(circle at 50% 38%, color-mix(in srgb, var(--monster-color) 18%, transparent), rgba(18,13,48,.95) 66%); text-align: center; }
 .collection-card::after { content: ''; position: absolute; inset: 0; pointer-events: none; box-shadow: inset 0 1px rgba(255,255,255,.06); }
-.collection-grade { position: absolute; z-index: 2; left: 11px; top: 11px; padding: 4px 7px; border-radius: 999px; background: rgba(5,3,23,.62); color: var(--monster-color); }
+.collection-grade { position: absolute; z-index: 2; left: 11px; top: 11px; padding: 4px 7px; border-radius: 999px; background: rgba(5,3,23,.62); color: var(--grade-color); }
 .collection-card img, .collection-card > .ph { width: 124px; height: 124px; margin: 8px auto -2px; object-fit: contain; filter: drop-shadow(0 11px 12px rgba(3,1,20,.35)); }
 .collection-card > .ph { display: grid; place-items: center; border-radius: 50%; }
 .collection-card h2 { margin: 0; }
@@ -2543,6 +2543,14 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
   line-height: 1;
   letter-spacing: .04em;
 }
+/* 배지 글자가 "등급"이므로 색도 등급을 가리킨다. 몬스터 고유색(--monster-color)으로
+   칠하면 같은 영웅 4마리가 4가지 색으로 나와 등급이 읽히지 않았다.
+   몬스터 고유색은 카드 테두리·배경 글로우·처치 점수 숫자에 그대로 남는다. */
+.collection-grade                  { --grade-color: var(--text-2); }
+.collection-grade[data-grade="rare"]    { --grade-color: var(--cyan); }
+.collection-grade[data-grade="epic"]    { --grade-color: var(--primary-light); }
+.collection-grade[data-grade="special"] { --grade-color: var(--gold); }
+.collection-grade[data-grade="boss"]    { --grade-color: var(--pink); }
 .collection-card h2 {
   font-size: var(--fs-body);
   font-weight: var(--fw-bold);
@@ -3005,6 +3013,118 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
 @keyframes solarHeatPulse {
   0%, 100% { opacity: .45; transform: scale(.95); }
   50% { opacity: .72; transform: scale(1.04); }
+}
+
+/* ============================================================
+   보스 보상 정산 팔레트
+   랭크/잠금/해금 캐릭터의 의미 색은 유지하고 진행·보상 강조만 교체한다.
+   ============================================================ */
+.boss-result-neon-nightmare {
+  --reward-accent: #f04cbd;
+  --reward-accent-2: #9c68ff;
+  --reward-panel: #241044;
+  --reward-panel-deep: #12092d;
+}
+.boss-result-glitch-king-slime {
+  --reward-accent: #55f5ca;
+  --reward-accent-2: #48d8ff;
+  --reward-panel: #092c3b;
+  --reward-panel-deep: #06172d;
+}
+.boss-result-solar-eclipse-phoenix {
+  --reward-accent: #ff8a2a;
+  --reward-accent-2: #ffd05a;
+  --reward-panel: #3b1914;
+  --reward-panel-deep: #1c0d18;
+}
+.boss-result.result-step-2 .result-burst {
+  background: repeating-conic-gradient(
+    from 0deg,
+    color-mix(in srgb, var(--reward-accent) 13%, transparent) 0 8deg,
+    transparent 8deg 19deg
+  );
+}
+.boss-result.result-step-2 .result-burst span {
+  background: var(--reward-accent);
+  box-shadow:
+    -120px 60px 0 var(--reward-accent-2),
+    110px 90px 0 color-mix(in srgb, var(--reward-accent) 70%, #fff),
+    -85px 180px 0 rgba(255,255,255,.7),
+    130px 210px 0 var(--reward-accent);
+}
+.boss-result.result-step-2 .reward-settlement {
+  background: radial-gradient(
+    circle at 50% 38%,
+    color-mix(in srgb, var(--reward-accent) 22%, transparent),
+    transparent 44%
+  );
+}
+.boss-result.result-step-2 .reward-total::before {
+  background: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--reward-accent) 32%, transparent),
+    color-mix(in srgb, var(--reward-accent-2) 10%, transparent) 46%,
+    transparent 72%
+  );
+}
+.boss-result.result-step-2 .reward-total svg {
+  color: var(--reward-accent-2);
+  filter: drop-shadow(0 0 8px color-mix(in srgb, var(--reward-accent) 58%, transparent));
+}
+.boss-result.result-step-2 .reward-total small {
+  color: color-mix(in srgb, var(--reward-accent) 76%, #fff);
+}
+.boss-result.result-step-2 .reward-total strong {
+  background: linear-gradient(135deg, #fff 12%, var(--reward-accent-2) 58%, var(--reward-accent));
+  background-clip: text;
+  color: transparent;
+  text-shadow: none;
+  filter: drop-shadow(0 5px 14px color-mix(in srgb, var(--reward-accent) 24%, transparent));
+}
+.boss-result.result-step-2 .reward-sources > div {
+  border-color: color-mix(in srgb, var(--reward-accent) 22%, transparent);
+  background: color-mix(in srgb, var(--reward-panel-deep) 80%, transparent);
+}
+.boss-result.result-step-2 .reward-sources > div:nth-child(1) strong { color: var(--reward-accent); }
+.boss-result.result-step-2 .reward-sources > div:nth-child(2) strong { color: var(--reward-accent-2); }
+.boss-result.result-step-2 .reward-sources > div:nth-child(3) strong {
+  color: color-mix(in srgb, var(--reward-accent) 64%, #fff);
+}
+.boss-result.result-step-2 .reward-kills strong {
+  color: color-mix(in srgb, var(--reward-accent) 62%, #fff);
+}
+.boss-result.result-step-2 .xp-progress-card {
+  border-color: color-mix(in srgb, var(--reward-accent) 25%, transparent);
+  background: linear-gradient(
+    145deg,
+    color-mix(in srgb, var(--reward-panel) 72%, transparent),
+    color-mix(in srgb, var(--reward-panel-deep) 82%, transparent)
+  );
+}
+.boss-result.result-step-2 .xp-progress-line > span i {
+  background: linear-gradient(90deg, var(--reward-accent-2), var(--reward-accent));
+  box-shadow: 0 0 9px color-mix(in srgb, var(--reward-accent) 52%, transparent);
+}
+.boss-result.result-step-2 .xp-progress-values small:last-child {
+  color: color-mix(in srgb, var(--reward-accent) 72%, #fff);
+}
+.boss-result.result-step-2 .next-reward-card {
+  border-color: color-mix(in srgb, var(--reward-accent) 25%, transparent);
+  background:
+    radial-gradient(circle at 15% 50%, color-mix(in srgb, var(--reward-accent) 12%, transparent), transparent 30%),
+    color-mix(in srgb, var(--reward-panel-deep) 74%, transparent);
+}
+.boss-result.result-step-2 .next-reward-card small {
+  color: color-mix(in srgb, var(--reward-accent) 68%, #fff);
+}
+.boss-result.result-step-2 .result-reward-actions .btn-primary {
+  border-color: color-mix(in srgb, var(--reward-accent-2) 45%, transparent);
+  background: linear-gradient(115deg, var(--reward-accent-2), var(--reward-accent));
+  box-shadow: 0 10px 24px color-mix(in srgb, var(--reward-accent) 25%, transparent);
+}
+.boss-result.result-step-2 .result-step-back {
+  border-color: color-mix(in srgb, var(--reward-accent) 30%, transparent);
+  color: color-mix(in srgb, var(--reward-accent) 68%, #fff);
 }
 
 /* ============================================================

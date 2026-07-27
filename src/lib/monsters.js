@@ -13,6 +13,20 @@ export const MONSTERS = [
   { id: 'wolf', name: '달빛 늑대', grade: '영웅', score: 350, weight: 5, hp: 2, speed: '매우 빠름', gesture: 'swipe-direction', cue: '↔×2', hint: '잔상 방향으로 두 번 밀기', behavior: 'predict-dash', escapeDuration: 5000, image: '/images/monsters/wolf.webp', color: '#75dfff', emoji: '◐', description: '달빛 잔상을 보고 이동 방향을 예측해 두 번 공격해야 합니다.' },
 ]
 
+// 등급 라벨은 도감 필터 칩과 카드 배지, 상세 모달이 같은 값을 써야 해서 여기서 한 번만 정의한다.
+// key 는 CSS 등급 색 선택자([data-grade])와 짝이며, 한글 라벨을 선택자에 직접 쓰지 않으려고 둔다.
+export const MONSTER_GRADES = [
+  { label: '일반', key: 'common' },
+  { label: '희귀', key: 'rare' },
+  { label: '영웅', key: 'epic' },
+  { label: '특수', key: 'special' },
+  { label: '보스', key: 'boss' },
+]
+
+export function getGradeKey(label) {
+  return MONSTER_GRADES.find((grade) => grade.label === label)?.key || 'common'
+}
+
 // 몬스터 이미지를 미리 디코딩해 두어, 첫 스폰 시 곧바로 표시되도록 합니다.
 export function preloadMonsterImages() {
   if (typeof Image === 'undefined') return
