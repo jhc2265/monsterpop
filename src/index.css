@@ -623,6 +623,11 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
 .filter-chips::-webkit-scrollbar { display: none; }
 .filter-chips button { flex: 0 0 auto; min-height: 36px; padding: 0 13px; border: 1px solid var(--line); border-radius: 999px; background: rgba(18,13,48,.82); color: #9d95b5; cursor: pointer; }
 .filter-chips button.active { border-color: rgba(179,105,255,.48); background: linear-gradient(135deg, rgba(105,54,223,.78), rgba(173,52,190,.68)); color: #fff; }
+/* 도감 등급 칩 — 카드 배지와 같은 등급색을 써서 칩 줄 자체가 색 범례가 된다.
+   커뮤니티 카테고리 칩과 .filter-chips 를 공유하므로 [data-grade] 가 붙은 것만 잡는다.
+   선택 상태는 색이 아니라 "채움"으로 구분한다 — 색은 이미 등급이 쓰고 있다. */
+.filter-chips button[data-grade] { border-color: color-mix(in srgb, var(--grade-color) 26%, transparent); color: var(--grade-color); }
+.filter-chips button[data-grade].active { border-color: var(--grade-color); background: var(--grade-color); color: #0b0824; }
 .collection-tools select, .field select { width: 100%; min-height: 44px; padding: 0 38px 0 14px; border: 1px solid var(--line); border-radius: 13px; background: #121034; color: var(--text-2); }
 .collection-card { width: 100%; color: var(--text); font: inherit; cursor: pointer; }
 .collection-card small { display: block; margin-top: 5px; color: #9d95b5; }
@@ -2543,14 +2548,15 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
   line-height: 1;
   letter-spacing: .04em;
 }
-/* 배지 글자가 "등급"이므로 색도 등급을 가리킨다. 몬스터 고유색(--monster-color)으로
+/* 등급색 단일 소스 — 카드 배지와 도감 필터 칩이 같은 값을 쓴다.
+   배지 글자가 "등급"이므로 색도 등급을 가리킨다. 몬스터 고유색(--monster-color)으로
    칠하면 같은 영웅 4마리가 4가지 색으로 나와 등급이 읽히지 않았다.
    몬스터 고유색은 카드 테두리·배경 글로우·처치 점수 숫자에 그대로 남는다. */
-.collection-grade                  { --grade-color: var(--text-2); }
-.collection-grade[data-grade="rare"]    { --grade-color: var(--cyan); }
-.collection-grade[data-grade="epic"]    { --grade-color: var(--primary-light); }
-.collection-grade[data-grade="special"] { --grade-color: var(--gold); }
-.collection-grade[data-grade="boss"]    { --grade-color: var(--pink); }
+[data-grade]            { --grade-color: var(--text-2); }
+[data-grade="rare"]     { --grade-color: var(--cyan); }
+[data-grade="epic"]     { --grade-color: var(--primary-light); }
+[data-grade="special"]  { --grade-color: var(--gold); }
+[data-grade="boss"]     { --grade-color: var(--pink); }
 .collection-card h2 {
   font-size: var(--fs-body);
   font-weight: var(--fw-bold);

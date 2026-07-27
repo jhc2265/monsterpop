@@ -29,7 +29,8 @@ export default function Collection() {
     </header>
     <p className="collection-intro">사냥터에서 발견한 몬스터와 특징을 확인하세요.</p>
     <section className="collection-tools" aria-label="몬스터 필터와 정렬">
-      <div className="filter-chips">{['전체', ...MONSTER_GRADES.map((grade) => grade.label)].map((grade) => <button key={grade} className={filter === grade ? 'active' : ''} onClick={() => setFilter(grade)}>{grade}</button>)}</div>
+      {/* '전체'는 등급이 아니라 필터 해제라서 data-grade 를 붙이지 않고 기본 선택색을 그대로 쓴다 */}
+      <div className="filter-chips">{['전체', ...MONSTER_GRADES.map((grade) => grade.label)].map((grade) => <button key={grade} data-grade={grade === '전체' ? undefined : getGradeKey(grade)} className={filter === grade ? 'active' : ''} onClick={() => setFilter(grade)}>{grade}</button>)}</div>
       <select value={sort} onChange={(event) => setSort(event.target.value)} aria-label="몬스터 정렬">
         <option value="default">기본 순서</option>
         <option value="score">점수 높은 순</option>
