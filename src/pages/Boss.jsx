@@ -277,7 +277,7 @@ export default function Boss() {
         }} />)}
       </div>
       <div className="boss-crown-glow" />
-      <div className="boss-aurora-ring ring-back" aria-hidden="true"><img src="/images/effects/boss-aurora-ring.webp" alt="" /></div>
+      <div className="boss-aurora-ring ring-back" aria-hidden="true"><i /><b /></div>
       <button
         className={`boss-target ${cueType ? `action-${cueType}` : 'action-idle'} ${effect ? `react-${effect.type}` : ''} ${holdProgress > 0 ? 'holding' : ''} ${holdReady ? 'hold-ready' : ''} ${phaseBreak ? 'phase-break' : ''}`}
         style={{ '--hold-progress': holdProgress }}
@@ -288,7 +288,7 @@ export default function Boss() {
         {cueType && <span className="action-cue">{CUE_LABEL[cueType]}</span>}
         <img src={boss.image} alt={boss.name} draggable="false" />
       </button>
-      <div className="boss-aurora-ring ring-front" aria-hidden="true"><img src="/images/effects/boss-aurora-ring.webp" alt="" /></div>
+      <div className="boss-aurora-ring ring-front" aria-hidden="true"><i /><b /></div>
       {/* 홀드 링은 boss-target 밖에 둔다 — 안에 두면 오로라 ring-front(z-index 4)가
           boss-target(z-index 3) 통째로 덮어서 진행 표시가 가려진다. */}
       {cue?.type === 'hold' && holdProgress > 0 && <div className={`boss-hold-ring ${holdReady ? 'ready' : ''}`} style={{ '--hold-progress': holdProgress }} aria-hidden="true">
