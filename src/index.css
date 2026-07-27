@@ -1191,6 +1191,22 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
 .result-monster-stage::before { content: ''; position: absolute; width: 190px; height: 150px; top: 10px; border-radius: 50%; background: radial-gradient(circle, rgba(213,63,200,.29), rgba(103,48,190,.08) 55%, transparent 72%); box-shadow: 0 0 34px rgba(177,59,212,.16); }
 .result-monster-stage img { position: relative; z-index: 1; width: 190px; height: 177px; object-fit: contain; filter: drop-shadow(0 13px 14px rgba(3,1,18,.48)); animation: resultMonsterFloat 3s ease-in-out infinite; }
 .result-monster-stage > strong { position: relative; z-index: 2; margin-top: -6px; padding: 6px 11px; border: 1px solid rgba(237,133,255,.16); border-radius: 10px; background: rgba(10,6,37,.74); color: #e8dff3; }
+.boss-result .result-header .eyebrow { color: var(--result-boss-accent); }
+.boss-result .result-card-v2 {
+  border-color: color-mix(in srgb, var(--result-boss-accent) 32%, transparent);
+}
+.boss-result .result-monster-stage::before {
+  background: radial-gradient(circle, color-mix(in srgb, var(--result-boss-accent) 30%, transparent), transparent 70%);
+  box-shadow: 0 0 36px color-mix(in srgb, var(--result-boss-accent) 18%, transparent);
+}
+.boss-result .result-monster-stage > strong {
+  border-color: color-mix(in srgb, var(--result-boss-accent) 30%, transparent);
+}
+.boss-result-glitch-king-slime .result-card-v2 {
+  background:
+    radial-gradient(circle at 50% 23%, rgba(41,208,198,.2), transparent 38%),
+    linear-gradient(155deg, rgba(14,50,67,.96), rgba(7,18,38,.99));
+}
 .score-panel { min-height: 112px; display: grid; grid-template-columns: 100px minmax(0,1fr); align-items: center; gap: 12px; padding: 11px 19px 11px 10px; border: 1px solid rgba(200,126,255,.24); border-radius: 18px; background: linear-gradient(120deg, rgba(17,11,54,.78), rgba(58,20,94,.42)); text-align: left; }
 .score-copy { min-width: 0; }
 .score-copy > small { color: #a89dce; }
@@ -2773,18 +2789,8 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
 /* 글리치 킹은 네온 나이트메어의 보석/오로라 문법을 공유하지 않는다. */
 .boss-glitch-king-slime .boss-gem-rain { display: none; }
 .boss-glitch-king-slime .boss-crown-glow {
-  top: 12%;
-  width: 64%;
-  height: 30%;
-  border-radius: 0;
-  background:
-    linear-gradient(90deg, transparent 0 12%, rgba(86,255,201,.65) 12% 18%, transparent 18% 63%, rgba(49,211,255,.58) 63% 72%, transparent 72%),
-    repeating-linear-gradient(0deg, transparent 0 12px, rgba(91,241,222,.2) 12px 14px);
-  filter: drop-shadow(0 0 10px rgba(62,241,220,.48));
-  animation: glitchCrown 2.4s steps(1) infinite;
+  display: none;
 }
-.boss-glitch-king-slime .boss-crown-glow::before,
-.boss-glitch-king-slime .boss-crown-glow::after { display: none; }
 .boss-glitch-king-slime .boss-aurora-ring.ring-front { display: none; }
 .boss-glitch-king-slime .boss-aurora-ring.ring-back {
   top: 57%;
@@ -2847,12 +2853,6 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
 }
 .boss-glitch-king-slime .boss-arena:has(.boss-target:not(.action-idle)) .boss-aurora-ring.ring-back::after {
   animation: glitchPortalSignal 1.15s steps(2) infinite;
-}
-@keyframes glitchCrown {
-  0%, 82%, 100% { transform: translateX(0); opacity: .78; }
-  84% { transform: translateX(-8px); opacity: .5; }
-  88% { transform: translateX(6px); opacity: 1; }
-  92% { transform: translateX(-2px); opacity: .7; }
 }
 @keyframes glitchOrbit {
   from { transform: rotateX(67deg) rotateZ(0deg); }

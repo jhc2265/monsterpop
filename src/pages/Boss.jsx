@@ -210,6 +210,7 @@ export default function Boss() {
         monsterCounts: cleared ? { boss: 1 } : {},
         mode: 'boss',
         bossClear: cleared,
+        bossId: boss.id,
         bossTimeLeft: timeRef.current,
         bossDamage: boss.maxHp - hpRef.current,
         bossMaxHp: boss.maxHp,
@@ -265,7 +266,7 @@ export default function Boss() {
     <div className="boss-healthbar"><div><small>PHASE {phase}</small><strong>{hp} / {boss.maxHp}</strong></div><span><i style={{ width: `${(hp / boss.maxHp) * 100}%` }} /></span></div>
 
     <section className="battle-arena boss-arena">
-      <img className="battle-background" src="/images/bg/battle-arena.webp" alt="" />
+      <img className="battle-background" src={boss.background || '/images/bg/battle-arena.webp'} alt="" />
       <div className="battle-vignette" />
       <div className="boss-gem-rain" aria-hidden="true">
         {Array.from({ length: 16 }, (_, index) => <i key={index} style={{

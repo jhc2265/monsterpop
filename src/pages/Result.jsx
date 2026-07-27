@@ -6,7 +6,7 @@ import { sound } from '../lib/sound'
 import Icon from '../components/Icon'
 import { getLevel, getLevelProgress, isMaxLevel, LEVEL_UNLOCKS, resolveProgress, saveStoredProgress } from '../lib/progression'
 import { recordGameForMissions } from '../lib/missions'
-import { getDailyBoss, recordBossClear } from '../lib/bosses'
+import { getBossById, getDailyBoss, recordBossClear } from '../lib/bosses'
 import { MONSTERS } from '../lib/monsters'
 
 // 보스 반복 도전은 연습으로 본다. 첫 클리어(firstClearXp)와 격차를 둬야
@@ -14,7 +14,8 @@ import { MONSTERS } from '../lib/monsters'
 const BOSS_REPEAT_XP = 30
 
 export default function Result() {
-  const { user, refreshProfile } = useAuth(); const navigate = useNavigate(); const location = useLocation(); const { score = 0, maxCombo = 0, monsterCounts = {}, mode = 'hunt', bossClear = false, bossTimeLeft = 0, bossDamage = 0, bossMaxHp = 30 } = location.state || {}
+  const { user, refreshProfile } = useAuth(); const navigate = useNavigate(); const location = useLocation(); const { score = 0, maxCombo = 0, monsterCounts = {}, mode = 'hunt', bossClear = false, bossId = '', bossTimeLeft = 0, bossDamage = 0, bossMaxHp = 30 } = location.state || {}
+  const activeBoss = mode === 'boss' ? (getBossById(bossId) || getDailyBoss()) : null
   const [saving, setSaving] = useState(true); const [isBest, setIsBest] = useState(false); const [rank, setRank] = useState(null); const [saveError, setSaveError] = useState(''); const [xpGain, setXpGain] = useState(0); const [xpProgress, setXpProgress] = useState(null); const [newDiscoveries, setNewDiscoveries] = useState([]); const [levelUp, setLevelUp] = useState(null); const savedRef = useRef(false)
   const [bossReward, setBossReward] = useState(null)
   const [missionXp, setMissionXp] = useState(0)
@@ -58,7 +59,7 @@ export default function Result() {
     // 하루 첫 클리어에만 firstClearXp 를 주고, 반복 도전은 연습으로 취급해 소액만 준다.
     let gained
     if (mode === 'boss') {
-      const boss = getDailyBoss()
+      const boss = activeBoss
       if (bossClear) {
         const record = recordBossClear(user.id, boss.id, { timeLeft: bossTimeLeft })
         setBossReward(record)
@@ -96,18 +97,21 @@ export default function Result() {
   function go(path, options) { sound.button(); navigate(path, options) }
   const totalKills = Object.values(monsterCounts).reduce((sum, count) => sum + count, 0)
   const isBossMode = mode === 'boss'
-  const representative = isBossMode ? MONSTERS.find((monster) => monster.id === 'boss') : getRepresentativeMonster(monsterCounts)
+  const representative = isBossMode ? activeBoss : getRepresentativeMonster(monsterCounts)
   const scoreGrade = getScoreGrade(score)
   const baseXp = 20
   const huntBonusXp = totalKills * 2 + (monsterCounts.boss || 0) * 10
   const recordBonusXp = isBest ? 15 : 0
   const nextUnlock = xpProgress && LEVEL_UNLOCKS[xpProgress.level + 1]
   const nextUnlockMonster = MONSTERS.find((item) => nextUnlock?.monsters?.includes(item.id))
-  return <main className={`page result-page result-step-${resultStep}`}>
+  return <main
+    className={`page result-page result-step-${resultStep}${isBossMode ? ` boss-result boss-result-${activeBoss.id}` : ''}`}
+    style={isBossMode ? { '--result-boss-accent': activeBoss.color } : undefined}
+  >
     <div className="result-burst" aria-hidden="true"><span /><span /><span /></div>
     <section className={`result-header ${resultStep === 2 ? 'result-header-compact' : ''}`}>
       {resultStep === 2 && <button className="result-step-back" onClick={() => { sound.button(); setResultStep(1); window.scrollTo({ top: 0, behavior: 'smooth' }) }} aria-label="전투 결과로 돌아가기"><Icon name="back" size={23} /></button>}
-      <span className="eyebrow"><Icon name="spark" size={14} /> {resultStep === 1 ? (isBossMode ? (bossClear ? 'BOSS DEFEATED' : 'BOSS ESCAPED') : 'HUNT COMPLETE') : 'REWARD COMPLETE'}</span><h1>{resultStep === 1 ? (isBossMode ? (bossClear ? '보스 격파!' : '도전 종료') : '사냥 완료!') : '보상 정산 완료!'}</h1><p>{resultStep === 1 ? (isBossMode ? (bossClear ? '네온 나이트메어를 물리쳤어요!' : '다음 도전에서는 반드시 쓰러뜨릴 수 있어요.') : isBest ? '최고 기록을 경신했어요, 헌터!' : '훌륭한 사냥이었어요, 헌터!') : '이번 도전으로 한층 더 성장했어요!'}</p>
+      <span className="eyebrow"><Icon name="spark" size={14} /> {resultStep === 1 ? (isBossMode ? (bossClear ? 'BOSS DEFEATED' : 'BOSS ESCAPED') : 'HUNT COMPLETE') : 'REWARD COMPLETE'}</span><h1>{resultStep === 1 ? (isBossMode ? (bossClear ? '보스 격파!' : '도전 종료') : '사냥 완료!') : '보상 정산 완료!'}</h1><p>{resultStep === 1 ? (isBossMode ? (bossClear ? `${activeBoss.name}을 물리쳤어요!` : `${activeBoss.name}이 도망쳤어요. 다음 도전에서 다시 만나요!`) : isBest ? '최고 기록을 경신했어요, 헌터!' : '훌륭한 사냥이었어요, 헌터!') : '이번 도전으로 한층 더 성장했어요!'}</p>
     </section>
     {resultStep === 1 ? <section className="result-card result-card-v2">
       {isBest && <div className="result-best-flag"><strong>NEW BEST!</strong><span>최고 기록 경신!</span></div>}
@@ -118,7 +122,7 @@ export default function Result() {
         <div className={`score-grade grade-${scoreGrade.toLowerCase()}`}><img src={`/images/ranks/rank-${scoreGrade.toLowerCase()}.webp`} alt={`${scoreGrade} 랭크 배지`} /></div>
         <div className="score-copy"><small>FINAL SCORE</small><strong className="result-score">{score.toLocaleString()}</strong></div>
       </div>
-      {isBossMode ? <div className="result-summary"><div><img src="/images/ui/stat-combo.webp" alt="" /><span>최고 콤보</span><strong>{maxCombo}</strong></div><i /><div><img src="/images/ui/stat-kills.webp" alt="" /><span>{bossClear ? '처치 시간' : '가한 피해'}</span><strong>{bossClear ? `${40 - bossTimeLeft}초` : `${bossDamage}/${bossMaxHp}`}</strong></div><i /><div><img src="/images/ui/stat-rank.webp" alt="" /><span>{bossClear ? '남은 시간' : '진행도'}</span><strong>{bossClear ? `${bossTimeLeft}초` : `${Math.round((bossDamage / Math.max(1, bossMaxHp)) * 100)}%`}</strong></div></div> : <div className="result-summary"><div><img src="/images/ui/stat-combo.webp" alt="" /><span>최고 콤보</span><strong>{maxCombo}</strong></div><i /><div><img src="/images/ui/stat-kills.webp" alt="" /><span>처치 몬스터</span><strong>{totalKills}마리</strong></div><i /><div><img src="/images/ui/stat-rank.webp" alt="" /><span>현재 순위</span><strong>{saving ? '...' : rank ? `${rank}위` : '-'}</strong></div></div>}
+      {isBossMode ? <div className="result-summary"><div><img src="/images/ui/stat-combo.webp" alt="" /><span>최고 콤보</span><strong>{maxCombo}</strong></div><i /><div><img src="/images/ui/stat-kills.webp" alt="" /><span>{bossClear ? '처치 시간' : '가한 피해'}</span><strong>{bossClear ? `${activeBoss.timeLimit - bossTimeLeft}초` : `${bossDamage}/${bossMaxHp}`}</strong></div><i /><div><img src="/images/ui/stat-rank.webp" alt="" /><span>{bossClear ? '남은 시간' : '진행도'}</span><strong>{bossClear ? `${bossTimeLeft}초` : `${Math.round((bossDamage / Math.max(1, bossMaxHp)) * 100)}%`}</strong></div></div> : <div className="result-summary"><div><img src="/images/ui/stat-combo.webp" alt="" /><span>최고 콤보</span><strong>{maxCombo}</strong></div><i /><div><img src="/images/ui/stat-kills.webp" alt="" /><span>처치 몬스터</span><strong>{totalKills}마리</strong></div><i /><div><img src="/images/ui/stat-rank.webp" alt="" /><span>현재 순위</span><strong>{saving ? '...' : rank ? `${rank}위` : '-'}</strong></div></div>}
     </section> : <section className="result-reward-card">
       <div className="reward-settlement">
         <div className="reward-total">

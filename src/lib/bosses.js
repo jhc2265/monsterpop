@@ -5,6 +5,7 @@ export const DAILY_BOSSES = [
     title: '밤을 삼키는 네온 왕',
     element: '그림자',
     image: '/images/monsters/boss-neon-nightmare.webp',
+    background: '/images/bg/battle-arena.webp',
     color: '#f04cbd',
     timeLimit: 40,
     maxHp: 32,
@@ -21,6 +22,7 @@ export const DAILY_BOSSES = [
     title: '왕관을 쓴 시스템 오류',
     element: '글리치',
     image: '/images/monsters/boss-glitch-king-slime-v2.webp',
+    background: '/images/bg/battle-arena-glitch-king.webp',
     color: '#55f5ca',
     timeLimit: 40,
     maxHp: 34,
@@ -46,6 +48,10 @@ export function koreaToday(date = new Date()) {
 export function getDailyBoss(date = new Date()) {
   const dayNumber = Number(koreaToday(date).replaceAll('-', ''))
   return DAILY_BOSSES[dayNumber % DAILY_BOSSES.length]
+}
+
+export function getBossById(bossId) {
+  return DAILY_BOSSES.find((boss) => boss.id === bossId) || null
 }
 
 // 반복 클리어로 보상을 무한히 받지 못하도록 "오늘 첫 클리어"를 기록한다.
