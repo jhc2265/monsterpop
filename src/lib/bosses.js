@@ -92,6 +92,28 @@ export function getBossById(bossId) {
   return DAILY_BOSSES.find((boss) => boss.id === bossId) || null
 }
 
+// 도감은 MONSTERS 를 읽는데 보스는 여기에만 있어 넷 중 셋이 빠져 있었다.
+// 같은 데이터를 양쪽에 두면 또 어긋나므로, 원본은 여기 하나로 두고
+// 도감이 쓰는 모양(등급 · 동작 신호 · 출현 주기)으로 변환만 해서 넘긴다.
+export function getBossArchiveEntries() {
+  return DAILY_BOSSES.map((boss) => ({
+    ...boss,
+    grade: '보스',
+    isBoss: true,
+    cycleDays: DAILY_BOSSES.length,
+    // 보스는 한 동작만 쓰지 않는다. 신호가 무작위로 바뀌는 게 핵심이라 그렇게 적는다.
+    cue: 'MIX',
+    hint: '신호에 맞춰 탭 · 홀드 · 스와이프',
+  }))
+}
+
+// 예전에는 어떤 보스를 잡아도 'boss' 하나로만 기록됐다.
+// 그 시절 기록을 네온 나이트메어 발견으로 인정해 준다.
+export function isMonsterDiscovered(discovered = [], monsterId) {
+  if (discovered.includes(monsterId)) return true
+  return monsterId === 'neon-nightmare' && discovered.includes('boss')
+}
+
 // 반복 클리어로 보상을 무한히 받지 못하도록 "오늘 첫 클리어"를 기록한다.
 // 미션과 같은 localStorage 방식이라 별도 DB 세팅이 필요 없다.
 const storageKey = (userId) => `monsterpop-boss-${userId}`

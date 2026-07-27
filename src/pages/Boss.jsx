@@ -209,7 +209,9 @@ export default function Boss() {
       state: {
         score: cleared ? 15000 + timeRef.current * 250 : Math.max(0, (boss.maxHp - hpRef.current) * 300),
         maxCombo: maxComboRef.current,
-        monsterCounts: cleared ? { boss: 1 } : {},
+        // 예전엔 어떤 보스를 잡아도 'boss' 로 고정 전송해, 폴라포드를 잡아도
+        // 도감에는 네온 나이트메어가 발견 처리됐다. 실제 id 로 기록한다.
+        monsterCounts: cleared ? { [boss.id]: 1 } : {},
         mode: 'boss',
         bossClear: cleared,
         bossId: boss.id,

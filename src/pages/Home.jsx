@@ -65,6 +65,8 @@ export default function Home() {
         score: `${dailyBoss.firstClearXp} XP`,
         difficulty: '★'.repeat(dailyBoss.difficulty),
         path: '/boss',
+        bossId: dailyBoss.id,
+        bossColor: dailyBoss.color,
       }
     : progress.level >= 3
       ? { label: 'TODAY’S HUNT', name: '불꽃 여우 출현!', copy: '고득점 몬스터 불꽃 여우를 30초 안에 사냥하세요.', image: '/images/monsters/fox.webp', grade: '영웅 몬스터', score: '300점', difficulty: '★★☆', path: '/game' }
@@ -98,7 +100,10 @@ export default function Home() {
       </div> : <div className="progress-mission locked"><span><Icon name="lock" size={17} /></span><div><small>오늘의 미션</small><strong>일일 미션 준비 중</strong><em>Lv.2부터 매일 새로운 성장 목표가 열려요</em></div><b>LV.2</b></div>}
     </section>
 
-    <section className="hero-card boss-card">
+    <section
+      className={`hero-card boss-card${featured.bossId ? ' is-daily-boss' : ''}`}
+      style={featured.bossColor ? { '--featured-boss-color': featured.bossColor } : undefined}
+    >
       <div className="boss-main">
         <div className="hero-copy">
           <span className="boss-label">{featured.label}</span>

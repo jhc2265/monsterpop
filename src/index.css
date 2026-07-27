@@ -3350,10 +3350,18 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
 .boss-polar-pod .boss-crown-glow::after { display: none; }
 
 .boss-result-polar-pod {
-  --reward-accent: #7fc9ff;
-  --reward-accent-2: #d9f3ff;
+  --reward-accent: #38a9d2;
+  --reward-accent-2: #4f87d5;
   --reward-panel: #102b54;
   --reward-panel-deep: #07152f;
+}
+.boss-result-polar-pod.result-step-1 .result-next-button,
+.boss-result-polar-pod.result-step-2 .result-reward-actions .btn-primary {
+  border-color: rgba(116,198,255,.52);
+  background: linear-gradient(112deg, #426fc5, #218eaf);
+  box-shadow:
+    0 12px 26px rgba(36,126,181,.28),
+    inset 0 1px 0 rgba(255,255,255,.2);
 }
 .boss-result-polar-pod .result-card-v2 {
   background:
@@ -3391,4 +3399,29 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
   0%, 100% { transform: translate(0, -5px); opacity: .14; }
   48% { transform: translate(4px, 7px); opacity: .68; }
   72% { transform: translate(-2px, 11px); opacity: .28; }
+}
+
+/* 홈의 일일 보스 카드는 공통 보라색을 유지하고 고유색은 작은 강조에만 쓴다. */
+.home-v2 .boss-card.is-daily-boss {
+  border-color: color-mix(in srgb, var(--featured-boss-color) 24%, rgba(190,142,255,.18));
+}
+.home-v2 .boss-card.is-daily-boss .hero-copy {
+  padding-top: 6px;
+}
+.home-v2 .boss-card.is-daily-boss .boss-label {
+  color: color-mix(in srgb, var(--featured-boss-color) 72%, #fff);
+}
+.home-v2 .boss-card.is-daily-boss .hunt-meta span:first-child {
+  color: color-mix(in srgb, var(--featured-boss-color) 66%, #fff);
+}
+.home-v2 .boss-card.is-daily-boss .boss-visual > span {
+  inset: 10% 2% 7%;
+  border: 0;
+  border-radius: 0;
+  background:
+    radial-gradient(circle at 43% 42%, color-mix(in srgb, var(--featured-boss-color) 22%, transparent), transparent 39%),
+    radial-gradient(circle at 65% 61%, color-mix(in srgb, var(--featured-boss-color) 13%, transparent), transparent 43%);
+  box-shadow: none;
+  filter: blur(14px);
+  opacity: .86;
 }
