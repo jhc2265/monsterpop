@@ -35,7 +35,7 @@ export default function Settings() {
 
   return <main className="page settings-page">
     <header className="topbar"><button className="icon-btn" onClick={() => navigate('/home')} aria-label="뒤로"><Icon name="back" /></button><div className="title-stack"><span className="overline">PREFERENCES</span><h1>설정</h1></div><span className="topbar-spacer" /></header>
-    <section className="settings-profile"><div className="avatar">{(profile?.nickname || '헌')[0]}</div><div><strong>{profile?.nickname || '헌터'} 헌터님</strong><span>{user.email}</span></div></section>
+    <button className="settings-profile" onClick={() => navigate('/profile')}><div className="avatar">{profile?.avatar_url ? <img src={profile.avatar_url} alt="" /> : (profile?.nickname || '헌')[0]}</div><div><strong>{profile?.nickname || '헌터'} 헌터님</strong><span>{user.email}</span></div><b>›</b></button>
     <SettingsGroup icon="sound" title="게임">
       <SettingToggle label="배경음악" checked={preferences.bgm} onChange={() => toggle('bgm')} />
       <SettingToggle label="효과음" checked={preferences.effects} onChange={() => toggle('effects')} />

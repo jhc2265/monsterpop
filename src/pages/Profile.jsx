@@ -1,0 +1,128 @@
+import { useEffect, useMemo, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { supabase } from '../lib/supabase'
+import { useAuth } from '../context/AuthContext'
+import { MONSTERS } from '../lib/monsters'
+import { getBossArchiveEntries, isMonsterDiscovered } from '../lib/bosses'
+import { getHunterTitle, getLevelProgress, resolveProgress } from '../lib/progression'
+import { sound } from '../lib/sound'
+import Icon from '../components/Icon'
+
+export default function Profile() {
+  const navigate = useNavigate()
+  const { user, profile, refreshProfile } = useAuth()
+  const progress = getLevelProgress(resolveProgress(profile, user.id).xp)
+  const discovered = resolveProgress(profile, user.id).discovered
+  const [nickname, setNickname] = useState(profile?.nickname || '')
+  const [avatarUrl, setAvatarUrl] = useState(profile?.avatar_url || '/images/monsters/slime.webp')
+  const [stats, setStats] = useState({ bestScore: 0, bestCombo: 0, hunts: 0 })
+  const [saving, setSaving] = useState(false)
+  const [notice, setNotice] = useState('')
+
+  const avatars = useMemo(() => [
+    ...MONSTERS.filter((monster) => monster.id !== 'boss'),
+    ...getBossArchiveEntries(),
+  ], [])
+
+  useEffect(() => {
+    supabase
+      .from('scores')
+      .select('score, max_combo')
+      .eq('user_id', user.id)
+      .order('score', { ascending: false })
+      .then(({ data }) => {
+        const rows = data || []
+        setStats({
+          bestScore: rows[0]?.score || 0,
+          bestCombo: rows.reduce((best, row) => Math.max(best, row.max_combo || 0), 0),
+          hunts: rows.length,
+        })
+      })
+  }, [user.id])
+
+  async function saveProfile() {
+    const trimmed = nickname.trim()
+    if (trimmed.length < 2) {
+      setNotice('닉네임은 2자 이상 입력해 주세요.')
+      return
+    }
+    setSaving(true)
+    setNotice('')
+    sound.button()
+    const { error } = await supabase
+      .from('profiles')
+      .update({ nickname: trimmed, avatar_url: avatarUrl })
+      .eq('id', user.id)
+    if (error) {
+      setNotice('프로필을 저장하지 못했어요. 잠시 후 다시 시도해 주세요.')
+    } else {
+      await refreshProfile()
+      setNotice('프로필을 저장했어요!')
+    }
+    setSaving(false)
+  }
+
+  const selected = avatars.find((monster) => monster.image === avatarUrl) || avatars[0]
+  const discoveredCount = avatars.filter((monster) => monster.id === 'slime' || isMonsterDiscovered(discovered, monster.id)).length
+
+  return <main className="page profile-page">
+    <header className="topbar">
+      <button className="icon-btn" onClick={() => navigate('/home')} aria-label="뒤로"><Icon name="back" /></button>
+      <div className="title-stack"><span className="overline">HUNTER PROFILE</span><h1>내 프로필</h1></div>
+      <button className="icon-btn" onClick={() => navigate('/settings')} aria-label="설정"><Icon name="settings" /></button>
+    </header>
+
+    <section className="profile-hero" style={{ '--avatar-color': selected?.color || '#b84dff' }}>
+      <div className="profile-avatar-stage">
+        <span className="profile-avatar-glow" />
+        <img src={selected?.image} alt={selected?.name || '대표 몬스터'} />
+        <b>LV.{progress.level}</b>
+      </div>
+      <div className="profile-identity">
+        <small>{getHunterTitle(progress.level)}</small>
+        <h2>{profile?.nickname || '헌터'}</h2>
+        <p>대표 몬스터 · {selected?.name}</p>
+      </div>
+      <div className="profile-xp"><span><i style={{ width: `${progress.percent}%` }} /></span><small>{progress.needed ? `${progress.current} / ${progress.needed} XP` : `${progress.total} XP · MAX`}</small></div>
+    </section>
+
+    <section className="profile-stats" aria-label="헌터 기록">
+      <div><small>최고 점수</small><strong>{stats.bestScore.toLocaleString()}</strong></div>
+      <div><small>최고 콤보</small><strong>{stats.bestCombo}</strong></div>
+      <div><small>발견 몬스터</small><strong>{discoveredCount}/{avatars.length}</strong></div>
+    </section>
+
+    <section className="profile-edit">
+      <div className="section-heading"><div><span className="overline">IDENTITY</span><h2>헌터 정보</h2></div></div>
+      <label htmlFor="profile-nickname">닉네임</label>
+      <div className="profile-name-input"><Icon name="user" size={19} /><input id="profile-nickname" value={nickname} onChange={(event) => setNickname(event.target.value)} maxLength={16} /></div>
+    </section>
+
+    <section className="profile-avatar-picker">
+      <div className="section-heading"><div><span className="overline">PARTNER MONSTER</span><h2>대표 몬스터 선택</h2></div><small>{discoveredCount}개 획득</small></div>
+      <p>직접 발견하거나 격파한 몬스터를 프로필 아바타로 사용할 수 있어요.</p>
+      <div className="profile-avatar-grid">
+        {avatars.map((monster) => {
+          const unlocked = monster.id === 'slime' || isMonsterDiscovered(discovered, monster.id)
+          const active = monster.image === avatarUrl
+          return <button
+            key={monster.id}
+            className={`${active ? 'active' : ''} ${!unlocked ? 'locked' : ''}`}
+            style={{ '--avatar-color': monster.color }}
+            onClick={() => unlocked && setAvatarUrl(monster.image)}
+            disabled={!unlocked}
+            aria-label={unlocked ? `${monster.name} 선택` : `${monster.name} 잠김`}
+          >
+            <span><img src={monster.image} alt="" /></span>
+            <small>{unlocked ? monster.name : '???'}</small>
+            {active && <i><Icon name="check" size={13} /></i>}
+            {!unlocked && <i><Icon name="lock" size={13} /></i>}
+          </button>
+        })}
+      </div>
+    </section>
+
+    {notice && <p className={`profile-notice ${notice.includes('저장했어요') ? 'success' : ''}`}>{notice}</p>}
+    <button className="btn btn-primary profile-save" onClick={saveProfile} disabled={saving}>{saving ? '저장 중...' : '프로필 저장하기'}</button>
+  </main>
+}

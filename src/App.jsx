@@ -13,6 +13,7 @@ import Community from './pages/Community'
 import PostDetail from './pages/PostDetail'
 import Collection from './pages/Collection'
 import Settings from './pages/Settings'
+import Profile from './pages/Profile'
 import ErrorBoundary from './components/ErrorBoundary'
 import { applyPreferences, getPreferences } from './lib/preferences'
 import { sound } from './lib/sound'
@@ -41,7 +42,7 @@ export default function App() {
     if (location.pathname === '/boss') scene = 'lobby'
     else if (location.pathname === '/ranking') scene = 'ranking'
     else if (location.pathname === '/collection') scene = 'collection'
-    else if (['/home', '/community', '/settings'].some((route) => location.pathname === route || location.pathname.startsWith(`${route}/`))) scene = 'lobby'
+    else if (['/home', '/community', '/settings', '/profile'].some((route) => location.pathname === route || location.pathname.startsWith(`${route}/`))) scene = 'lobby'
     sound.setScene(scene)
   }, [location.pathname])
 
@@ -59,6 +60,7 @@ export default function App() {
     <Route path="/community" element={<Protected><Community /></Protected>} />
     <Route path="/community/:id" element={<Protected><PostDetail /></Protected>} />
     <Route path="/settings" element={<Protected><Settings /></Protected>} />
+    <Route path="/profile" element={<Protected><Profile /></Protected>} />
     <Route path="*" element={<Navigate to="/" replace />} />
   </Routes></ErrorBoundary></div>
 }
