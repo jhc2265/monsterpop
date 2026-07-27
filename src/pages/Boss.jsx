@@ -254,7 +254,7 @@ export default function Boss() {
   useEffect(() => () => { clearTimers(); sound.stopBossBGM() }, [clearTimers])
 
   const cueType = phaseBreak ? null : cue?.type
-  return <main className={`battle-page boss-battle phase-${phase}`}>
+  return <main className={`battle-page boss-battle boss-${boss.id} phase-${phase}`}>
     <header className="battle-hud boss-hud">
       <button className="battle-pause" onClick={quit} aria-label="보스전 나가기"><Icon name="back" size={18} /></button>
       <div className="battle-score"><small>DAILY BOSS</small><strong>{boss.name}</strong><span>{boss.element}</span></div>

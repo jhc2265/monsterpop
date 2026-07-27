@@ -13,6 +13,23 @@ export const DAILY_BOSSES = [
     firstClearXp: 120,
     mechanics: ['shield', 'mixed-gestures', 'final-rush'],
     description: '깨진 네온 왕관으로 그림자 포털을 지배하는 첫 번째 일일 보스예요.',
+    cardCopy: '깨진 네온 왕관의 지배자를 사냥하고 최고 기록에 도전하세요.',
+  },
+  {
+    id: 'glitch-king-slime',
+    name: '글리치 킹 슬라임',
+    title: '왕관을 쓴 시스템 오류',
+    element: '글리치',
+    image: '/images/monsters/boss-glitch-king-slime-v2.webp',
+    color: '#55f5ca',
+    timeLimit: 40,
+    maxHp: 34,
+    unlockLevel: 10,
+    difficulty: 3,
+    firstClearXp: 130,
+    mechanics: ['shield', 'mixed-gestures', 'final-rush'],
+    description: '픽셀 왕관에서 쏟아지는 오류로 사냥터를 뒤틀어 버리는 두 번째 일일 보스예요.',
+    cardCopy: '멈춰 버린 표정 뒤에 숨은 시스템 오류를 빠르게 정리하세요.',
   },
 ]
 

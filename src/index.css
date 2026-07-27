@@ -2769,3 +2769,101 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
   from { transform: rotateX(64deg) rotateZ(0deg); }
   to { transform: rotateX(64deg) rotateZ(360deg); }
 }
+
+/* 글리치 킹은 네온 나이트메어의 보석/오로라 문법을 공유하지 않는다. */
+.boss-glitch-king-slime .boss-gem-rain { display: none; }
+.boss-glitch-king-slime .boss-crown-glow {
+  top: 12%;
+  width: 64%;
+  height: 30%;
+  border-radius: 0;
+  background:
+    linear-gradient(90deg, transparent 0 12%, rgba(86,255,201,.65) 12% 18%, transparent 18% 63%, rgba(49,211,255,.58) 63% 72%, transparent 72%),
+    repeating-linear-gradient(0deg, transparent 0 12px, rgba(91,241,222,.2) 12px 14px);
+  filter: drop-shadow(0 0 10px rgba(62,241,220,.48));
+  animation: glitchCrown 2.4s steps(1) infinite;
+}
+.boss-glitch-king-slime .boss-crown-glow::before,
+.boss-glitch-king-slime .boss-crown-glow::after { display: none; }
+.boss-glitch-king-slime .boss-aurora-ring.ring-front { display: none; }
+.boss-glitch-king-slime .boss-aurora-ring.ring-back {
+  top: 57%;
+  width: min(78%, 380px);
+  opacity: .38;
+  clip-path: none;
+}
+.boss-glitch-king-slime .boss-aurora-ring.ring-back i {
+  border-radius: 50%;
+  background: conic-gradient(from 12deg,
+    transparent 0 7%, rgba(67,226,224,.68) 7% 10%, transparent 10% 27%,
+    rgba(84,248,203,.5) 27% 31%, transparent 31% 58%,
+    rgba(151,255,77,.55) 58% 60%, transparent 60% 82%,
+    rgba(52,192,229,.52) 82% 85%, transparent 85% 100%);
+  mask: radial-gradient(closest-side, transparent 82%, #000 84%, #000 87%, transparent 89%);
+  -webkit-mask: radial-gradient(closest-side, transparent 82%, #000 84%, #000 87%, transparent 89%);
+  filter: drop-shadow(0 0 4px rgba(68,224,218,.38));
+  animation: glitchOrbit 13s steps(24) infinite;
+}
+.boss-glitch-king-slime .boss-aurora-ring.ring-back b {
+  border-radius: 0;
+  animation: glitchOrbitReverse 17s steps(20) infinite;
+}
+.boss-glitch-king-slime .boss-aurora-ring.ring-back b::before,
+.boss-glitch-king-slime .boss-aurora-ring.ring-back b::after {
+  content: '';
+  position: absolute;
+  width: 7px;
+  height: 7px;
+  border-radius: 1px;
+  background: rgba(76,232,220,.72);
+  box-shadow: 0 0 5px rgba(76,232,220,.45);
+}
+.boss-glitch-king-slime .boss-aurora-ring.ring-back b::before {
+  left: 15%;
+  top: 35%;
+}
+.boss-glitch-king-slime .boss-aurora-ring.ring-back b::after {
+  left: auto;
+  right: 12%;
+  top: 62%;
+  width: 5px;
+  height: 5px;
+  background: rgba(177,255,66,.7);
+  box-shadow: 0 0 5px rgba(177,255,66,.38);
+  transform: none;
+}
+/* 입력 신호가 나타나는 짧은 순간에만 포털 윤곽이 완성됐다가 다시 깨진다. */
+.boss-glitch-king-slime .boss-aurora-ring.ring-back::after {
+  content: '';
+  position: absolute;
+  inset: 10%;
+  border-radius: 50%;
+  background: conic-gradient(from 30deg,
+    rgba(80,239,220,.58), transparent 9% 18%, rgba(70,204,237,.45) 23%,
+    transparent 31% 52%, rgba(168,255,70,.48) 59%, transparent 68% 100%);
+  mask: radial-gradient(closest-side, transparent 86%, #000 88%, #000 90%, transparent 92%);
+  -webkit-mask: radial-gradient(closest-side, transparent 86%, #000 88%, #000 90%, transparent 92%);
+  opacity: 0;
+}
+.boss-glitch-king-slime .boss-arena:has(.boss-target:not(.action-idle)) .boss-aurora-ring.ring-back::after {
+  animation: glitchPortalSignal 1.15s steps(2) infinite;
+}
+@keyframes glitchCrown {
+  0%, 82%, 100% { transform: translateX(0); opacity: .78; }
+  84% { transform: translateX(-8px); opacity: .5; }
+  88% { transform: translateX(6px); opacity: 1; }
+  92% { transform: translateX(-2px); opacity: .7; }
+}
+@keyframes glitchOrbit {
+  from { transform: rotateX(67deg) rotateZ(0deg); }
+  to { transform: rotateX(67deg) rotateZ(360deg); }
+}
+@keyframes glitchOrbitReverse {
+  from { transform: rotateX(67deg) rotateZ(360deg); }
+  to { transform: rotateX(67deg) rotateZ(0deg); }
+}
+@keyframes glitchPortalSignal {
+  0%, 20% { opacity: 0; transform: rotateX(67deg) scale(.96); }
+  21%, 62% { opacity: .48; transform: rotateX(67deg) scale(1); }
+  63%, 100% { opacity: .08; transform: rotateX(67deg) scale(1.025); }
+}
