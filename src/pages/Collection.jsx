@@ -42,7 +42,7 @@ export default function Collection() {
         const requiredLevel = getMonsterUnlockLevel(monster.id)
         const unlocked = playerLevel >= requiredLevel
         const discovered = playerProgress.discovered.includes(monster.id)
-        return <button className={`collection-card ${!unlocked ? 'locked' : !discovered ? 'undiscovered' : ''}`} key={monster.id} style={{ '--monster-color': monster.color }} onClick={() => discovered && setSelected(monster)} disabled={!discovered}>
+        return <button className={`collection-card ${!unlocked ? 'locked' : !discovered ? 'undiscovered' : ''}`} key={monster.id} data-grade={getGradeKey(monster.grade)} style={{ '--monster-color': monster.color }} onClick={() => discovered && setSelected(monster)} disabled={!discovered}>
         <span className="collection-grade" data-grade={getGradeKey(monster.grade)}>{monster.grade}</span>
         <MonsterImage monster={monster} />
         {!unlocked && <span className="collection-lock"><Icon name="lock" size={18} /></span>}
