@@ -639,6 +639,8 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
 /* display:block 이어야 margin auto 로 가운데 정렬된다. inline 이면 등급 배지와 같은
    줄에 묶여 "배지+이미지"가 통째로 중앙 정렬되고, 몬스터만 옆으로 밀린다. */
 .monster-detail > img, .monster-detail > .ph { display: block; width: 190px; height: 190px; margin: -4px auto -8px; object-fit: contain; filter: drop-shadow(0 18px 20px rgba(0,0,0,.4)); }
+/* 아직 못 만난 몬스터는 카드와 같은 실루엣으로. 그림이 풀리는 순간이 수집의 보상이다. */
+.monster-detail.undiscovered > img, .monster-detail.undiscovered > .ph { opacity: .68; filter: grayscale(.9) brightness(.4) sepia(.25) hue-rotate(225deg) drop-shadow(0 18px 20px rgba(0,0,0,.4)); }
 .monster-detail h2 { margin: 8px 0; }
 .monster-detail > p { margin: 0 auto 18px; max-width: 330px; color: var(--text-2); }
 .monster-detail-close { position: absolute; right: 18px; top: 18px; width: 36px; height: 36px; border: 1px solid var(--line); border-radius: 12px; background: rgba(8,6,28,.6); color: #b5aec9; cursor: pointer; }
@@ -931,7 +933,9 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
 .hunter-xp-bar { height: 5px; overflow: hidden; border-radius: 999px; background: rgba(255,255,255,.07); }
 .hunter-xp-bar i { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #7944ff, #f24fc1); box-shadow: 0 0 8px rgba(232,74,195,.58); transition: width .3s ease; }
 
-.collection-card.locked, .collection-card.undiscovered { cursor: default; }
+/* 흔적 카드는 다시 누를 수 있다 — 해금됐으면 상세(처치 방법)를 연다.
+   미해금은 사냥터에 나오지도 않으므로 그대로 잠가 둔다. */
+.collection-card.locked { cursor: default; }
 .collection-card.locked img, .collection-card.locked > .ph { filter: grayscale(1) brightness(.25); opacity: .52; }
 .collection-card.undiscovered img, .collection-card.undiscovered > .ph { filter: grayscale(.9) brightness(.4) sepia(.25) hue-rotate(225deg); opacity: .68; }
 .collection-card.locked { border-color: rgba(133,124,157,.16); background: rgba(15,12,38,.82); }

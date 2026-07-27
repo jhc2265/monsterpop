@@ -15,6 +15,7 @@ export default function Collection() {
   const [filter, setFilter] = useState('전체')
   const [sort, setSort] = useState('default')
   const [selected, setSelected] = useState(null)
+  const selectedDiscovered = !!selected && playerProgress.discovered.includes(selected.id)
   const totalWeight = MONSTERS.reduce((sum, monster) => sum + monster.weight, 0)
   const monsters = useMemo(() => {
     const filtered = filter === '전체' ? MONSTERS : MONSTERS.filter((monster) => monster.grade === filter)
@@ -42,7 +43,9 @@ export default function Collection() {
         const requiredLevel = getMonsterUnlockLevel(monster.id)
         const unlocked = playerLevel >= requiredLevel
         const discovered = playerProgress.discovered.includes(monster.id)
-        return <button className={`collection-card ${!unlocked ? 'locked' : !discovered ? 'undiscovered' : ''}`} key={monster.id} data-grade={getGradeKey(monster.grade)} style={{ '--monster-color': monster.color }} onClick={() => discovered && setSelected(monster)} disabled={!discovered}>
+        // 해금되면 상세를 연다. 처치 방법은 보상이 아니라 도움말이라,
+        // 처음 만나 당황할 몬스터일수록 먼저 볼 수 있어야 한다.
+        return <button className={`collection-card ${!unlocked ? 'locked' : !discovered ? 'undiscovered' : ''}`} key={monster.id} data-grade={getGradeKey(monster.grade)} style={{ '--monster-color': monster.color }} onClick={() => unlocked && setSelected(monster)} disabled={!unlocked}>
         <span className="collection-grade" data-grade={getGradeKey(monster.grade)}>{monster.grade}</span>
         <MonsterImage monster={monster} />
         {!unlocked && <span className="collection-lock"><Icon name="lock" size={18} /></span>}
@@ -50,14 +53,15 @@ export default function Collection() {
       </button>
       })}
     </section>
-    {selected && <div className="modal-overlay monster-detail-overlay" onClick={() => setSelected(null)}><section className="modal monster-detail" onClick={(event) => event.stopPropagation()} data-grade={getGradeKey(selected.grade)} style={{ '--monster-color': selected.color }}>
+    {selected && <div className="modal-overlay monster-detail-overlay" onClick={() => setSelected(null)}><section className={`modal monster-detail ${selectedDiscovered ? '' : 'undiscovered'}`} onClick={(event) => event.stopPropagation()} data-grade={getGradeKey(selected.grade)} style={{ '--monster-color': selected.color }}>
       <div className="modal-handle" />
       <button className="monster-detail-close" onClick={() => setSelected(null)} aria-label="닫기">×</button>
       {/* 배지는 이미지 아래 — 이미지 위에 두면 인라인 한 줄로 묶여 몬스터가 옆으로 밀린다 */}
       <MonsterImage monster={selected} />
       <span className="collection-grade" data-grade={getGradeKey(selected.grade)}>{selected.grade}</span>
       <h2>{selected.name}</h2>
-      <p>{selected.description}</p>
+      {/* 설화와 원본 그림은 수집의 보상이라 직접 만나야 풀린다 */}
+      <p>{selectedDiscovered ? selected.description : '아직 직접 만나지 못한 몬스터예요. 사냥터에서 마주치면 모습과 이야기가 드러납니다.'}</p>
       <div className="monster-howto"><span className="howto-cue">{selected.cue}</span><span className="howto-body"><small>처치 방법</small><strong>{selected.hint}</strong></span></div>
       <div className="monster-facts"><div><small>처치 점수</small><strong>{selected.score}점</strong></div><div><small>이동 속도</small><strong>{selected.speed}</strong></div><div><small>출현 확률</small><strong>{Math.round((selected.weight / totalWeight) * 100)}%</strong></div></div>
       <button className="btn btn-primary" onClick={() => navigate('/game')}>이 몬스터 사냥하러 가기</button>
