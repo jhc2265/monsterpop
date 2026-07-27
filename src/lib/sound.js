@@ -5,6 +5,29 @@ let bgmOn = false
 let muted = false
 let bgmEnabled = true
 let effectsEnabled = true
+let lobbyAudio = null
+let lobbyRequested = false
+
+function ensureLobbyAudio() {
+  if (!lobbyAudio) {
+    lobbyAudio = new Audio('/audio/monster-pop-lobby.mp3')
+    lobbyAudio.loop = true
+    lobbyAudio.preload = 'auto'
+    lobbyAudio.volume = 0.22
+  }
+  return lobbyAudio
+}
+
+function syncLobbyBGM() {
+  const audio = ensureLobbyAudio()
+  if (lobbyRequested && bgmEnabled && !muted) {
+    audio.play().catch(() => {
+      // Browsers block autoplay until the first user interaction.
+    })
+  } else {
+    audio.pause()
+  }
+}
 
 function ensureContext() {
   if (!context) {
@@ -51,9 +74,25 @@ export const sound = {
     step()
   },
   stopBGM() { bgmOn = false; if (bgmTimer) clearTimeout(bgmTimer); bgmTimer = null },
-  setMuted(value) { muted = value; if (value) this.stopBGM(); if (masterGain) masterGain.gain.value = value ? 0 : 0.5 },
+  setScene(scene) {
+    lobbyRequested = scene === 'lobby'
+    syncLobbyBGM()
+  },
+  setMuted(value) {
+    muted = value
+    if (value) this.stopBGM()
+    if (masterGain) masterGain.gain.value = value ? 0 : 0.5
+    syncLobbyBGM()
+  },
   isMuted() { return muted },
-  setBgmEnabled(value) { bgmEnabled = value; if (!value) this.stopBGM() },
+  setBgmEnabled(value) {
+    bgmEnabled = value
+    if (!value) this.stopBGM()
+    syncLobbyBGM()
+  },
   setEffectsEnabled(value) { effectsEnabled = value },
-  unlock() { ensureContext() },
+  unlock() {
+    ensureContext()
+    syncLobbyBGM()
+  },
 }

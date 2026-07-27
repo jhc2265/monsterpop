@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { Routes, Route, Navigate } from 'react-router-dom'
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import { useAuth } from './context/AuthContext'
 import Login from './pages/Login'
 import Hero from './pages/Hero'
@@ -23,12 +23,21 @@ function Protected({ children }) {
 }
 
 export default function App() {
+  const location = useLocation()
+
   useEffect(() => {
     const preferences = getPreferences()
     applyPreferences(preferences)
     sound.setBgmEnabled(preferences.bgm)
     sound.setEffectsEnabled(preferences.effects)
   }, [])
+
+  useEffect(() => {
+    const lobbyRoutes = ['/home', '/ranking', '/collection', '/community', '/settings']
+    const isLobby = lobbyRoutes.some((route) => location.pathname === route || location.pathname.startsWith(`${route}/`))
+    sound.setScene(isLobby ? 'lobby' : 'silent')
+  }, [location.pathname])
+
   return <div className="app-container"><ErrorBoundary><Routes>
     <Route path="/" element={<Hero />} />
     <Route path="/login" element={<Login initialMode="login" />} />
