@@ -6,27 +6,129 @@ let muted = false
 let bgmEnabled = true
 let effectsEnabled = true
 let lobbyAudio = null
-let lobbyRequested = false
+let collectionAudio = null
+let rankingAudio = null
+let lobbyIntroAudio = null
+let logoAudio = null
+let rewardAudio = null
+let resultAudio = null
+let bossAlertAudio = null
+let battleAudio = null
+let sceneRequested = 'silent'
+let lobbyNeedsIntro = true
 
 function ensureLobbyAudio() {
   if (!lobbyAudio) {
-    lobbyAudio = new Audio('/audio/monster-pop-lobby.mp3')
+    lobbyAudio = new Audio('/audio/soundtrack/lobby-loop.mp3')
     lobbyAudio.loop = true
     lobbyAudio.preload = 'auto'
-    lobbyAudio.volume = 0.22
+    lobbyAudio.volume = 0.17
   }
   return lobbyAudio
 }
 
-function syncLobbyBGM() {
-  const audio = ensureLobbyAudio()
-  if (lobbyRequested && bgmEnabled && !muted) {
+function ensureLobbyIntroAudio() {
+  if (!lobbyIntroAudio) {
+    lobbyIntroAudio = new Audio('/audio/soundtrack/theme-intro.mp3')
+    lobbyIntroAudio.preload = 'auto'
+    lobbyIntroAudio.volume = 0.17
+    lobbyIntroAudio.addEventListener('ended', () => syncSceneBGM())
+  }
+  return lobbyIntroAudio
+}
+
+function ensureSceneAudio(scene) {
+  if (scene === 'lobby') return ensureLobbyAudio()
+  if (scene === 'collection') {
+    if (!collectionAudio) {
+      collectionAudio = new Audio('/audio/soundtrack/collection-loop.mp3')
+      collectionAudio.loop = true
+      collectionAudio.preload = 'auto'
+      collectionAudio.volume = 0.16
+    }
+    return collectionAudio
+  }
+  if (scene === 'ranking') {
+    if (!rankingAudio) {
+      rankingAudio = new Audio('/audio/soundtrack/ranking-loop.mp3')
+      rankingAudio.loop = true
+      rankingAudio.preload = 'auto'
+      rankingAudio.volume = 0.15
+    }
+    return rankingAudio
+  }
+  return null
+}
+
+function ensureThemeClip(type) {
+  if (type === 'logo') {
+    if (!logoAudio) {
+      logoAudio = new Audio('/audio/soundtrack/theme-logo.mp3')
+      logoAudio.preload = 'auto'
+      logoAudio.volume = 0.2
+    }
+    return logoAudio
+  }
+  if (type === 'reward') {
+    if (!rewardAudio) {
+      rewardAudio = new Audio('/audio/soundtrack/reward-sting.mp3')
+      rewardAudio.preload = 'auto'
+      rewardAudio.volume = 0.2
+    }
+    return rewardAudio
+  }
+  if (type === 'result') {
+    if (!resultAudio) {
+      resultAudio = new Audio('/audio/soundtrack/result-jingle.mp3')
+      resultAudio.preload = 'auto'
+      resultAudio.volume = 0.19
+    }
+    return resultAudio
+  }
+  if (!bossAlertAudio) {
+    bossAlertAudio = new Audio('/audio/soundtrack/boss-alert.mp3')
+    bossAlertAudio.preload = 'auto'
+    bossAlertAudio.volume = 0.22
+  }
+  return bossAlertAudio
+}
+
+function syncSceneBGM() {
+  const audio = ensureSceneAudio(sceneRequested)
+  const intro = ensureLobbyIntroAudio()
+  const sceneAudios = [lobbyAudio, collectionAudio, rankingAudio].filter(Boolean)
+  sceneAudios.forEach((item) => {
+    if (item !== audio) item.pause()
+  })
+  if (!audio || !bgmEnabled || muted) {
+    intro.pause()
+    if (audio) audio.pause()
+    return
+  }
+  if (sceneRequested === 'lobby' && lobbyNeedsIntro) {
+    intro.currentTime = 0
+    intro.play().then(() => {
+      lobbyNeedsIntro = false
+    }).catch(() => {
+      // Browsers block autoplay until the first user interaction.
+    })
+    return
+  }
+  if (sceneRequested !== 'lobby' || intro.ended || intro.paused) {
     audio.play().catch(() => {
       // Browsers block autoplay until the first user interaction.
     })
-  } else {
-    audio.pause()
   }
+}
+
+function playThemeClip(type) {
+  if (!bgmEnabled || muted) return
+  const audio = ensureThemeClip(type)
+  if (type === 'reward' && resultAudio) resultAudio.pause()
+  audio.currentTime = 0
+  audio.play().catch(() => {
+    // The next user interaction can retry scene audio.
+  })
 }
 
 function ensureContext() {
@@ -68,31 +170,62 @@ export const sound = {
   over() { if (!effectsEnabled) return; tone(659, 0.18, 'triangle', 0.28); tone(523, 0.18, 'triangle', 0.28, 0.14); tone(392, 0.3, 'triangle', 0.28, 0.28) },
   startBGM() {
     if (bgmOn || muted || !bgmEnabled) return
-    ensureContext(); bgmOn = true
-    const notes = [523, 587, 659, 784, 659, 587, 523, 440]; let index = 0
-    const step = () => { if (!bgmOn) return; tone(notes[index % notes.length], 0.22, 'triangle', 0.08); tone(notes[index % notes.length] / 2, 0.22, 'sine', 0.06); index += 1; bgmTimer = setTimeout(step, 260) }
-    step()
+    if (!battleAudio) {
+      battleAudio = new Audio('/audio/soundtrack/battle-loop.mp3')
+      battleAudio.loop = true
+      battleAudio.preload = 'auto'
+      battleAudio.volume = 0.22
+    }
+    bgmOn = true
+    battleAudio.currentTime = 0
+    battleAudio.play().catch(() => {})
   },
-  stopBGM() { bgmOn = false; if (bgmTimer) clearTimeout(bgmTimer); bgmTimer = null },
+  stopBGM() {
+    bgmOn = false
+    if (bgmTimer) clearTimeout(bgmTimer)
+    bgmTimer = null
+    if (battleAudio) {
+      battleAudio.pause()
+      battleAudio.currentTime = 0
+    }
+  },
   setScene(scene) {
-    lobbyRequested = scene === 'lobby'
-    syncLobbyBGM()
+    const previousScene = sceneRequested
+    sceneRequested = scene
+    if (sceneRequested === 'lobby' && previousScene === 'silent') lobbyNeedsIntro = true
+    if (sceneRequested !== 'lobby') {
+      if (lobbyIntroAudio) {
+        lobbyIntroAudio.pause()
+        lobbyIntroAudio.currentTime = 0
+      }
+    }
+    syncSceneBGM()
   },
+  logoTheme() { playThemeClip('logo') },
+  rewardTheme() { playThemeClip('reward') },
+  resultTheme() { playThemeClip('result') },
+  bossAlert() { playThemeClip('boss') },
   setMuted(value) {
     muted = value
     if (value) this.stopBGM()
+    if (value) {
+      if (logoAudio) logoAudio.pause()
+      if (rewardAudio) rewardAudio.pause()
+      if (resultAudio) resultAudio.pause()
+      if (bossAlertAudio) bossAlertAudio.pause()
+    }
     if (masterGain) masterGain.gain.value = value ? 0 : 0.5
-    syncLobbyBGM()
+    syncSceneBGM()
   },
   isMuted() { return muted },
   setBgmEnabled(value) {
     bgmEnabled = value
     if (!value) this.stopBGM()
-    syncLobbyBGM()
+    syncSceneBGM()
   },
   setEffectsEnabled(value) { effectsEnabled = value },
   unlock() {
     ensureContext()
-    syncLobbyBGM()
+    syncSceneBGM()
   },
 }

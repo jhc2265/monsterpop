@@ -6,6 +6,7 @@ export default function Hero() {
 
   function enter(path) {
     sound.unlock()
+    sound.logoTheme()
     sound.button()
     navigate(path)
   }

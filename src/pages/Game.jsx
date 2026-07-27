@@ -72,6 +72,7 @@ export default function Game() {
   const pointerRef = useRef(null)
   const holdTimerRef = useRef(null)
   const lastTapRef = useRef({})
+  const bossPresentRef = useRef(false)
 
   const fillArena = useCallback(() => {
     const next = Array.from({ length: MAX_ENEMIES }, (_, index) => makeEnemy(index, false, allowedMonsterIds))
@@ -115,6 +116,12 @@ export default function Game() {
     const timer = setInterval(() => setArenaTick((value) => value + 1), 120)
     return () => clearInterval(timer)
   }, [playing])
+
+  useEffect(() => {
+    const bossPresent = enemies.some((enemy) => enemy.id === 'boss')
+    if (bossPresent && !bossPresentRef.current) sound.bossAlert()
+    bossPresentRef.current = bossPresent
+  }, [enemies])
 
   useEffect(() => {
     if (!playing) return

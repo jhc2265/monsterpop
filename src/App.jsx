@@ -33,9 +33,11 @@ export default function App() {
   }, [])
 
   useEffect(() => {
-    const lobbyRoutes = ['/home', '/ranking', '/collection', '/community', '/settings']
-    const isLobby = lobbyRoutes.some((route) => location.pathname === route || location.pathname.startsWith(`${route}/`))
-    sound.setScene(isLobby ? 'lobby' : 'silent')
+    let scene = 'silent'
+    if (location.pathname === '/ranking') scene = 'ranking'
+    else if (location.pathname === '/collection') scene = 'collection'
+    else if (['/home', '/community', '/settings'].some((route) => location.pathname === route || location.pathname.startsWith(`${route}/`))) scene = 'lobby'
+    sound.setScene(scene)
   }, [location.pathname])
 
   return <div className="app-container"><ErrorBoundary><Routes>

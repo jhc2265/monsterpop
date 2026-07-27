@@ -11,8 +11,18 @@ import { MONSTERS } from '../lib/monsters'
 export default function Result() {
   const { user, refreshProfile } = useAuth(); const navigate = useNavigate(); const location = useLocation(); const { score = 0, maxCombo = 0, monsterCounts = {} } = location.state || {}
   const [saving, setSaving] = useState(true); const [isBest, setIsBest] = useState(false); const [rank, setRank] = useState(null); const [saveError, setSaveError] = useState(''); const [xpGain, setXpGain] = useState(0); const [xpProgress, setXpProgress] = useState(null); const [newDiscoveries, setNewDiscoveries] = useState([]); const [levelUp, setLevelUp] = useState(null); const savedRef = useRef(false)
+  const rewardThemePlayedRef = useRef(false)
   const [resultStep, setResultStep] = useState(1)
-  useEffect(() => { if (!location.state) { navigate('/home', { replace: true }); return } if (!savedRef.current) { savedRef.current = true; saveAndRank() } }, [])
+  useEffect(() => {
+    if (!location.state) { navigate('/home', { replace: true }); return }
+    sound.resultTheme()
+    if (!savedRef.current) { savedRef.current = true; saveAndRank() }
+  }, [])
+  useEffect(() => {
+    if (rewardThemePlayedRef.current || (!isBest && !levelUp && newDiscoveries.length === 0)) return
+    rewardThemePlayedRef.current = true
+    sound.rewardTheme()
+  }, [isBest, levelUp, newDiscoveries])
   async function saveAndRank() {
     try {
       const { data: prev } = await supabase.from('scores').select('score').eq('user_id', user.id).order('score', { ascending: false }).limit(1); const prevBest = prev?.[0]?.score ?? 0
