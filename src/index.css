@@ -636,10 +636,17 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
 .monster-detail-overlay { z-index: 60; }
 .monster-detail { position: relative; padding: 10px 24px 30px; text-align: center; }
 .monster-detail > .collection-grade { position: static; display: inline-flex; margin: 0 auto; }
-.monster-detail > img, .monster-detail > .ph { width: 190px; height: 190px; margin: -4px auto -16px; object-fit: contain; filter: drop-shadow(0 18px 20px rgba(0,0,0,.4)); }
+/* display:block 이어야 margin auto 로 가운데 정렬된다. inline 이면 등급 배지와 같은
+   줄에 묶여 "배지+이미지"가 통째로 중앙 정렬되고, 몬스터만 옆으로 밀린다. */
+.monster-detail > img, .monster-detail > .ph { display: block; width: 190px; height: 190px; margin: -4px auto -8px; object-fit: contain; filter: drop-shadow(0 18px 20px rgba(0,0,0,.4)); }
 .monster-detail h2 { margin: 8px 0; }
 .monster-detail > p { margin: 0 auto 18px; max-width: 330px; color: var(--text-2); }
 .monster-detail-close { position: absolute; right: 18px; top: 18px; width: 36px; height: 36px; border: 1px solid var(--line); border-radius: 12px; background: rgba(8,6,28,.6); color: #b5aec9; cursor: pointer; }
+/* 처치 방법 — 도감에서 가장 실용적인 정보라 설명 바로 아래, 수치 박스 위에 둔다. */
+.monster-howto { display: flex; align-items: center; gap: 11px; max-width: 330px; margin: 0 auto 14px; padding: 10px 13px; border: 1px solid color-mix(in srgb, var(--grade-color) 26%, transparent); border-radius: 14px; background: color-mix(in srgb, var(--grade-color) 7%, rgba(12,9,37,.9)); text-align: left; }
+.howto-cue { flex: 0 0 auto; min-width: 48px; padding: 8px 9px; border-radius: 10px; background: color-mix(in srgb, var(--grade-color) 18%, transparent); color: var(--grade-color); text-align: center; }
+.howto-body { display: grid; gap: 2px; min-width: 0; }
+.howto-body small { color: var(--muted); }
 .monster-facts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 18px; }
 .monster-facts div { padding: 13px 5px; border: 1px solid color-mix(in srgb, var(--monster-color) 24%, transparent); border-radius: 14px; background: color-mix(in srgb, var(--monster-color) 8%, rgba(12,9,37,.9)); }
 .monster-facts small, .monster-facts strong { display: block; }
@@ -2589,6 +2596,23 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
   line-height: var(--lh-relaxed);
 }
 .monster-detail-close { font-size: 1.4375rem; font-weight: var(--fw-regular); line-height: 1; }   /* × 글리프 */
+.howto-cue {                            /* TAP / HOLD / ×2 같은 동작 기호 */
+  font-size: var(--fs-label);
+  font-weight: var(--fw-black);
+  line-height: 1;
+  letter-spacing: var(--ls-caps);
+}
+.howto-body small {
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-regular);
+  line-height: var(--lh-snug);
+}
+.howto-body strong {
+  font-size: var(--fs-body);
+  font-weight: var(--fw-bold);
+  line-height: var(--lh-snug);
+  letter-spacing: var(--ls-tight);
+}
 .monster-facts small {
   font-size: var(--fs-label);
   font-weight: var(--fw-regular);

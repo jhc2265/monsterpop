@@ -50,13 +50,15 @@ export default function Collection() {
       </button>
       })}
     </section>
-    {selected && <div className="modal-overlay monster-detail-overlay" onClick={() => setSelected(null)}><section className="modal monster-detail" onClick={(event) => event.stopPropagation()} style={{ '--monster-color': selected.color }}>
+    {selected && <div className="modal-overlay monster-detail-overlay" onClick={() => setSelected(null)}><section className="modal monster-detail" onClick={(event) => event.stopPropagation()} data-grade={getGradeKey(selected.grade)} style={{ '--monster-color': selected.color }}>
       <div className="modal-handle" />
       <button className="monster-detail-close" onClick={() => setSelected(null)} aria-label="닫기">×</button>
-      <span className="collection-grade" data-grade={getGradeKey(selected.grade)}>{selected.grade}</span>
+      {/* 배지는 이미지 아래 — 이미지 위에 두면 인라인 한 줄로 묶여 몬스터가 옆으로 밀린다 */}
       <MonsterImage monster={selected} />
+      <span className="collection-grade" data-grade={getGradeKey(selected.grade)}>{selected.grade}</span>
       <h2>{selected.name}</h2>
       <p>{selected.description}</p>
+      <div className="monster-howto"><span className="howto-cue">{selected.cue}</span><span className="howto-body"><small>처치 방법</small><strong>{selected.hint}</strong></span></div>
       <div className="monster-facts"><div><small>처치 점수</small><strong>{selected.score}점</strong></div><div><small>이동 속도</small><strong>{selected.speed}</strong></div><div><small>출현 확률</small><strong>{Math.round((selected.weight / totalWeight) * 100)}%</strong></div></div>
       <button className="btn btn-primary" onClick={() => navigate('/game')}>이 몬스터 사냥하러 가기</button>
     </section></div>}
