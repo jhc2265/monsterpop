@@ -106,8 +106,8 @@ export default function Home() {
     >
       <div className="boss-main">
         <div className="hero-copy">
+          {/* 스펙(메타)은 이름 뒤에 온다. 앞에 두면 무엇인지 알기 전에 숫자부터 읽게 된다 */}
           <span className="boss-label">{featured.label}</span>
-          <div className="hunt-meta"><span>{featured.grade}</span><span>+{featured.score}</span><span>난이도 {featured.difficulty}</span></div>
           <h2>{featured.name}</h2>
           <p>{featured.copy}</p>
         </div>
@@ -116,6 +116,9 @@ export default function Home() {
           <img className="hero-monster" src={featured.image} alt="" />
         </div>
       </div>
+      {/* 메타는 boss-main 밖에 둔다. 안에 두면 몬스터가 가장 넓어지는 높이와 겹쳐,
+          화면이 좁아질 때마다 칩이 그림 아래로 파고든다 */}
+      <div className="hunt-meta"><span>{featured.grade}</span><span>+{featured.score}</span><span>난이도 {featured.difficulty}</span></div>
       <button className="boss-start" onClick={() => go(featured.path)}><img src="/images/ui/hunt-swords.webp" alt="" /><span>{featured.path === '/boss' ? '보스 도전하기' : '지금 사냥하기'}</span><b>›</b></button>
     </section>
     <BottomNav />

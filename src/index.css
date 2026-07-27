@@ -1090,15 +1090,22 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
   padding: 15px;
   border-radius: 24px;
 }
-.home-v2 .boss-main { min-height: 154px; }
+/* 메타 칩이 boss-main 밖으로 나가 그만큼 짧아져도 된다. 그대로 두면 카드가 35px 커져
+   작은 화면에서 홈이 스크롤된다. 몬스터는 absolute 라 이 높이에 묶이지 않는다. */
+.home-v2 .boss-main { min-height: 122px; }
+/* 몬스터를 카드 배경으로 내리고 카피가 전체 폭을 쓴다.
+   카피 컬럼이 64%(360px 기준 187px)로 눌려 메타 칩 셋이 2+1 로 깨졌었다.
+   폭을 넓혀 원인을 없애고, 제목·본문에만 안전선을 둬 몬스터와 겹치지 않게 한다. */
 .home-v2 .boss-card .hero-copy {
-  width: 64%;
+  width: 100%;
   padding-top: 0;
 }
+.home-v2 .boss-card .hero-copy h2,
+.home-v2 .boss-card .hero-copy p { max-width: 66%; }
 .home-v2 .boss-label { margin-bottom: 6px; }
 .home-v2 .hunt-meta {
   gap: 4px;
-  margin-bottom: 7px;
+  margin: 11px 0 0;         /* 제목·본문 뒤로 내려왔으므로 위쪽 간격을 쓴다 */
 }
 .home-v2 .hunt-meta span {
   padding: 3px 5px;
@@ -1110,11 +1117,13 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
   right: -2px;
   width: 40%;
   height: 145px;
+  opacity: .5;              /* 몬스터가 배경으로 물러나므로 후광도 같이 낮춘다 */
 }
 .home-v2 .boss-card .hero-monster {
-  width: 140px;
-  right: 0;
+  width: 158px;
+  right: -18px;             /* 보스마다 투명 여백이 2~20px 로 달라, 가장 빡빡한 쪽(네온) 기준으로 띄운다 */
   bottom: -2px;
+  opacity: .74;
 }
 .home-v2 .boss-card .boss-start {
   min-height: 46px;
