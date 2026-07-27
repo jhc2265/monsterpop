@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { getDailyBoss } from '../lib/bosses'
+import { useNavigate, useParams } from 'react-router-dom'
+import { getBossById, getDailyBoss } from '../lib/bosses'
 import { sound } from '../lib/sound'
 import Icon from '../components/Icon'
 
@@ -40,7 +40,9 @@ const CUE_HINT = {
 
 export default function Boss() {
   const navigate = useNavigate()
-  const [boss] = useState(() => getDailyBoss())
+  const { bossId } = useParams()
+  // 주소로 직접 들어오거나 없는 id 가 오면 오늘의 보스로 떨어뜨린다.
+  const [boss] = useState(() => getBossById(bossId) || getDailyBoss())
 
   const [countdown, setCountdown] = useState(3)
   const [timeLeft, setTimeLeft] = useState(boss.timeLimit)
@@ -222,7 +224,7 @@ export default function Boss() {
     playingRef.current = false
     clearTimers()
     sound.stopBossBGM()
-    navigate('/home', { replace: true })
+    navigate('/boss', { replace: true })
   }
 
   useEffect(() => {

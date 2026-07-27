@@ -3006,3 +3006,131 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
   0%, 100% { opacity: .45; transform: scale(.95); }
   50% { opacity: .72; transform: scale(1.04); }
 }
+
+/* ============================================================
+   BOSS SELECT — 보스 도전 전 선택 화면
+   홈의 "보스 도전하기"가 바로 전투로 들어가던 것을 한 단계 앞에 둔다.
+   요일별 출현 규칙은 아직 없다. 지금은 하루마다 도는 오늘의 보스만
+   .today 로 강조하고, 나중에 요일 규칙이 생기면 같은 클래스(활성)와
+   .locked(비활성)를 그대로 재사용한다.
+   ============================================================ */
+.boss-select-intro {
+  margin: -8px 0 18px;
+  color: var(--text-2);
+  font-size: var(--fs-body-sm);
+  line-height: var(--lh-relaxed);
+  text-align: center;
+}
+.boss-select-list {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.boss-select-card {
+  --boss-color: var(--primary-light);
+  position: relative;
+  display: grid;
+  grid-template-columns: 84px 1fr 18px;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  color: var(--text);
+  text-align: left;
+  cursor: pointer;
+  transition: transform .16s, border-color .16s, background .16s;
+}
+.boss-select-card:active { transform: scale(.985); }
+.boss-select-card:hover:not(:disabled) { border-color: var(--line-strong); background: var(--surface-2); }
+
+/* 활성(오늘 도전 가능) — 보스 고유색을 테두리와 배경 글로우로 쓴다 */
+.boss-select-card.today {
+  border-color: color-mix(in srgb, var(--boss-color) 52%, transparent);
+  background:
+    radial-gradient(120% 140% at 12% 0%, color-mix(in srgb, var(--boss-color) 18%, transparent), transparent 62%),
+    var(--surface-2);
+  box-shadow: 0 10px 30px color-mix(in srgb, var(--boss-color) 20%, transparent);
+}
+.boss-select-card.locked { opacity: .5; cursor: not-allowed; }
+
+.boss-select-visual {
+  position: relative;
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1;
+}
+.boss-select-visual i {
+  position: absolute;
+  inset: 8%;
+  border-radius: 50%;
+  background: radial-gradient(circle, color-mix(in srgb, var(--boss-color) 46%, transparent), transparent 68%);
+  filter: blur(9px);
+}
+.boss-select-visual img {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.boss-select-body { display: grid; gap: 3px; min-width: 0; }
+.boss-select-tags { display: flex; flex-wrap: wrap; align-items: center; gap: 5px; }
+.boss-select-tags em,
+.boss-select-tags b {
+  padding: 2px 7px;
+  border-radius: 999px;
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-bold);
+  font-style: normal;
+  line-height: var(--lh-snug);
+}
+.boss-select-tags em { border: 1px solid var(--line-strong); color: var(--text-2); }
+.boss-select-tags .tag-today {
+  background: color-mix(in srgb, var(--boss-color) 26%, transparent);
+  border: 1px solid color-mix(in srgb, var(--boss-color) 58%, transparent);
+  color: var(--text);
+}
+.boss-select-tags .tag-cleared { background: rgba(30, 122, 90, .55); border: 1px solid rgba(96, 231, 176, .45); color: #b9f5dc; }
+
+.boss-select-body strong {
+  font-family: var(--font-display);
+  font-size: var(--fs-h2);
+  font-weight: var(--fw-bold);
+  line-height: var(--lh-tight);
+  letter-spacing: var(--ls-tight);
+}
+.boss-select-body small {
+  color: var(--muted);
+  font-size: var(--fs-label);
+  font-weight: var(--fw-regular);
+  line-height: var(--lh-snug);
+}
+.boss-select-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+  margin-top: 3px;
+  color: var(--text-2);
+  font-size: var(--fs-label);
+  font-weight: var(--fw-medium);
+  line-height: var(--lh-snug);
+}
+.boss-select-go {
+  display: grid;
+  place-items: center;
+  color: var(--muted);
+  font-size: var(--fs-h2);
+  font-weight: var(--fw-bold);
+  line-height: 1;
+}
+.boss-select-card.today .boss-select-go { color: var(--boss-color); }
+
+@media (max-width: 340px) {
+  .boss-select-card { grid-template-columns: 68px 1fr 14px; gap: 10px; padding: 11px 12px; }
+  .boss-select-body strong { font-size: var(--fs-h3); }
+}

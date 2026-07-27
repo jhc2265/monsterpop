@@ -162,7 +162,7 @@ export default function Result() {
     {saving && <p className="status-copy"><span className="loader small" /> 기록을 저장하는 중...</p>}{saveError && <div className="notice notice-error">{saveError}</div>}
     {resultStep === 1 ? <div className="result-next-wrap">
       <button className="btn btn-primary result-next-button" onClick={() => { sound.button(); setResultStep(2); window.scrollTo({ top: 0, behavior: 'smooth' }) }}>보상 확인하기 <span aria-hidden="true">→</span></button>
-    </div> : <div className="result-reward-actions"><button className="btn btn-primary" onClick={() => go(isBossMode ? '/boss' : '/game', { replace: true })}><img src="/images/ui/hunt-swords.webp" alt="" /><span>{isBossMode ? '보스 재도전' : '다시 사냥'}</span></button><button className="btn btn-secondary" onClick={() => go('/ranking')}><Icon name="trophy" size={19} /><span>랭킹</span></button><button className="btn btn-secondary" onClick={() => go('/home')}><Icon name="home" size={18} /><span>홈</span></button></div>}
+    </div> : <div className="result-reward-actions"><button className="btn btn-primary" onClick={() => go(isBossMode ? `/boss/${activeBoss.id}` : '/game', { replace: true })}><img src="/images/ui/hunt-swords.webp" alt="" /><span>{isBossMode ? '보스 재도전' : '다시 사냥'}</span></button><button className="btn btn-secondary" onClick={() => go('/ranking')}><Icon name="trophy" size={19} /><span>랭킹</span></button><button className="btn btn-secondary" onClick={() => go('/home')}><Icon name="home" size={18} /><span>홈</span></button></div>}
     {levelUp && <LevelUpModal levelUp={levelUp} onClose={() => setLevelUp(null)} onCollection={() => go('/collection')} onTrySkill={() => go('/game', { replace: true })} onOpenMission={() => go('/home')} />}
   </main>
 }

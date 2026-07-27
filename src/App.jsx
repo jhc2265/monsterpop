@@ -6,6 +6,7 @@ import Hero from './pages/Hero'
 import Home from './pages/Home'
 import Game from './pages/Game'
 import Boss from './pages/Boss'
+import BossSelect from './pages/BossSelect'
 import Result from './pages/Result'
 import Ranking from './pages/Ranking'
 import Community from './pages/Community'
@@ -35,7 +36,10 @@ export default function App() {
 
   useEffect(() => {
     let scene = 'silent'
-    if (location.pathname === '/ranking') scene = 'ranking'
+    // 보스 선택 화면은 로비 음악. startsWith 로 묶으면 /boss/:bossId(전투)까지
+    // 로비로 잡혀 보스 BGM 을 덮어써서, 여기만 정확히 일치로 본다.
+    if (location.pathname === '/boss') scene = 'lobby'
+    else if (location.pathname === '/ranking') scene = 'ranking'
     else if (location.pathname === '/collection') scene = 'collection'
     else if (['/home', '/community', '/settings'].some((route) => location.pathname === route || location.pathname.startsWith(`${route}/`))) scene = 'lobby'
     sound.setScene(scene)
@@ -47,7 +51,8 @@ export default function App() {
     <Route path="/signup" element={<Login initialMode="signup" />} />
     <Route path="/home" element={<Protected><Home /></Protected>} />
     <Route path="/game" element={<Protected><Game /></Protected>} />
-    <Route path="/boss" element={<Protected><Boss /></Protected>} />
+    <Route path="/boss" element={<Protected><BossSelect /></Protected>} />
+    <Route path="/boss/:bossId" element={<Protected><Boss /></Protected>} />
     <Route path="/result" element={<Protected><Result /></Protected>} />
     <Route path="/ranking" element={<Protected><Ranking /></Protected>} />
     <Route path="/collection" element={<Protected><Collection /></Protected>} />
