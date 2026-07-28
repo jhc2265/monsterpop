@@ -14,7 +14,7 @@ export const DAILY_BOSSES = [
     firstClearXp: 120,
     mechanics: ['shield', 'mixed-gestures', 'final-rush'],
     description: '깨진 네온 왕관으로 그림자 포털을 지배하는 첫 번째 일일 보스예요.',
-    cardCopy: '깨진 네온 왕관의 지배자를 사냥하고 최고 기록에 도전하세요.',
+    cardCopy: '깨진 네온 왕관의 지배자를\n사냥해 최고 기록에 도전하세요.',
     holdHint: '왕관이 빛나요. 길게 눌러 힘을 모으세요',
   },
   {
@@ -32,7 +32,7 @@ export const DAILY_BOSSES = [
     firstClearXp: 130,
     mechanics: ['shield', 'mixed-gestures', 'final-rush'],
     description: '픽셀 왕관에서 쏟아지는 오류로 사냥터를 뒤틀어 버리는 두 번째 일일 보스예요.',
-    cardCopy: '멈춰 버린 표정 뒤에 숨은 시스템 오류를 빠르게 정리하세요.',
+    cardCopy: '왕관에 숨은 시스템 오류를 찾아\n뒤틀린 사냥터를 복구하세요.',
     holdHint: '몸 안의 코어가 열렸어요. 길게 눌러 오류를 멈추세요',
   },
   {
@@ -50,7 +50,7 @@ export const DAILY_BOSSES = [
     firstClearXp: 140,
     mechanics: ['shield', 'mixed-gestures', 'final-rush'],
     description: '검은 태양 파편을 품고 잿빛 사냥터에 잠든 세 번째 일일 보스예요.',
-    cardCopy: '잠든 불새가 눈을 뜨기 전에 검은 태양 파편을 식혀 주세요.',
+    cardCopy: '잠든 불새가 깨어나기 전에\n검은 태양의 열기를 식혀 주세요.',
     holdHint: '불꽃이 잦아들었어요. 길게 눌러 열기를 흡수하세요',
   },
   {
@@ -68,7 +68,7 @@ export const DAILY_BOSSES = [
     firstClearXp: 150,
     mechanics: ['shield', 'mixed-gestures', 'final-rush'],
     description: '얼어붙은 시계 조각으로 사냥터의 시간을 늦추는 네 번째 일일 보스예요.',
-    cardCopy: '불안한 예언자의 외눈을 피해 얼어붙은 시간을 다시 움직이세요.',
+    cardCopy: '빙하 예언자의 외눈을 피해\n멈춰 버린 시간을 움직이세요.',
     holdHint: '시계가 멈췄어요. 길게 눌러 얼음을 녹이세요',
   },
 ]

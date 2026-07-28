@@ -5,7 +5,7 @@ import Icon from '../components/Icon'
 import BottomNav from '../components/BottomNav'
 import { getHunterTitle, getLevelProgress, getMonsterUnlockLevel, resolveProgress } from '../lib/progression'
 import { getDailyMissions } from '../lib/missions'
-import { getDailyBoss, koreaToday } from '../lib/bosses'
+import { getBossById, getDailyBoss, koreaToday } from '../lib/bosses'
 import { resolveAvatarUrl } from '../lib/avatar'
 
 export default function Home() {
@@ -20,7 +20,8 @@ export default function Home() {
 
   const progress = getLevelProgress(resolveProgress(profile, user.id).xp)
   const missions = progress.level >= 2 ? getDailyMissions(user.id) : []
-  const dailyBoss = getDailyBoss()
+  const previewBossId = new URLSearchParams(window.location.search).get('boss')
+  const dailyBoss = getBossById(previewBossId) || getDailyBoss()
   const isPopGreeting = Number(koreaToday().slice(-2)) % 2 === 0
   // 보스 카드는 최고 레벨이 아니라 보스 해금 레벨(MONSTER_LEVEL.boss)을 따른다
   const featured = progress.level >= getMonsterUnlockLevel('boss')
@@ -78,7 +79,7 @@ export default function Home() {
     </section>
 
     <section
-      className={`hero-card boss-card${featured.bossId ? ' is-daily-boss' : ''}`}
+      className={`hero-card boss-card${featured.bossId ? ` is-daily-boss boss-card-${featured.bossId}` : ''}`}
       style={featured.bossColor ? { '--featured-boss-color': featured.bossColor } : undefined}
     >
       <div className="boss-main">

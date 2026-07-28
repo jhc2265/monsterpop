@@ -1234,6 +1234,7 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
 }
 .home-v2 .boss-card .hero-copy p {
   margin-top: 7px;
+  white-space: pre-line;
 }
 .home-v2 .boss-main .boss-visual {
   right: -2px;
@@ -3592,7 +3593,7 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
 }
 .home-v2 .boss-card .hero-monster {
   width: 180px;
-  right: 0;
+  right: -10px;
   opacity: 1;
 }
 .home-v2 .boss-main .boss-visual {
