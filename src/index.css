@@ -953,6 +953,7 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
 .boss-healthbar { flex: 0 0 auto; padding: 2px 6px 5px; }
 .boss-healthbar > div { display: flex; justify-content: space-between; margin-bottom: 6px; color: #f3d9ff; }
 .boss-healthbar small { color: var(--pink); letter-spacing: .09em; }
+.boss-healthbar strong em { margin-right: 3px; color: var(--pink); font-size: .72em; font-style: normal; letter-spacing: .08em; }
 .boss-healthbar > span { display: block; height: 13px; overflow: hidden; border: 1px solid rgba(255, 139, 231, .38); border-radius: 999px; background: rgba(7, 3, 25, .8); box-shadow: inset 0 0 12px rgba(0, 0, 0, .55); }
 .boss-healthbar i { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #ff497d, #f04cbd 52%, #a268ff); box-shadow: 0 0 16px rgba(240, 76, 189, .7); transition: width .2s ease; }
 .boss-arena { display: grid; place-items: center; padding-bottom: 0; }
@@ -3085,6 +3086,66 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
 
 /* 글리치 킹은 네온 나이트메어의 보석/오로라 문법을 공유하지 않는다. */
 .boss-glitch-king-slime .boss-gem-rain { display: none; }
+.boss-glitch-field { display: none; }
+.boss-glitch-king-slime .boss-glitch-field {
+  position: absolute;
+  z-index: 2;
+  inset: 10% 4% 8%;
+  display: block;
+  overflow: hidden;
+  opacity: .58;
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
+.boss-glitch-king-slime .boss-glitch-field::before,
+.boss-glitch-king-slime .boss-glitch-field::after {
+  position: absolute;
+  left: 12%;
+  right: 10%;
+  height: 18%;
+  background:
+    repeating-linear-gradient(to bottom, rgba(68,226,224,.18) 0 1px, transparent 1px 7px),
+    linear-gradient(90deg, transparent, rgba(73,216,255,.14) 28%, rgba(185,255,54,.12) 62%, transparent);
+  clip-path: polygon(0 13%, 62% 13%, 62% 0, 100% 0, 100% 71%, 36% 71%, 36% 100%, 0 100%);
+  content: "";
+  filter: drop-shadow(0 0 8px rgba(69,226,224,.34));
+  animation: glitchFieldSlice 3.1s steps(1) infinite;
+}
+.boss-glitch-king-slime .boss-glitch-field::before { top: 25%; }
+.boss-glitch-king-slime .boss-glitch-field::after {
+  top: 58%;
+  opacity: .72;
+  animation-delay: -1.35s;
+  animation-duration: 2.6s;
+}
+.boss-glitch-king-slime .boss-glitch-field i {
+  position: absolute;
+  width: 18px;
+  height: 5px;
+  background: #49d8ff;
+  box-shadow: 0 0 7px rgba(73,216,255,.7);
+  animation: glitchPixelDrift 2.8s steps(6) infinite;
+}
+.boss-glitch-king-slime .boss-glitch-field i:nth-child(1) { left: 18%; top: 26%; width: 8px; animation-delay: -.2s; }
+.boss-glitch-king-slime .boss-glitch-field i:nth-child(2) { left: 28%; top: 48%; width: 28px; height: 3px; background: #b9ff36; animation-delay: -1.7s; }
+.boss-glitch-king-slime .boss-glitch-field i:nth-child(3) { left: 14%; top: 68%; width: 14px; animation-delay: -.9s; }
+.boss-glitch-king-slime .boss-glitch-field i:nth-child(4) { right: 15%; top: 31%; width: 24px; height: 3px; background: #55f5ca; animation-delay: -2.1s; }
+.boss-glitch-king-slime .boss-glitch-field i:nth-child(5) { right: 22%; top: 54%; width: 9px; background: #b9ff36; animation-delay: -.55s; }
+.boss-glitch-king-slime .boss-glitch-field i:nth-child(6) { right: 10%; top: 72%; width: 31px; height: 2px; animation-delay: -1.25s; }
+.boss-glitch-king-slime .boss-glitch-field i:nth-child(7) { left: 38%; top: 18%; width: 6px; background: #55f5ca; animation-delay: -2.45s; }
+.boss-glitch-king-slime .boss-glitch-field i:nth-child(8) { left: 43%; top: 78%; width: 20px; height: 3px; animation-delay: -.85s; }
+.boss-glitch-king-slime .boss-glitch-field i:nth-child(9) { right: 37%; top: 39%; width: 11px; background: #b9ff36; animation-delay: -1.95s; }
+@keyframes glitchFieldSlice {
+  0%, 82%, 100% { opacity: .22; transform: translate(0); }
+  84% { opacity: .72; transform: translate(-9px, 2px); }
+  87% { opacity: .38; transform: translate(13px, -1px); }
+  91% { opacity: .6; transform: translate(-4px, 1px); }
+}
+@keyframes glitchPixelDrift {
+  0%, 100% { opacity: .18; transform: translate(0); }
+  34% { opacity: .78; transform: translate(8px, -3px); }
+  68% { opacity: .36; transform: translate(-6px, 3px); }
+}
 .boss-glitch-king-slime .boss-crown-glow {
   display: none;
 }
@@ -3598,6 +3659,28 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
 }
 .home-v2 .boss-main .boss-visual {
   opacity: 1;
+}
+
+/* 오늘의 보스 CTA는 각 보스의 전투 팔레트를 그대로 이어받는다. */
+.home-v2 .boss-card-neon-nightmare .boss-start {
+  border-color: rgba(240,76,189,.48);
+  background: linear-gradient(112deg, #783cff, #ed3fbd);
+  box-shadow: 0 12px 25px rgba(211,54,190,.28), inset 0 1px 0 rgba(255,255,255,.22);
+}
+.home-v2 .boss-card-glitch-king-slime .boss-start {
+  border-color: rgba(85,245,202,.5);
+  background: linear-gradient(112deg, #1387b7, #20c99e);
+  box-shadow: 0 12px 25px rgba(32,201,158,.25), inset 0 1px 0 rgba(255,255,255,.22);
+}
+.home-v2 .boss-card-solar-eclipse-phoenix .boss-start {
+  border-color: rgba(255,174,62,.54);
+  background: linear-gradient(112deg, #ffad38, #f35d55);
+  box-shadow: 0 12px 25px rgba(244,100,72,.27), inset 0 1px 0 rgba(255,255,255,.24);
+}
+.home-v2 .boss-card-polar-pod .boss-start {
+  border-color: rgba(127,201,255,.55);
+  background: linear-gradient(112deg, #426fd2, #36b9d2);
+  box-shadow: 0 12px 25px rgba(55,157,210,.26), inset 0 1px 0 rgba(255,255,255,.22);
 }
 
 /* 긴 모바일 화면에서는 보스 컬러 영역이 고정 내비게이션 위의 남는 높이를 채운다. */

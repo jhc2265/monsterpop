@@ -4,13 +4,49 @@ import { getBossById, getDailyBoss } from '../lib/bosses'
 import { sound } from '../lib/sound'
 import Icon from '../components/Icon'
 
-// 모든 페이즈에서 최소 2종이 나오게 한다. 1페이즈를 tap 만으로 두니
-// 10히트 내내 같은 신호가 나와 지루했고, 실수하면 HP 가 안 줄어 더 길어졌다.
-// 페이즈는 "새 동작 추가"가 아니라 "비중 이동 + 반응 시간 단축"으로 조인다.
-const PHASES = {
-  1: { weights: { tap: 60, hold: 40 }, window: 2600 },
-  2: { weights: { tap: 35, hold: 30, swipe: 20, shield: 15 }, window: 2100 },
-  3: { weights: { tap: 26, hold: 26, swipe: 26, shield: 22 }, window: 1600 },
+// 보스마다 신호 구성과 속도가 다르다. 뒤로 갈수록 입력 종류가 일찍 늘고
+// 반응 시간이 짧아지지만, 각 보스의 제한 시간 안에서 숙련 플레이로 완주할 수 있게 맞춘다.
+const BOSS_PATTERNS = {
+  'neon-nightmare': {
+    cueDelay: 340,
+    holdMs: 600,
+    shieldMs: 900,
+    phases: {
+      1: { weights: { tap: 70, hold: 30 }, window: 2800 },
+      2: { weights: { tap: 45, hold: 30, swipe: 15, shield: 10 }, window: 2300 },
+      3: { weights: { tap: 35, hold: 25, swipe: 25, shield: 15 }, window: 1850 },
+    },
+  },
+  'glitch-king-slime': {
+    cueDelay: 285,
+    holdMs: 620,
+    shieldMs: 860,
+    phases: {
+      1: { weights: { tap: 55, hold: 25, swipe: 20 }, window: 2500 },
+      2: { weights: { tap: 30, hold: 25, swipe: 30, shield: 15 }, window: 1900 },
+      3: { weights: { tap: 22, hold: 22, swipe: 34, shield: 22 }, window: 1450 },
+    },
+  },
+  'solar-eclipse-phoenix': {
+    cueDelay: 265,
+    holdMs: 720,
+    shieldMs: 940,
+    phases: {
+      1: { weights: { tap: 45, hold: 55 }, window: 2600 },
+      2: { weights: { tap: 25, hold: 45, swipe: 15, shield: 15 }, window: 1950 },
+      3: { weights: { tap: 20, hold: 40, swipe: 20, shield: 20 }, window: 1450 },
+    },
+  },
+  'polar-pod': {
+    cueDelay: 240,
+    holdMs: 680,
+    shieldMs: 800,
+    phases: {
+      1: { weights: { tap: 45, hold: 35, swipe: 20 }, window: 2350 },
+      2: { weights: { tap: 25, hold: 25, swipe: 25, shield: 25 }, window: 1700 },
+      3: { weights: { tap: 18, hold: 22, swipe: 30, shield: 30 }, window: 1250 },
+    },
+  },
 }
 
 function pickCue(weights) {
@@ -23,11 +59,9 @@ function pickCue(weights) {
   return 'tap'
 }
 
-const HOLD_MS = 620          // 홀드 성공에 필요한 시간
 const TAP_MAX_MS = 320       // 이보다 오래 누르면 탭으로 인정하지 않는다
 const SWIPE_MIN_PX = 34
 const MISS_TIME_PENALTY = 2  // 반격 — 이게 있어야 제한 시간이 실제 압박이 된다
-const SHIELD_MS = 900        // 방어막이 올라와 있는 시간
 const PHASE_BREAK_MS = 900   // 페이즈 전환 무적 연출
 
 const CUE_LABEL = { tap: 'TAP', hold: 'HOLD', swipe: 'SWIPE', shield: 'WAIT' }
@@ -43,6 +77,7 @@ export default function Boss() {
   const { bossId } = useParams()
   // 주소로 직접 들어오거나 없는 id 가 오면 오늘의 보스로 떨어뜨린다.
   const [boss] = useState(() => getBossById(bossId) || getDailyBoss())
+  const pattern = BOSS_PATTERNS[boss.id] || BOSS_PATTERNS['neon-nightmare']
 
   const [countdown, setCountdown] = useState(3)
   const [timeLeft, setTimeLeft] = useState(boss.timeLimit)
@@ -86,11 +121,11 @@ export default function Boss() {
   }, [])
 
   // 다음 신호를 띄운다. 제한 시간 안에 반응하지 못하면 보스의 반격으로 이어진다.
-  const nextCue = useCallback((delay = 300) => {
+  const nextCue = useCallback((delay = pattern.cueDelay) => {
     clearTimers()
     cueTimerRef.current = setTimeout(() => {
       if (!playingRef.current) return
-      const settings = PHASES[phaseRef.current]
+      const settings = pattern.phases[phaseRef.current]
       const type = pickCue(settings.weights)
       setCue({ type, id: Date.now() })
       resetHold()
@@ -107,9 +142,9 @@ export default function Boss() {
         } else {
           punishRef.current('반응이 늦었어요!')
         }
-      }, type === 'shield' ? SHIELD_MS : settings.window)
+      }, type === 'shield' ? pattern.shieldMs : settings.window)
     }, delay)
-  }, [clearTimers, resetHold])
+  }, [clearTimers, pattern, resetHold])
 
   // 실패 처리 — 콤보를 끊고 제한 시간을 깎는다.
   function punish(message) {
@@ -128,7 +163,8 @@ export default function Boss() {
   punishRef.current = punish
 
   function hit(label) {
-    const nextHp = Math.max(0, hpRef.current - 1)
+    const damage = boss.damagePerHit || 1
+    const nextHp = Math.max(0, hpRef.current - damage)
     const nextCombo = comboRef.current + 1
     comboRef.current = nextCombo
     hpRef.current = nextHp
@@ -137,7 +173,7 @@ export default function Boss() {
     maxComboRef.current = Math.max(maxComboRef.current, nextCombo)
     sound.hit(nextCombo)
     setJudge(label)
-    flash(`-1`, phaseRef.current === 3 ? 'rush' : 'hit')
+    flash(`-${damage}`, phaseRef.current === 3 ? 'rush' : 'hit')
     resetHold()
 
     if (nextHp === 0) { finish(true); return }
@@ -169,7 +205,7 @@ export default function Boss() {
     if (cue.type === 'hold') {
       const step = () => {
         if (!pointerRef.current) return
-        const ratio = Math.min(1, (Date.now() - pointerRef.current.at) / HOLD_MS)
+        const ratio = Math.min(1, (Date.now() - pointerRef.current.at) / pattern.holdMs)
         setHoldProgress(ratio)
         if (ratio >= 1) { setHoldReady(true); return }
         holdRafRef.current = requestAnimationFrame(step)
@@ -190,7 +226,7 @@ export default function Boss() {
       if (heldFor <= TAP_MAX_MS) hit('NICE!')
       else punish('너무 오래 눌렀어요!')
     } else if (cue.type === 'hold') {
-      if (heldFor >= HOLD_MS) hit('PERFECT!')
+      if (heldFor >= pattern.holdMs) hit('PERFECT!')
       else punish('더 길게 눌러주세요!')
     } else if (cue.type === 'swipe') {
       if (Math.abs(dx) >= SWIPE_MIN_PX && Math.abs(dx) > Math.abs(dy)) hit('SLASH!')
@@ -207,7 +243,9 @@ export default function Boss() {
     navigate('/result', {
       replace: true,
       state: {
-        score: cleared ? 15000 + timeRef.current * 250 : Math.max(0, (boss.maxHp - hpRef.current) * 300),
+        score: cleared
+          ? 15000 + timeRef.current * 250
+          : Math.max(0, ((boss.maxHp - hpRef.current) / (boss.damagePerHit || 1)) * 300),
         maxCombo: maxComboRef.current,
         // 예전엔 어떤 보스를 잡아도 'boss' 로 고정 전송해, 폴라포드를 잡아도
         // 도감에는 네온 나이트메어가 발견 처리됐다. 실제 id 로 기록한다.
@@ -267,11 +305,14 @@ export default function Boss() {
       <div className={`battle-combo ${combo > 0 ? 'active' : ''}`}><small>COMBO</small><strong>{combo}</strong></div>
     </header>
 
-    <div className="boss-healthbar"><div><small>PHASE {phase}</small><strong>{hp} / {boss.maxHp}</strong></div><span><i style={{ width: `${(hp / boss.maxHp) * 100}%` }} /></span></div>
+    <div className="boss-healthbar"><div><small>PHASE {phase}</small><strong><em>HP</em> {hp} / {boss.maxHp}</strong></div><span><i style={{ width: `${(hp / boss.maxHp) * 100}%` }} /></span></div>
 
     <section className="battle-arena boss-arena">
       <img className="battle-background" src={boss.background || '/images/bg/battle-arena.webp'} alt="" />
       <div className="battle-vignette" />
+      <div className="boss-glitch-field" aria-hidden="true">
+        {Array.from({ length: 9 }, (_, index) => <i key={index} />)}
+      </div>
       <div className="boss-gem-rain" aria-hidden="true">
         {Array.from({ length: 16 }, (_, index) => <i key={index} style={{
           '--gem-x': `${6 + ((index * 23) % 90)}%`,
