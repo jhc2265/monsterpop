@@ -774,7 +774,7 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
 .home-hunter-xp > span { display: block; overflow: hidden; height: 6px; margin-top: 7px; border-radius: 999px; background: rgba(255,255,255,.08); }
 .home-hunter-xp > span > i { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #f04cbd, #8f4cff); box-shadow: 0 0 8px rgba(240,76,189,.3); }
 .home-profile-chevron { position: absolute; right: 17px; top: 20px; color: #817797; font-size: 25px; font-style: normal; font-weight: 400; }
-.home-v2 .hunter-progress.mission-card { margin: 0 0 20px; padding: 3px 4px 20px; border: 0; border-radius: 0; background: transparent; box-shadow: none; }
+.home-v2 .hunter-progress.mission-card { margin: 0 0 20px; padding: 3px 4px 22px; border: 0; border-radius: 0; background: transparent; box-shadow: none; }
 .mission-card .mission-list { margin-top: 0; padding-top: 0; border-top: 0; }
 .mission-card .progress-mission { margin-top: 0; padding-top: 0; border-top: 0; }
 @media (max-width: 390px) {
