@@ -731,8 +731,9 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
 .home-utility-btn:hover, .home-utility-btn:focus-visible { outline: 0; background: rgba(145,104,220,.14); color: #fff; }
 .home-utility-btn:active { background: rgba(145,104,220,.22); transform: scale(.92); }
 .home-welcome { align-items: center; }
-.home-hunter-identity { position: relative; display: flex; align-items: center; min-width: 0; width: 100%; gap: 15px; padding: 16px 38px 16px 16px; border: 1px solid rgba(178,112,255,.25); border-radius: 23px; background: linear-gradient(135deg, rgba(42,23,91,.9), rgba(24,15,63,.88)); box-shadow: inset 0 1px rgba(255,255,255,.035); color: inherit; text-align: left; }
-.home-hunter-identity:active { transform: scale(.99); }
+.home-hunter-identity { position: relative; display: flex; align-items: center; min-width: 0; width: 100%; gap: 20px; padding: 7px 34px 18px 4px; border: 0; border-bottom: 1px solid rgba(171,127,255,.14); border-radius: 0; background: transparent; box-shadow: none; color: inherit; text-align: left; }
+.home-hunter-identity:hover, .home-hunter-identity:focus-visible { outline: 0; background: linear-gradient(90deg, rgba(132,69,210,.06), transparent 72%); }
+.home-hunter-identity:active { background: linear-gradient(90deg, rgba(132,69,210,.11), transparent 72%); transform: scale(.995); }
 .home-hunter-avatar { position: relative; display: grid; place-items: center; flex: 0 0 88px; width: 88px; height: 96px; border: 1px solid rgba(232,91,211,.45); border-radius: 20px; background: radial-gradient(circle at 50% 42%, rgba(206,73,220,.2), transparent 65%), rgba(28,17,68,.8); box-shadow: inset 0 0 24px rgba(193,71,223,.1); }
 .home-hunter-avatar > i { position: absolute; width: 62px; height: 62px; border-radius: 45%; background: rgba(205,74,224,.18); filter: blur(9px); }
 .home-hunter-avatar img { position: relative; width: 82px; height: 82px; object-fit: contain; filter: drop-shadow(0 7px 9px rgba(0,0,0,.38)); transform: scale(1.04); }
@@ -749,14 +750,14 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
 .home-hunter-xp > span { display: block; overflow: hidden; height: 6px; margin-top: 7px; border-radius: 999px; background: rgba(255,255,255,.08); }
 .home-hunter-xp > span > i { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #f04cbd, #8f4cff); box-shadow: 0 0 8px rgba(240,76,189,.3); }
 .home-profile-chevron { position: absolute; right: 17px; top: 20px; color: #817797; font-size: 25px; font-style: normal; font-weight: 400; }
-.mission-card { padding-top: 14px; }
+.home-v2 .hunter-progress.mission-card { margin: 0 0 20px; padding: 3px 4px 20px; border: 0; border-bottom: 1px solid rgba(171,127,255,.14); border-radius: 0; background: transparent; box-shadow: none; }
 .mission-card .mission-list { margin-top: 0; padding-top: 0; border-top: 0; }
 .mission-card .progress-mission { margin-top: 0; padding-top: 0; border-top: 0; }
 @media (max-width: 390px) {
   .home-welcome { gap: 6px; }
   .home-daily-row { gap: 4px; }
   .home-daily-greeting { gap: 5px; font-size: 15px; }
-  .home-hunter-identity { gap: 12px; padding: 13px 32px 13px 13px; }
+  .home-hunter-identity { gap: 20px; padding: 5px 30px 16px 2px; }
   .home-hunter-avatar { flex-basis: 74px; width: 74px; height: 86px; border-radius: 17px; }
   .home-hunter-avatar img { width: 70px; height: 70px; }
   .home-hunter-copy > strong { font-size: 19px; }
