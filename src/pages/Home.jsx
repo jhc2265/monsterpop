@@ -51,8 +51,8 @@ export default function Home() {
       <button className="home-hunter-identity" onClick={() => go('/profile')} aria-label="내 프로필 보기">
         <span className="home-hunter-avatar"><i /><img src={resolveAvatarUrl(profile?.avatar_url)} alt="" /><em aria-hidden="true">✎</em></span>
         <span className="home-hunter-copy">
-          <strong>{profile?.nickname || '헌터'} 헌터</strong>
           <small><b>LV.{progress.level}</b><span>{getHunterTitle(progress.level)}</span></small>
+          <strong>{profile?.nickname || '헌터'} 헌터</strong>
           <span className="home-hunter-xp">
             <em>{progress.needed > 0 ? <>다음 레벨까지 <b>{(progress.needed - progress.current).toLocaleString()} XP</b></> : <><b>MAX LEVEL</b></>}<i>{Math.round(progress.percent)}%</i></em>
             <span><i style={{ width: `${progress.percent}%` }} /></span>
