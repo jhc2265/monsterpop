@@ -1,10 +1,38 @@
 import { MONSTERS } from './monsters'
 import { getBossArchiveEntries } from './bosses'
 
-export const DEFAULT_AVATAR_URL = '/images/monsters/slime.webp'
+export const DEFAULT_AVATAR_URL = '/images/ranking/default-hunter.png'
+
+const PROFILE_REWARD_AVATARS = [
+  {
+    id: 'avatar-shadow-hunter',
+    name: '그림자 헌터',
+    image: '/images/ranking/default-hunter.png',
+    color: '#a45cff',
+    profileExtra: true,
+    unlockLevel: 1,
+  },
+  {
+    id: 'avatar-daily-mission',
+    name: '데일리 미션 배지',
+    image: '/images/rewards/level-2-daily-mission.webp',
+    color: '#d76cff',
+    profileExtra: true,
+    unlockLevel: 2,
+  },
+  {
+    id: 'avatar-boss-hunter',
+    name: '보스 헌터 문장',
+    image: '/images/rewards/level-10-boss-challenge.webp',
+    color: '#ff4c9d',
+    profileExtra: true,
+    unlockLevel: 10,
+  },
+]
 
 export function getProfileAvatarOptions() {
   return [
+    ...PROFILE_REWARD_AVATARS,
     ...MONSTERS.filter((monster) => monster.id !== 'boss'),
     ...getBossArchiveEntries(),
   ]

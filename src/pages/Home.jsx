@@ -66,7 +66,7 @@ export default function Home() {
       {progress.level >= 2 ? <div className="mission-list">
         <div className="mission-list-head"><small><Icon name="spark" size={15} />오늘의 미션</small><span>{missions.filter((m) => m.done).length}/{missions.length} 완료</span></div>
         {missions.map((mission) => <div key={mission.id} className={`mission-item ${mission.done ? 'done' : ''}`}>
-          <span className={`mission-check mission-icon-${mission.id}`}><Icon name={{ play: 'sword', kills: 'skull', combo: 'bolt' }[mission.id]} size={27} strokeWidth={2.1} /></span>
+          <span className={`mission-check mission-icon-${mission.id}`}><Icon name={{ play: 'missionSword', kills: 'skull', combo: 'bolt' }[mission.id]} size={27} strokeWidth={2.1} /></span>
           <div className="mission-body">
             <div className="mission-body-top"><strong>{mission.title}</strong><em>{mission.value}/{mission.goal}</em><b>{mission.done ? '완료' : `+${mission.rewardXp} XP`}</b></div>
             <div className="mission-track"><i style={{ width: `${mission.percent}%` }} /></div>

@@ -13,6 +13,7 @@ const paths = {
   send: '<path d="m22 2-7 20-4-9-9-4 20-7Z"/><path d="M22 2 11 13"/>',
   spark: '<path d="m12 3 1.4 4.6L18 9l-4.6 1.4L12 15l-1.4-4.6L6 9l4.6-1.4L12 3Z"/>',
   sword: '<path d="m14.5 4.5 5-2-2 5L9 16l-3-3 8.5-8.5Z"/><path d="m5 14 5 5"/><path d="m4 20 3-3"/>',
+  missionSword: '<path d="m19.5 2.5-2.7 5.4-7.4 7.5-2.8-2.8L14.1 5l5.4-2.5Z"/><path d="m5.2 11.2 5.6 5.6"/><path d="m7.8 15.2-3.9 3.9"/><path d="m3 18 3 3"/>',
   skull: '<path d="M5 15v-3a7 7 0 0 1 14 0v3a4 4 0 0 1-3 3.87V21l-2-1-2 1-2-1-2 1v-2.13A4 4 0 0 1 5 15Z"/><circle cx="9" cy="13" r="1"/><circle cx="15" cy="13" r="1"/><path d="m11 17 1-1 1 1"/>',
   bolt: '<path d="m13 2-8 12h7l-1 8 8-12h-7l1-8Z"/>',
   lock: '<rect width="14" height="11" x="5" y="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/>',

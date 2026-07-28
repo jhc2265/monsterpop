@@ -67,7 +67,12 @@ export default function Profile() {
   }
 
   const selected = avatars.find((monster) => monster.image === avatarUrl) || avatars[0]
-  const discoveredCount = avatars.filter((monster) => monster.id === 'slime' || isMonsterDiscovered(discovered, monster.id)).length
+  const monsterAvatars = avatars.filter((avatar) => !avatar.profileExtra)
+  const isAvatarUnlocked = (avatar) => avatar.profileExtra
+    ? progress.level >= avatar.unlockLevel
+    : avatar.id === 'slime' || isMonsterDiscovered(discovered, avatar.id)
+  const discoveredCount = monsterAvatars.filter((monster) => monster.id === 'slime' || isMonsterDiscovered(discovered, monster.id)).length
+  const unlockedAvatarCount = avatars.filter(isAvatarUnlocked).length
 
   return <main className="page profile-page">
     <header className="topbar">
@@ -85,7 +90,7 @@ export default function Profile() {
       <div className="profile-identity">
         <small>{getHunterTitle(progress.level)}</small>
         <h2>{profile?.nickname || '헌터'}</h2>
-        <p>대표 몬스터 · {selected?.name}</p>
+        <p>대표 프로필 · {selected?.name}</p>
       </div>
       <div className="profile-xp"><span><i style={{ width: `${progress.percent}%` }} /></span><small>{progress.needed ? `${progress.current} / ${progress.needed} XP` : `${progress.total} XP · MAX`}</small></div>
     </section>
@@ -93,7 +98,7 @@ export default function Profile() {
     <section className="profile-stats" aria-label="헌터 기록">
       <div><small>최고 점수</small><strong>{stats.bestScore.toLocaleString()}</strong></div>
       <div><small>최고 콤보</small><strong>{stats.bestCombo}</strong></div>
-      <div><small>발견 몬스터</small><strong>{discoveredCount}/{avatars.length}</strong></div>
+      <div><small>발견 몬스터</small><strong>{discoveredCount}/{monsterAvatars.length}</strong></div>
     </section>
 
     <section className="profile-edit">
@@ -103,11 +108,11 @@ export default function Profile() {
     </section>
 
     <section className="profile-avatar-picker">
-      <div className="section-heading"><div><span className="overline">PARTNER MONSTER</span><h2>대표 몬스터 선택</h2></div><small>{discoveredCount}개 획득</small></div>
-      <p>직접 발견하거나 격파한 몬스터를 프로필 아바타로 사용할 수 있어요.</p>
+      <div className="section-heading"><div><span className="overline">PROFILE AVATAR</span><h2>프로필 이미지 선택</h2></div><small>{unlockedAvatarCount}개 획득</small></div>
+      <p>성장 보상과 직접 발견하거나 격파한 몬스터를 프로필 이미지로 사용할 수 있어요.</p>
       <div className="profile-avatar-grid">
         {avatars.map((monster) => {
-          const unlocked = monster.id === 'slime' || isMonsterDiscovered(discovered, monster.id)
+          const unlocked = isAvatarUnlocked(monster)
           const active = monster.image === avatarUrl
           return <button
             key={monster.id}
