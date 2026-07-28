@@ -5,7 +5,7 @@ import { useAuth } from '../context/AuthContext'
 import { sound } from '../lib/sound'
 import Icon from '../components/Icon'
 import BottomNav from '../components/BottomNav'
-import { getLevelProgress, getMonsterUnlockLevel, resolveProgress } from '../lib/progression'
+import { getHunterTitle, getLevelProgress, getMonsterUnlockLevel, resolveProgress } from '../lib/progression'
 import { getDailyMissions } from '../lib/missions'
 import { getDailyBoss } from '../lib/bosses'
 
@@ -13,20 +13,15 @@ export default function Home() {
   const { user, profile } = useAuth()
   const navigate = useNavigate()
   const [best, setBest] = useState(0)
-  const [delta, setDelta] = useState(null)
   const [rank, setRank] = useState(null)
-  const [totalPlayers, setTotalPlayers] = useState(0)
   const [muted, setMuted] = useState(sound.isMuted())
 
   useEffect(() => { if (user) loadStats() }, [user])
 
   async function loadStats() {
-    const { data: mine } = await supabase.from('scores').select('score').eq('user_id', user.id).order('score', { ascending: false }).limit(2)
+    const { data: mine } = await supabase.from('scores').select('score').eq('user_id', user.id).order('score', { ascending: false }).limit(1)
     const myBest = mine?.[0]?.score ?? 0
     setBest(myBest)
-
-    const previous = mine?.[1]?.score
-    if (myBest > 0 && previous > 0) setDelta(Math.round(((myBest - previous) / previous) * 100))
 
     if (myBest > 0) {
       const { data: all } = await supabase.from('scores').select('user_id, score').order('score', { ascending: false })
@@ -35,7 +30,6 @@ export default function Home() {
       const scores = Object.values(bestByUser).sort((a, b) => b - a)
       const currentRank = scores.indexOf(myBest) + 1
       setRank(currentRank)
-      setTotalPlayers(scores.length)
     }
   }
 
@@ -74,15 +68,14 @@ export default function Home() {
 
   return <main className="page home-page home-v2">
     <header className="home-welcome">
-      <button className="home-welcome-profile" onClick={() => go('/profile')} aria-label="내 프로필 보기">
-        <img src={profile?.avatar_url || '/images/monsters/slime.webp'} alt="" />
-        <em>LV.{progress.level}</em>
+      <button className="home-hunter-identity" onClick={() => go('/profile')} aria-label="내 프로필 보기">
+        <span className="home-hunter-avatar"><i /><img src={profile?.avatar_url || '/images/monsters/slime.webp'} alt="" /></span>
+        <span className="home-hunter-copy">
+          <strong>{profile?.nickname || '헌터'} 헌터</strong>
+          <small><b>LV.{progress.level}</b> · {getHunterTitle(progress.level)}</small>
+          <em>{best > 0 ? <>최고 <b>{best.toLocaleString()}점</b>{rank ? ` · ${rank}위` : ''} <i>›</i></> : <>첫 기록에 도전해보세요 <i>›</i></>}</em>
+        </span>
       </button>
-      <div className="home-welcome-copy">
-        <h1>안녕하세요, <strong>{profile?.nickname || '헌터'} 헌터님!</strong></h1>
-        <p>오늘도 최고 기록에 도전해보세요.</p>
-        {best > 0 && <button className="home-best-line" onClick={() => go('/ranking')}>최고 <strong>{best.toLocaleString()}점</strong>{rank ? ` · ${rank}위` : ''} <span>›</span></button>}
-      </div>
       <div className="topbar-actions">
         <button className="icon-btn" onClick={toggleMute} aria-label={muted ? '소리 켜기' : '소리 끄기'}><Icon name={muted ? 'mute' : 'sound'} /></button>
         <button className="icon-btn" onClick={() => go('/settings')} aria-label="설정"><Icon name="settings" /></button>

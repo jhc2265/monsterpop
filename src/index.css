@@ -719,21 +719,29 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
 .profile-notice.success { color: #64efc5; }
 .profile-save { width: 100%; margin-top: 15px; }
 
-/* Home profile is a compact identity cue; mission content keeps its own hierarchy. */
-.home-welcome { align-items: flex-start; }
-.home-welcome-profile { position: relative; display: grid; place-items: center; flex: 0 0 56px; width: 56px; height: 56px; padding: 0; border: 1px solid rgba(196,139,255,.28); border-radius: 18px; background: radial-gradient(circle, rgba(219,74,205,.24), rgba(67,36,130,.2) 72%); box-shadow: inset 0 0 18px rgba(184,77,255,.1); }
-.home-welcome-profile img { width: 54px; height: 54px; object-fit: contain; filter: drop-shadow(0 5px 7px rgba(0,0,0,.3)); transform: scale(1.06); }
-.home-welcome-profile em { position: absolute; right: -4px; bottom: -4px; padding: 2px 5px; border: 1px solid rgba(255,255,255,.16); border-radius: 6px; background: #291150; color: #fff; font-size: 9px; font-style: normal; font-weight: 800; line-height: 1.2; }
-.home-welcome-copy { min-width: 0; flex: 1; padding-top: 3px; }
-.home-welcome-copy h1, .home-welcome-copy p { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.home-welcome .topbar-actions { flex: 0 0 auto; padding-top: 6px; }
+/* The home header acts as a compact hunter identity card. */
+.home-welcome { align-items: center; }
+.home-hunter-identity { display: flex; align-items: center; min-width: 0; flex: 1; gap: 10px; padding: 2px 0; border: 0; background: transparent; color: inherit; text-align: left; }
+.home-hunter-avatar { position: relative; display: grid; place-items: center; flex: 0 0 62px; width: 62px; height: 66px; }
+.home-hunter-avatar > i { position: absolute; width: 48px; height: 48px; border-radius: 44% 56% 48% 52%; background: rgba(205,74,224,.22); filter: blur(7px); transform: rotate(-12deg); }
+.home-hunter-avatar img { position: relative; width: 62px; height: 62px; object-fit: contain; filter: drop-shadow(0 7px 9px rgba(0,0,0,.4)); transform: scale(1.08); }
+.home-hunter-copy { display: flex; min-width: 0; flex: 1; flex-direction: column; align-items: flex-start; }
+.home-hunter-copy > strong { max-width: 100%; overflow: hidden; color: #fff; font-size: 18px; font-weight: 800; line-height: 1.2; text-overflow: ellipsis; white-space: nowrap; }
+.home-hunter-copy > small { margin-top: 4px; color: #a79dbf; font-size: 11px; line-height: 1.2; }
+.home-hunter-copy > small b { color: #d966d1; }
+.home-hunter-copy > em { margin-top: 7px; color: #aaa1c0; font-size: 11px; font-style: normal; line-height: 1.2; white-space: nowrap; }
+.home-hunter-copy > em b { color: #ffd45b; font-size: 13px; }
+.home-hunter-copy > em i { margin-left: 2px; color: #d966d1; font-style: normal; }
+.home-welcome .topbar-actions { flex: 0 0 auto; }
 .mission-card { padding-top: 14px; }
 .mission-card .mission-list { margin-top: 0; padding-top: 0; border-top: 0; }
 .mission-card .progress-mission { margin-top: 0; padding-top: 0; border-top: 0; }
 @media (max-width: 390px) {
-  .home-welcome { gap: 8px; }
-  .home-welcome-profile { flex-basis: 50px; width: 50px; height: 50px; border-radius: 16px; }
-  .home-welcome-profile img { width: 49px; height: 49px; }
+  .home-welcome { gap: 6px; }
+  .home-hunter-identity { gap: 7px; }
+  .home-hunter-avatar { flex-basis: 54px; width: 54px; height: 62px; }
+  .home-hunter-avatar img { width: 56px; height: 56px; }
+  .home-hunter-copy > strong { font-size: 16px; }
   .home-welcome .topbar-actions { gap: 4px; }
   .home-welcome .icon-btn { width: 36px; height: 36px; }
 }
