@@ -734,9 +734,9 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
 .home-hunter-identity { position: relative; display: flex; align-items: center; min-width: 0; width: 100%; gap: 20px; padding: 7px 34px 18px 4px; border: 0; border-bottom: 1px solid rgba(171,127,255,.14); border-radius: 0; background: transparent; box-shadow: none; color: inherit; text-align: left; }
 .home-hunter-identity:hover, .home-hunter-identity:focus-visible { outline: 0; background: linear-gradient(90deg, rgba(132,69,210,.06), transparent 72%); }
 .home-hunter-identity:active { background: linear-gradient(90deg, rgba(132,69,210,.11), transparent 72%); transform: scale(.995); }
-.home-hunter-avatar { position: relative; display: grid; place-items: center; flex: 0 0 88px; width: 88px; height: 88px; border: 1px solid rgba(232,91,211,.45); border-radius: 50%; background: radial-gradient(circle at 50% 42%, rgba(206,73,220,.2), transparent 65%), rgba(28,17,68,.8); box-shadow: inset 0 0 24px rgba(193,71,223,.1); }
+.home-hunter-avatar { position: relative; display: grid; place-items: center; flex: 0 0 88px; width: 88px; height: 88px; border: 0; border-radius: 50%; background: radial-gradient(circle at 50% 42%, rgba(224,92,218,.24) 0%, rgba(105,53,176,.14) 48%, rgba(28,17,68,.38) 72%, transparent 100%); box-shadow: 0 0 20px rgba(151,62,210,.12); }
 .home-hunter-avatar > i { position: absolute; width: 62px; height: 62px; border-radius: 45%; background: rgba(205,74,224,.18); filter: blur(9px); }
-.home-hunter-avatar img { position: relative; width: 72px; height: 72px; object-fit: contain; filter: drop-shadow(0 7px 9px rgba(0,0,0,.38)); }
+.home-hunter-avatar img { position: relative; width: 76px; height: 76px; object-fit: contain; filter: drop-shadow(0 7px 9px rgba(0,0,0,.38)); }
 .home-hunter-avatar > em { position: absolute; z-index: 2; right: -6px; bottom: -5px; display: grid; place-items: center; width: 27px; height: 27px; border: 2px solid #17103c; border-radius: 50%; background: linear-gradient(135deg, #8a43f1, #e64bbf); color: #fff; font-size: 13px; font-style: normal; font-weight: 800; box-shadow: 0 4px 10px rgba(0,0,0,.4); transform: scaleX(-1); }
 .home-hunter-copy { display: flex; min-width: 0; flex: 1; flex-direction: column; align-items: flex-start; }
 .home-hunter-copy > strong { max-width: 100%; overflow: hidden; color: #fff; font-size: 22px; font-weight: 800; line-height: 1.2; text-overflow: ellipsis; white-space: nowrap; }
@@ -759,7 +759,7 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
   .home-daily-greeting { gap: 5px; font-size: 15px; }
   .home-hunter-identity { gap: 20px; padding: 5px 30px 16px 2px; }
   .home-hunter-avatar { flex-basis: 74px; width: 74px; height: 74px; border-radius: 50%; }
-  .home-hunter-avatar img { width: 58px; height: 58px; }
+  .home-hunter-avatar img { width: 64px; height: 64px; }
   .home-hunter-copy > strong { font-size: 19px; }
   .home-hunter-copy > small { gap: 6px; }
   .home-hunter-copy > small span { padding-left: 6px; }
