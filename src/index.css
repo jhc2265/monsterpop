@@ -720,8 +720,8 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
 .profile-save { width: 100%; margin-top: 15px; }
 
 /* The home header acts as a compact hunter identity card. */
-.home-daily-greeting { display: flex; align-items: center; gap: 6px; margin: 0 0 11px 3px; color: #aaa1c0; font-size: 12px; font-weight: 600; line-height: 1.3; }
-.home-daily-greeting i { font-size: 11px; font-style: normal; }
+.home-daily-greeting { display: flex; align-items: center; gap: 7px; margin: 0 0 12px 3px; color: #c8c0d8; font-family: 'Paperlogy', sans-serif; font-size: 17px; font-weight: 700; line-height: 1.3; letter-spacing: -.02em; }
+.home-daily-greeting i { font-size: 14px; font-style: normal; }
 .home-daily-greeting.signal i { color: #55e9e0; text-shadow: 0 0 10px rgba(85,233,224,.5); }
 .home-daily-greeting.pop i { color: #f04cbd; text-shadow: 0 0 10px rgba(240,76,189,.5); }
 .home-welcome { align-items: center; }
