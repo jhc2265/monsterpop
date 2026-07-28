@@ -14,7 +14,6 @@ export default function Home() {
   const navigate = useNavigate()
   const [best, setBest] = useState(0)
   const [rank, setRank] = useState(null)
-  const [muted, setMuted] = useState(sound.isMuted())
 
   useEffect(() => { if (user) loadStats() }, [user])
 
@@ -37,12 +36,6 @@ export default function Home() {
     sound.unlock()
     sound.button()
     navigate(path)
-  }
-
-  function toggleMute() {
-    const next = !muted
-    sound.setMuted(next)
-    setMuted(next)
   }
 
   const progress = getLevelProgress(resolveProgress(profile, user.id).xp)
@@ -72,7 +65,7 @@ export default function Home() {
       <p className={`home-daily-greeting ${isPopGreeting ? 'pop' : 'signal'}`}>
         <i>✦</i> {isPopGreeting ? '오늘도 팝! 터뜨릴 준비됐나요?' : '몬스터 출현 신호를 발견했어요!'}
       </p>
-      <button className="home-utility-btn" onClick={toggleMute} aria-label={muted ? '소리 켜기' : '소리 끄기'}><Icon name={muted ? 'mute' : 'sound'} size={19} /></button>
+      <button className="home-utility-btn" onClick={() => go('/settings')} aria-label="설정"><Icon name="settings" size={20} /></button>
     </div>
     <header className="home-welcome">
       <button className="home-hunter-identity" onClick={() => go('/profile')} aria-label="내 프로필 보기">
@@ -83,7 +76,6 @@ export default function Home() {
           <em>{best > 0 ? <>최고 <b>{best.toLocaleString()}점</b>{rank ? ` · ${rank}위` : ''} <i>›</i></> : <>첫 기록에 도전해보세요 <i>›</i></>}</em>
         </span>
       </button>
-      <button className="home-utility-btn home-settings-btn" onClick={() => go('/settings')} aria-label="설정"><Icon name="settings" size={20} /></button>
     </header>
 
     <section className="hunter-progress mission-card" aria-label="오늘의 미션">

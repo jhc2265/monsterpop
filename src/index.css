@@ -729,18 +729,17 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
 .home-utility-btn:hover, .home-utility-btn:focus-visible { outline: 0; background: rgba(145,104,220,.14); color: #fff; }
 .home-utility-btn:active { background: rgba(145,104,220,.22); transform: scale(.92); }
 .home-welcome { align-items: center; }
-.home-hunter-identity { display: flex; align-items: center; min-width: 0; flex: 1; gap: 10px; padding: 2px 0; border: 0; background: transparent; color: inherit; text-align: left; }
-.home-hunter-avatar { position: relative; display: grid; place-items: center; flex: 0 0 62px; width: 62px; height: 66px; }
-.home-hunter-avatar > i { position: absolute; width: 48px; height: 48px; border-radius: 44% 56% 48% 52%; background: rgba(205,74,224,.22); filter: blur(7px); transform: rotate(-12deg); }
-.home-hunter-avatar img { position: relative; width: 62px; height: 62px; object-fit: contain; filter: drop-shadow(0 7px 9px rgba(0,0,0,.4)); transform: scale(1.08); }
+.home-hunter-identity { display: flex; align-items: center; min-width: 0; width: 100%; gap: 14px; padding: 3px 2px 7px; border: 0; background: transparent; color: inherit; text-align: left; }
+.home-hunter-avatar { position: relative; display: grid; place-items: center; flex: 0 0 76px; width: 76px; height: 78px; }
+.home-hunter-avatar > i { position: absolute; width: 59px; height: 59px; border-radius: 44% 56% 48% 52%; background: rgba(205,74,224,.24); filter: blur(8px); transform: rotate(-12deg); }
+.home-hunter-avatar img { position: relative; width: 74px; height: 74px; object-fit: contain; filter: drop-shadow(0 8px 11px rgba(0,0,0,.42)); transform: scale(1.08); }
 .home-hunter-copy { display: flex; min-width: 0; flex: 1; flex-direction: column; align-items: flex-start; }
-.home-hunter-copy > strong { max-width: 100%; overflow: hidden; color: #fff; font-size: 18px; font-weight: 800; line-height: 1.2; text-overflow: ellipsis; white-space: nowrap; }
-.home-hunter-copy > small { margin-top: 4px; color: #a79dbf; font-size: 11px; line-height: 1.2; }
+.home-hunter-copy > strong { max-width: 100%; overflow: hidden; color: #fff; font-size: 21px; font-weight: 800; line-height: 1.2; text-overflow: ellipsis; white-space: nowrap; }
+.home-hunter-copy > small { margin-top: 5px; color: #a79dbf; font-size: 12px; line-height: 1.2; }
 .home-hunter-copy > small b { color: #d966d1; }
-.home-hunter-copy > em { margin-top: 7px; color: #aaa1c0; font-size: 11px; font-style: normal; line-height: 1.2; white-space: nowrap; }
-.home-hunter-copy > em b { color: #ffd45b; font-size: 13px; }
+.home-hunter-copy > em { margin-top: 8px; color: #aaa1c0; font-size: 12px; font-style: normal; line-height: 1.2; white-space: nowrap; }
+.home-hunter-copy > em b { color: #ffd45b; font-size: 15px; }
 .home-hunter-copy > em i { margin-left: 2px; color: #d966d1; font-style: normal; }
-.home-settings-btn { margin-right: 2px; }
 .mission-card { padding-top: 14px; }
 .mission-card .mission-list { margin-top: 0; padding-top: 0; border-top: 0; }
 .mission-card .progress-mission { margin-top: 0; padding-top: 0; border-top: 0; }
@@ -748,10 +747,10 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
   .home-welcome { gap: 6px; }
   .home-daily-row { gap: 4px; }
   .home-daily-greeting { gap: 5px; font-size: 15px; }
-  .home-hunter-identity { gap: 7px; }
-  .home-hunter-avatar { flex-basis: 54px; width: 54px; height: 62px; }
-  .home-hunter-avatar img { width: 56px; height: 56px; }
-  .home-hunter-copy > strong { font-size: 16px; }
+  .home-hunter-identity { gap: 10px; }
+  .home-hunter-avatar { flex-basis: 66px; width: 66px; height: 70px; }
+  .home-hunter-avatar img { width: 66px; height: 66px; }
+  .home-hunter-copy > strong { font-size: 19px; }
 }
 .settings-section { margin-top: 24px; }
 .settings-section h2 { display: flex; align-items: center; gap: 8px; margin: 0 0 9px 4px; color: #b895ff; }
