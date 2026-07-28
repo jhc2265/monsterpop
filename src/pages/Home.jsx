@@ -43,7 +43,8 @@ export default function Home() {
   return <main className="page home-page home-v2">
     <div className="home-daily-row">
       <p className={`home-daily-greeting ${isPopGreeting ? 'pop' : 'signal'}`}>
-        <i>✦</i> {isPopGreeting ? '오늘도 팝! 터뜨릴 준비됐나요?' : '몬스터 출현 신호를 발견했어요!'}
+        <span className="home-greeting-burst" aria-hidden="true"><Icon name="spark" size={18} strokeWidth={2.1} /></span>
+        {isPopGreeting ? '오늘도 팝! 터뜨릴 준비됐나요?' : '몬스터 출현 신호를 발견했어요!'}
       </p>
       <button className="home-utility-btn" onClick={() => go('/settings')} aria-label="설정"><Icon name="settings" size={20} /></button>
     </div>
@@ -64,7 +65,7 @@ export default function Home() {
 
     <section className="hunter-progress mission-card" aria-label="오늘의 미션">
       {progress.level >= 2 ? <div className="mission-list">
-        <div className="mission-list-head"><small><Icon name="spark" size={15} />오늘의 미션</small><span>{missions.filter((m) => m.done).length}/{missions.length} 완료</span></div>
+        <div className="mission-list-head"><small>TODAY’S MISSIONS</small><span>{missions.filter((m) => m.done).length}/{missions.length} 완료</span></div>
         {missions.map((mission) => <div key={mission.id} className={`mission-item ${mission.done ? 'done' : ''}`}>
           <span className={`mission-check mission-icon-${mission.id}`}><Icon name={{ play: 'missionSword', kills: 'skull', combo: 'bolt' }[mission.id]} size={23} strokeWidth={2.1} /></span>
           <div className="mission-body">
@@ -72,7 +73,7 @@ export default function Home() {
             <div className="mission-track"><i style={{ width: `${mission.percent}%` }} /></div>
           </div>
         </div>)}
-      </div> : <div className="progress-mission locked"><span><Icon name="lock" size={17} /></span><div><small>오늘의 미션</small><strong>일일 미션 준비 중</strong><em>Lv.2부터 매일 새로운 성장 목표가 열려요</em></div><b>LV.2</b></div>}
+      </div> : <div className="progress-mission locked"><span><Icon name="lock" size={17} /></span><div><small>TODAY’S MISSIONS</small><strong>일일 미션 준비 중</strong><em>Lv.2부터 매일 새로운 성장 목표가 열려요</em></div><b>LV.2</b></div>}
     </section>
 
     <section
