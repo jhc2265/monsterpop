@@ -52,7 +52,7 @@ export default function BossSelect() {
               <span className="boss-select-meta">
                 <span>난이도 {'★'.repeat(boss.difficulty)}</span>
                 <span>+{boss.firstClearXp} XP</span>
-                <span>{record.bestTimeLeft != null ? `최고 ${record.bestTimeLeft}초 남김` : `${boss.timeLimit}초 제한`}</span>
+                <span>{boss.timeLimit}초 제한</span>
               </span>
             </span>
             <span className="boss-select-go">{locked ? <Icon name="lock" size={16} /> : '›'}</span>
