@@ -734,9 +734,9 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
 .home-hunter-avatar > i { position: absolute; width: 59px; height: 59px; border-radius: 44% 56% 48% 52%; background: rgba(205,74,224,.24); filter: blur(8px); transform: rotate(-12deg); }
 .home-hunter-avatar img { position: relative; width: 74px; height: 74px; object-fit: contain; filter: drop-shadow(0 8px 11px rgba(0,0,0,.42)); transform: scale(1.08); }
 .home-hunter-copy { display: flex; min-width: 0; flex: 1; flex-direction: column; align-items: flex-start; }
-.home-hunter-copy > strong { max-width: 100%; overflow: hidden; color: #fff; font-size: 21px; font-weight: 800; line-height: 1.2; text-overflow: ellipsis; white-space: nowrap; }
-.home-hunter-copy > small { margin-top: 5px; color: #a79dbf; font-size: 12px; line-height: 1.2; }
-.home-hunter-copy > small b { color: #d966d1; }
+.home-hunter-copy > strong { max-width: 100%; overflow: hidden; margin-top: 7px; color: #fff; font-size: 21px; font-weight: 800; line-height: 1.2; text-overflow: ellipsis; white-space: nowrap; }
+.home-hunter-copy > small { display: flex; align-items: center; gap: 5px; color: #aaa1c0; font-size: 12px; line-height: 1.2; }
+.home-hunter-copy > small b { display: inline-flex; align-items: center; min-height: 21px; padding: 2px 7px; border: 1px solid rgba(240,76,189,.28); border-radius: 7px; background: rgba(240,76,189,.11); color: #f56ac8; font-size: 11px; line-height: 1; }
 .home-hunter-copy > em { margin-top: 8px; color: #aaa1c0; font-size: 12px; font-style: normal; line-height: 1.2; white-space: nowrap; }
 .home-hunter-copy > em b { color: #ffd45b; font-size: 15px; }
 .home-hunter-copy > em i { margin-left: 2px; color: #d966d1; font-style: normal; }

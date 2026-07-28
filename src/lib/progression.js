@@ -25,11 +25,11 @@ export const MAX_LEVEL = LEVEL_XP.length
 // 칭호 구간 — 경계는 해금 이정표에 맞춘다.
 //   4 섀도우 버스트 · 7 수정 고슴도치 · 10 보스전 · 14 최고 레벨
 const HUNTER_TITLES = [
-  { from: 14, title: '마스터 헌터' },
-  { from: 10, title: '정예 헌터' },
-  { from: 7, title: '숙련 헌터' },
-  { from: 4, title: '정식 헌터' },
-  { from: 1, title: '견습 헌터' },
+  { from: 14, title: '팝 마스터' },
+  { from: 10, title: '팝 버스터' },
+  { from: 7, title: '몬스터 체이서' },
+  { from: 4, title: '콤보 스파크' },
+  { from: 1, title: '팝 루키' },
 ]
 
 export function getHunterTitle(level = 1) {

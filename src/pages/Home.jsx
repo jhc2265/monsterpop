@@ -71,8 +71,8 @@ export default function Home() {
       <button className="home-hunter-identity" onClick={() => go('/profile')} aria-label="내 프로필 보기">
         <span className="home-hunter-avatar"><i /><img src={profile?.avatar_url || '/images/monsters/slime.webp'} alt="" /></span>
         <span className="home-hunter-copy">
-          <strong>{profile?.nickname || '헌터'} 헌터</strong>
           <small><b>LV.{progress.level}</b> · {getHunterTitle(progress.level)}</small>
+          <strong>{profile?.nickname || '헌터'} 헌터</strong>
           <em>{best > 0 ? <>최고 <b>{best.toLocaleString()}점</b>{rank ? ` · ${rank}위` : ''} <i>›</i></> : <>첫 기록에 도전해보세요 <i>›</i></>}</em>
         </span>
       </button>
