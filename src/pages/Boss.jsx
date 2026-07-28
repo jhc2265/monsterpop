@@ -71,6 +71,12 @@ const CUE_HINT = {
   swipe: '틈이 생겼어요. 좌우로 밀어내세요',
   shield: '방어막이 올라왔어요. 건드리지 마세요',
 }
+const BOSS_MECHANICS = {
+  'neon-nightmare': { name: '그림자 장막', short: 'SHADOW VEIL' },
+  'glitch-king-slime': { name: '신호 오류', short: 'SIGNAL ERROR' },
+  'solar-eclipse-phoenix': { name: '과열', short: 'OVERHEAT' },
+  'polar-pod': { name: '시간 동결', short: 'TIME FREEZE' },
+}
 
 export default function Boss() {
   const navigate = useNavigate()
@@ -89,19 +95,30 @@ export default function Boss() {
   const [phaseBreak, setPhaseBreak] = useState(false)
   const [judge, setJudge] = useState('보스의 공격 신호를 확인하세요')
   const [effect, setEffect] = useState(null)
+  const [cueScrambling, setCueScrambling] = useState(false)
+  const [shadowVeil, setShadowVeil] = useState(false)
+  const [heat, setHeat] = useState(0)
+  const [frozen, setFrozen] = useState(false)
 
   const playingRef = useRef(false)
   const comboRef = useRef(0)
   const maxComboRef = useRef(0)
   const pointerRef = useRef(null)
   const cueTimerRef = useRef(null)
+  const revealTimerRef = useRef(null)
+  const mechanicTimerRef = useRef(null)
   const holdRafRef = useRef(null)
   const punishRef = useRef(null)
   const phaseRef = useRef(1)
   const hpRef = useRef(boss.maxHp)
   const timeRef = useRef(boss.timeLimit)
+  const heatRef = useRef(0)
+  const frozenRef = useRef(false)
+  const cueCountRef = useRef(0)
+  const successfulHitsRef = useRef(0)
 
   const phase = hp > boss.maxHp * 0.7 ? 1 : hp > boss.maxHp * 0.4 ? 2 : 3
+  const mechanic = BOSS_MECHANICS[boss.id] || BOSS_MECHANICS['neon-nightmare']
 
   function flash(text, type) {
     setEffect({ text, type, id: Date.now() + Math.random() })
@@ -110,6 +127,8 @@ export default function Boss() {
 
   const clearTimers = useCallback(() => {
     if (cueTimerRef.current) { clearTimeout(cueTimerRef.current); cueTimerRef.current = null }
+    if (revealTimerRef.current) { clearTimeout(revealTimerRef.current); revealTimerRef.current = null }
+    if (mechanicTimerRef.current) { clearTimeout(mechanicTimerRef.current); mechanicTimerRef.current = null }
     if (holdRafRef.current) { cancelAnimationFrame(holdRafRef.current); holdRafRef.current = null }
   }, [])
 
@@ -129,22 +148,41 @@ export default function Boss() {
       const type = pickCue(settings.weights)
       setCue({ type, id: Date.now() })
       resetHold()
+      cueCountRef.current += 1
 
-      // 방어막은 버티면 통과, 나머지는 시간 내 반응하지 못하면 실패.
-      cueTimerRef.current = setTimeout(() => {
-        if (!playingRef.current) return
-        if (type === 'shield') {
-          comboRef.current += 1
-          maxComboRef.current = Math.max(maxComboRef.current, comboRef.current)
-          setCombo(comboRef.current)
-          setJudge('잘 버텼어요!')
-          nextCue(240)
-        } else {
-          punishRef.current('반응이 늦었어요!')
-        }
-      }, type === 'shield' ? pattern.shieldMs : settings.window)
+      setShadowVeil(false)
+      if (boss.id === 'neon-nightmare' && cueCountRef.current % 4 === 0) {
+        setShadowVeil(true)
+        mechanicTimerRef.current = setTimeout(() => setShadowVeil(false), 720)
+      }
+
+      const startResponseWindow = () => {
+        setCueScrambling(false)
+        if (boss.id === 'glitch-king-slime') setJudge('신호 확인!')
+        // 방어막은 버티면 통과, 나머지는 시간 내 반응하지 못하면 실패.
+        cueTimerRef.current = setTimeout(() => {
+          if (!playingRef.current) return
+          if (type === 'shield') {
+            comboRef.current += 1
+            maxComboRef.current = Math.max(maxComboRef.current, comboRef.current)
+            setCombo(comboRef.current)
+            setJudge('잘 버텼어요!')
+            nextCue(240)
+          } else {
+            punishRef.current('반응이 늦었어요!')
+          }
+        }, type === 'shield' ? pattern.shieldMs : settings.window)
+      }
+
+      if (boss.id === 'glitch-king-slime') {
+        setCueScrambling(true)
+        setJudge('신호 복구 중...')
+        revealTimerRef.current = setTimeout(startResponseWindow, 420)
+      } else {
+        startResponseWindow()
+      }
     }, delay)
-  }, [clearTimers, pattern, resetHold])
+  }, [boss.id, clearTimers, pattern, resetHold])
 
   // 실패 처리 — 콤보를 끊고 제한 시간을 깎는다.
   function punish(message) {
@@ -152,6 +190,10 @@ export default function Boss() {
     setCombo(0)
     sound.miss()
     setJudge(message)
+    if (boss.id === 'solar-eclipse-phoenix') {
+      heatRef.current = 0
+      setHeat(0)
+    }
     flash(`MISS  -${MISS_TIME_PENALTY}초`, 'miss')
     timeRef.current = Math.max(0, timeRef.current - MISS_TIME_PENALTY)
     setTimeLeft(timeRef.current)
@@ -163,7 +205,15 @@ export default function Boss() {
   punishRef.current = punish
 
   function hit(label) {
-    const damage = boss.damagePerHit || 1
+    let damage = boss.damagePerHit || 1
+    let overheat = false
+    if (boss.id === 'solar-eclipse-phoenix') {
+      const nextHeat = heatRef.current + 25
+      overheat = nextHeat >= 100
+      heatRef.current = overheat ? 0 : nextHeat
+      setHeat(heatRef.current)
+      if (overheat) damage *= 2
+    }
     const nextHp = Math.max(0, hpRef.current - damage)
     const nextCombo = comboRef.current + 1
     comboRef.current = nextCombo
@@ -172,9 +222,10 @@ export default function Boss() {
     setCombo(nextCombo)
     maxComboRef.current = Math.max(maxComboRef.current, nextCombo)
     sound.hit(nextCombo)
-    setJudge(label)
-    flash(`-${damage}`, phaseRef.current === 3 ? 'rush' : 'hit')
+    setJudge(overheat ? 'OVERHEAT!' : label)
+    flash(overheat ? `OVERHEAT  -${damage}` : `-${damage}`, phaseRef.current === 3 || overheat ? 'rush' : 'hit')
     resetHold()
+    successfulHitsRef.current += 1
 
     if (nextHp === 0) { finish(true); return }
 
@@ -190,11 +241,26 @@ export default function Boss() {
       setTimeout(() => { setPhaseBreak(false); nextCue(220) }, PHASE_BREAK_MS)
       return
     }
+
+    if (boss.id === 'polar-pod' && successfulHitsRef.current % 5 === 0) {
+      clearTimers()
+      setCue(null)
+      frozenRef.current = true
+      setFrozen(true)
+      setJudge('시간이 얼어붙었어요!')
+      mechanicTimerRef.current = setTimeout(() => {
+        frozenRef.current = false
+        setFrozen(false)
+        setJudge('동결 해제!')
+        nextCue(180)
+      }, 680)
+      return
+    }
     nextCue()
   }
 
   function handlePointerDown(event) {
-    if (!playingRef.current || !cue || phaseBreak) return
+    if (!playingRef.current || !cue || phaseBreak || cueScrambling || frozen) return
     event.preventDefault()
     event.currentTarget.setPointerCapture?.(event.pointerId)
 
@@ -215,7 +281,7 @@ export default function Boss() {
   }
 
   function handlePointerUp(event) {
-    if (!playingRef.current || !cue || !pointerRef.current || phaseBreak) return
+    if (!playingRef.current || !cue || !pointerRef.current || phaseBreak || cueScrambling || frozen) return
     event.preventDefault()
     const pointer = pointerRef.current
     const heldFor = Date.now() - pointer.at
@@ -286,7 +352,7 @@ export default function Boss() {
   useEffect(() => {
     if (countdown !== 0) return
     const timer = setInterval(() => {
-      if (!playingRef.current) return
+      if (!playingRef.current || frozenRef.current) return
       timeRef.current -= 1
       setTimeLeft(timeRef.current)
       if (timeRef.current <= 0) finish(false)
@@ -296,8 +362,9 @@ export default function Boss() {
 
   useEffect(() => () => { clearTimers(); sound.stopBossBGM() }, [clearTimers])
 
-  const cueType = phaseBreak ? null : cue?.type
-  return <main className={`battle-page boss-battle boss-${boss.id} phase-${phase}`}>
+  const cueType = phaseBreak || frozen ? null : cue?.type
+  const mechanicActive = shadowVeil || cueScrambling || frozen || (boss.id === 'solar-eclipse-phoenix' && heat >= 75)
+  return <main className={`battle-page boss-battle boss-${boss.id} phase-${phase}${shadowVeil ? ' mechanic-shadow-active' : ''}${cueScrambling ? ' mechanic-glitch-active' : ''}${frozen ? ' mechanic-frozen' : ''}`}>
     <header className="battle-hud boss-hud">
       <button className="battle-pause" onClick={quit} aria-label="보스전 나가기"><Icon name="back" size={18} /></button>
       <div className="battle-score"><small>DAILY BOSS</small><strong>{boss.name}</strong><span>{boss.element}</span></div>
@@ -305,7 +372,7 @@ export default function Boss() {
       <div className={`battle-combo ${combo > 0 ? 'active' : ''}`}><small>COMBO</small><strong>{combo}</strong></div>
     </header>
 
-    <div className="boss-healthbar"><div><small>PHASE {phase}</small><strong><em>HP</em> {hp} / {boss.maxHp}</strong></div><span><i style={{ width: `${(hp / boss.maxHp) * 100}%` }} /></span></div>
+    <div className="boss-healthbar"><div><small>PHASE {phase}</small><span className={`boss-mechanic-chip${mechanicActive ? ' active' : ''}`}>{mechanic.name}{boss.id === 'solar-eclipse-phoenix' ? ` ${heat}%` : ''}</span><strong><em>HP</em> {hp} / {boss.maxHp}</strong></div><span><i style={{ width: `${(hp / boss.maxHp) * 100}%` }} /></span></div>
 
     <section className="battle-arena boss-arena">
       <img className="battle-background" src={boss.background || '/images/bg/battle-arena.webp'} alt="" />
@@ -331,7 +398,7 @@ export default function Boss() {
         onPointerUp={handlePointerUp}
         onPointerCancel={resetHold}
       >
-        {cueType && <span className="action-cue">{CUE_LABEL[cueType]}</span>}
+        {cueType && <span className="action-cue">{cueScrambling ? 'ERROR' : CUE_LABEL[cueType]}</span>}
         <img src={boss.image} alt={boss.name} draggable="false" />
       </button>
       <div className="boss-aurora-ring ring-front" aria-hidden="true"><i /><b /></div>
@@ -342,13 +409,13 @@ export default function Boss() {
       </div>}
       {effect && <div key={effect.id} className={`boss-hit-effect ${effect.type}`}>{effect.text}</div>}
       {phaseBreak && <div className="boss-phase-banner"><span>PHASE {phase}</span><strong>{phase === 3 ? '마지막 단계' : '패턴이 늘어납니다'}</strong></div>}
-      {countdown > 0 && <div className="battle-countdown"><span>DAILY BOSS</span><strong key={countdown}>{countdown}</strong><p>{boss.title}</p></div>}
+      {countdown > 0 && <div className="battle-countdown"><span>DAILY BOSS</span><strong key={countdown}>{countdown}</strong><p>{boss.title}</p><em>{boss.element} · {mechanic.name}</em></div>}
     </section>
 
     <section className="boss-command">
       <small>{phase === 3 ? 'FINAL PHASE' : `PHASE ${phase}`}</small>
       <strong>{judge}</strong>
-      <span>{cueType ? (cueType === 'hold' && boss.holdHint ? boss.holdHint : CUE_HINT[cueType]) : '다음 신호를 기다리세요'}</span>
+      <span>{cueScrambling ? '신호가 확정된 뒤 판정이 시작됩니다' : frozen ? '동결 중에는 제한 시간도 멈춥니다' : cueType ? (cueType === 'hold' && boss.holdHint ? boss.holdHint : CUE_HINT[cueType]) : '다음 신호를 기다리세요'}</span>
     </section>
   </main>
 }
