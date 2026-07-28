@@ -723,9 +723,13 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
 
 /* The home header acts as a compact hunter identity card. */
 .home-daily-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 10px; }
-.home-daily-greeting { display: flex; min-width: 0; align-items: center; gap: 7px; margin: 0 0 0 3px; color: #c8c0d8; font-family: 'Paperlogy', sans-serif; font-size: 17px; font-weight: 700; line-height: 1.3; letter-spacing: -.02em; white-space: nowrap; animation: homeGreetingIn .46s ease-out both; }
+.home-daily-greeting { position: relative; display: flex; min-width: 0; align-items: center; gap: 7px; margin: 0 0 0 3px; color: #c8c0d8; font-family: 'Paperlogy', sans-serif; font-size: 17px; font-weight: 700; line-height: 1; letter-spacing: -.02em; white-space: nowrap; animation: homeGreetingIn .46s ease-out both; }
+.home-greeting-text { display: block; line-height: 1.2; }
 .home-greeting-burst { position: relative; display: grid; place-items: center; flex: 0 0 22px; width: 22px; height: 22px; color: #f04cbd; isolation: isolate; }
 .home-daily-greeting.signal .home-greeting-burst { color: #55e9e0; }
+.home-greeting-burst-tail { position: absolute; right: -11px; top: 50%; width: 12px; height: 22px; margin-top: -11px; pointer-events: none; }
+.home-greeting-burst-tail::before { inset: 5px 0; }
+.home-greeting-burst-tail::after { left: 4px; top: 9px; animation-delay: .08s; }
 .home-greeting-burst svg { position: relative; z-index: 2; color: currentColor; filter: drop-shadow(0 0 6px currentColor); animation: homeGreetingSpark .68s cubic-bezier(.2,.9,.3,1.25) both; }
 .home-greeting-burst::before { position: absolute; z-index: 0; inset: 2px; border: 1px solid currentColor; border-radius: 50%; content: ""; animation: homeGreetingRing .68s ease-out both; }
 .home-greeting-burst::after { position: absolute; z-index: 1; left: 9px; top: 9px; width: 4px; height: 4px; border-radius: 50%; background: currentColor; box-shadow: -13px -6px #bf75ff, 12px -9px #f04cbd, 15px 5px #8d6cff, -11px 12px #f365d6, 5px 14px #c982ff; content: ""; animation: homeGreetingParticles .72s ease-out both; }
@@ -3550,4 +3554,20 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
   box-shadow: none;
   filter: blur(14px);
   opacity: .86;
+}
+
+/* 홈 피처드는 카드가 아니라 오늘의 보스를 구분하는 풀블리드 컬러 구역이다. */
+.home-v2 .boss-card {
+  width: calc(100% + 36px);
+  margin-right: -18px;
+  margin-left: -18px;
+  padding: 22px 30px 24px;
+  border: 0;
+  border-radius: 0;
+  background:
+    radial-gradient(circle at 82% 42%, color-mix(in srgb, var(--featured-boss-color, #b84dff) 24%, transparent), transparent 34%),
+    linear-gradient(118deg, rgba(39,20,91,.9), color-mix(in srgb, var(--featured-boss-color, #b84dff) 16%, rgba(20,10,52,.94)));
+  box-shadow:
+    inset 0 1px color-mix(in srgb, var(--featured-boss-color, #b84dff) 34%, transparent),
+    inset 0 -1px color-mix(in srgb, var(--featured-boss-color, #b84dff) 22%, transparent);
 }

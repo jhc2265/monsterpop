@@ -44,7 +44,8 @@ export default function Home() {
     <div className="home-daily-row">
       <p className={`home-daily-greeting ${isPopGreeting ? 'pop' : 'signal'}`}>
         <span className="home-greeting-burst" aria-hidden="true"><Icon name="spark" size={18} strokeWidth={2.1} /></span>
-        {isPopGreeting ? '오늘도 팝! 터뜨릴 준비됐나요?' : '몬스터 출현 신호를 발견했어요!'}
+        <span className="home-greeting-text">{isPopGreeting ? '오늘도 팝! 터뜨릴 준비됐나요?' : '몬스터 출현 신호를 발견했어요!'}</span>
+        <span className="home-greeting-burst home-greeting-burst-tail" aria-hidden="true" />
       </p>
       <button className="home-utility-btn" onClick={() => go('/settings')} aria-label="설정"><Icon name="settings" size={20} /></button>
     </div>
