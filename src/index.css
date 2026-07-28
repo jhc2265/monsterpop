@@ -3591,10 +3591,12 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
   z-index: 1;
 }
 .home-v2 .boss-card .hero-monster {
+  width: 180px;
+  right: -22px;
   opacity: 1;
 }
 .home-v2 .boss-main .boss-visual {
-  opacity: .82;
+  opacity: 1;
 }
 
 /* 긴 모바일 화면에서는 보스 컬러 영역이 고정 내비게이션 위의 남는 높이를 채운다. */
