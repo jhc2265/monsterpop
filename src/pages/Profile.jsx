@@ -99,7 +99,7 @@ export default function Profile() {
     <section className="profile-edit">
       <div className="section-heading"><div><span className="overline">IDENTITY</span><h2>헌터 정보</h2></div></div>
       <label htmlFor="profile-nickname">닉네임</label>
-      <div className="profile-name-input"><Icon name="user" size={19} /><input id="profile-nickname" value={nickname} onChange={(event) => setNickname(event.target.value)} maxLength={16} /></div>
+      <div className="profile-name-input"><Icon name="user" size={19} /><input id="profile-nickname" value={nickname} onChange={(event) => { setNickname(event.target.value); setNotice('') }} maxLength={16} /></div>
     </section>
 
     <section className="profile-avatar-picker">
@@ -113,7 +113,7 @@ export default function Profile() {
             key={monster.id}
             className={`${active ? 'active' : ''} ${!unlocked ? 'locked' : ''}`}
             style={{ '--avatar-color': monster.color }}
-            onClick={() => unlocked && setAvatarUrl(monster.image)}
+            onClick={() => { if (unlocked) { setAvatarUrl(monster.image); setNotice('') } }}
             disabled={!unlocked}
             aria-label={unlocked ? `${monster.name} 선택` : `${monster.name} 잠김`}
           >
@@ -126,7 +126,7 @@ export default function Profile() {
       </div>
     </section>
 
-    {notice && <p className={`profile-notice ${notice.includes('저장했어요') ? 'success' : ''}`}>{notice}</p>}
-    <button className="btn btn-primary profile-save" onClick={saveProfile} disabled={saving}>{saving ? '저장 중...' : '프로필 저장하기'}</button>
+    {notice && !notice.includes('저장했어요') && <p className="profile-notice">{notice}</p>}
+    <button className={`btn btn-primary profile-save ${notice.includes('저장했어요') ? 'saved' : ''}`} onClick={saveProfile} disabled={saving}>{saving ? '저장 중...' : notice.includes('저장했어요') ? '✓ 프로필 저장 완료!' : '프로필 저장하기'}</button>
   </main>
 }

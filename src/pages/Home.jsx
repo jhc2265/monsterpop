@@ -1,6 +1,4 @@
-import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { supabase } from '../lib/supabase'
 import { useAuth } from '../context/AuthContext'
 import { sound } from '../lib/sound'
 import Icon from '../components/Icon'
@@ -13,25 +11,6 @@ import { resolveAvatarUrl } from '../lib/avatar'
 export default function Home() {
   const { user, profile } = useAuth()
   const navigate = useNavigate()
-  const [best, setBest] = useState(0)
-  const [rank, setRank] = useState(null)
-
-  useEffect(() => { if (user) loadStats() }, [user])
-
-  async function loadStats() {
-    const { data: mine } = await supabase.from('scores').select('score').eq('user_id', user.id).order('score', { ascending: false }).limit(1)
-    const myBest = mine?.[0]?.score ?? 0
-    setBest(myBest)
-
-    if (myBest > 0) {
-      const { data: all } = await supabase.from('scores').select('user_id, score').order('score', { ascending: false })
-      const bestByUser = {}
-      for (const row of all || []) if (bestByUser[row.user_id] === undefined) bestByUser[row.user_id] = row.score
-      const scores = Object.values(bestByUser).sort((a, b) => b - a)
-      const currentRank = scores.indexOf(myBest) + 1
-      setRank(currentRank)
-    }
-  }
 
   function go(path) {
     sound.unlock()
@@ -74,7 +53,7 @@ export default function Home() {
         <span className="home-hunter-copy">
           <small><b>LV.{progress.level}</b> · {getHunterTitle(progress.level)}</small>
           <strong>{profile?.nickname || '헌터'} 헌터</strong>
-          <em>{best > 0 ? <>최고 <b>{best.toLocaleString()}점</b>{rank ? ` · ${rank}위` : ''} <i>›</i></> : <>첫 기록에 도전해보세요 <i>›</i></>}</em>
+          <em>{progress.needed > 0 ? <>LV.{progress.level + 1}까지 <b>{(progress.needed - progress.current).toLocaleString()} XP</b> <i>›</i></> : <>MAX LEVEL · <b>{getHunterTitle(progress.level)}</b> <i>›</i></>}</em>
         </span>
       </button>
     </header>

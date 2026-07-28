@@ -619,6 +619,7 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
 .ranking-page .rank-num { width: 30px; height: 30px; display: grid; place-items: center; border-radius: 10px; background: rgba(132,74,225,.12); color: #b5a9cd; }
 .ranking-page .avatar { background: #211546; }
 .ranking-page .avatar img { object-fit: contain; transform: scale(1.08); }
+.ranking-page .podium-medal .avatar img { transform: translateY(8%) scale(1.08); }
 .ranking-page .rank-score { color: #58e7ff; text-shadow: 0 0 11px rgba(64,220,255,.16); }
 
 .collection-tools { margin-bottom: 15px; }
@@ -718,6 +719,7 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
 .profile-notice { margin: 14px 0 0; color: #ff8fae; text-align: center; }
 .profile-notice.success { color: #64efc5; }
 .profile-save { width: 100%; margin-top: 15px; }
+.profile-save.saved { background: linear-gradient(135deg, #28cfa4, #39d9d0); box-shadow: 0 10px 28px rgba(40,207,164,.22); color: #071d20; }
 
 /* The home header acts as a compact hunter identity card. */
 .home-daily-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 10px; }
