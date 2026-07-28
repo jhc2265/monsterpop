@@ -4,11 +4,12 @@ import { useAuth } from '../context/AuthContext'
 import { sound } from '../lib/sound'
 import Icon from '../components/Icon'
 import BottomNav from '../components/BottomNav'
+import { resolveAvatarUrl } from '../lib/avatar'
 
 export default function Ranking() {
-  const { user } = useAuth()
+  const { user, profile } = useAuth()
   const [tab, setTab] = useState('all'); const [rows, setRows] = useState([]); const [loading, setLoading] = useState(true); const [prevScore, setPrevScore] = useState(null)
-  useEffect(() => { load() }, [tab])
+  useEffect(() => { load() }, [tab, profile?.avatar_url, profile?.nickname])
   useEffect(() => {
     if (!user) return
     supabase.from('scores').select('score').eq('user_id', user.id).order('score', { ascending: false }).limit(2)
@@ -28,7 +29,12 @@ export default function Ranking() {
     const { data, error } = await query.limit(300)
     if (error) { setRows([]); setLoading(false); return }
     const seen = new Set(); const best = []
-    for (const row of data || []) { if (!seen.has(row.user_id)) { seen.add(row.user_id); best.push(row) } }
+    for (const original of data || []) {
+      const row = original.user_id === user.id
+        ? { ...original, profiles: { ...original.profiles, nickname: profile?.nickname || original.profiles?.nickname, avatar_url: profile?.avatar_url || original.profiles?.avatar_url } }
+        : original
+      if (!seen.has(row.user_id)) { seen.add(row.user_id); best.push(row) }
+    }
     setRows(best.slice(0, 50)); setLoading(false)
   }
   const podium = rows.slice(0, 3)
@@ -49,7 +55,7 @@ export default function Ranking() {
   </main>
 }
 
-function Avatar({ row }) { return <div className="avatar"><img src={row?.profiles?.avatar_url || '/images/ranking/default-hunter.png'} alt="" /></div> }
+function Avatar({ row }) { return <div className="avatar"><img src={resolveAvatarUrl(row?.profiles?.avatar_url)} alt="" /></div> }
 function Podium({ row, rank, me }) { return <article className={`podium-item rank-${rank} ${me ? 'me' : ''}`}><div className="podium-medal"><Avatar row={row} /><img className="podium-frame" src={`/images/ranking/frame-${rank === 1 ? 'gold' : rank === 2 ? 'silver' : 'bronze'}.png`} alt="" /><b>{rank}</b></div><strong>{row.profiles?.nickname || '익명 헌터'}</strong><span>{row.score.toLocaleString()}점</span><small>최고 콤보 {row.max_combo || 0}</small></article> }
 function PodiumPlaceholder({ rank }) { return <article className={`podium-item rank-${rank} placeholder`}><div className="podium-medal"><Avatar /><img className="podium-frame" src={`/images/ranking/frame-${rank === 1 ? 'gold' : rank === 2 ? 'silver' : 'bronze'}.png`} alt="" /><b>{rank}</b></div><strong>도전자를 기다려요</strong><span>-</span></article> }
 function RankRow({ row, rank, me }) { return <article className={`rank-item ${me ? 'me' : ''}`}><b className="rank-num">{rank}</b><Avatar row={row} /><div className="rank-name"><strong>{row.profiles?.nickname || '익명 헌터'}{me && <em>나</em>}</strong><small>최고 콤보 {row.max_combo || 0}</small></div><b className="rank-score">{row.score.toLocaleString()}점</b></article> }

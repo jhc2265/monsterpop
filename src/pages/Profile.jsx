@@ -2,8 +2,8 @@ import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../context/AuthContext'
-import { MONSTERS } from '../lib/monsters'
-import { getBossArchiveEntries, isMonsterDiscovered } from '../lib/bosses'
+import { isMonsterDiscovered } from '../lib/bosses'
+import { getProfileAvatarOptions, resolveAvatarUrl } from '../lib/avatar'
 import { getHunterTitle, getLevelProgress, resolveProgress } from '../lib/progression'
 import { sound } from '../lib/sound'
 import Icon from '../components/Icon'
@@ -14,15 +14,19 @@ export default function Profile() {
   const progress = getLevelProgress(resolveProgress(profile, user.id).xp)
   const discovered = resolveProgress(profile, user.id).discovered
   const [nickname, setNickname] = useState(profile?.nickname || '')
-  const [avatarUrl, setAvatarUrl] = useState(profile?.avatar_url || '/images/monsters/slime.webp')
+  const [avatarUrl, setAvatarUrl] = useState(() => resolveAvatarUrl(profile?.avatar_url))
   const [stats, setStats] = useState({ bestScore: 0, bestCombo: 0, hunts: 0 })
   const [saving, setSaving] = useState(false)
   const [notice, setNotice] = useState('')
 
-  const avatars = useMemo(() => [
-    ...MONSTERS.filter((monster) => monster.id !== 'boss'),
-    ...getBossArchiveEntries(),
-  ], [])
+  const avatars = useMemo(getProfileAvatarOptions, [])
+
+  useEffect(() => {
+    if (profile) {
+      setNickname(profile.nickname || '')
+      setAvatarUrl(resolveAvatarUrl(profile.avatar_url))
+    }
+  }, [profile])
 
   useEffect(() => {
     supabase

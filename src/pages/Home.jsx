@@ -8,6 +8,7 @@ import BottomNav from '../components/BottomNav'
 import { getHunterTitle, getLevelProgress, getMonsterUnlockLevel, resolveProgress } from '../lib/progression'
 import { getDailyMissions } from '../lib/missions'
 import { getDailyBoss, koreaToday } from '../lib/bosses'
+import { resolveAvatarUrl } from '../lib/avatar'
 
 export default function Home() {
   const { user, profile } = useAuth()
@@ -69,7 +70,7 @@ export default function Home() {
     </div>
     <header className="home-welcome">
       <button className="home-hunter-identity" onClick={() => go('/profile')} aria-label="내 프로필 보기">
-        <span className="home-hunter-avatar"><i /><img src={profile?.avatar_url || '/images/monsters/slime.webp'} alt="" /></span>
+        <span className="home-hunter-avatar"><i /><img src={resolveAvatarUrl(profile?.avatar_url)} alt="" /><em aria-hidden="true">✎</em></span>
         <span className="home-hunter-copy">
           <small><b>LV.{progress.level}</b> · {getHunterTitle(progress.level)}</small>
           <strong>{profile?.nickname || '헌터'} 헌터</strong>
