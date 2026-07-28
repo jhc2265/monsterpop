@@ -1110,11 +1110,16 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
 .progress-mission.complete > b { color: var(--cyan); }
 .mission-list { margin-top: 12px; padding-top: 11px; border-top: 1px solid rgba(255,255,255,.08); display: grid; gap: 17px; }
 .mission-list-head { display: flex; align-items: center; justify-content: space-between; }
-.mission-list-head small { color: #bd8cff; }
+.mission-list-head small { display: inline-flex; align-items: center; gap: 7px; color: #bd8cff; }
+.mission-list-head small svg { color: #dc73ff; filter: drop-shadow(0 0 6px rgba(220,115,255,.4)); }
 .mission-list-head span { color: #9f97b6; }
-.mission-item { display: flex; align-items: center; gap: 10px; }
-.mission-check { flex: 0 0 auto; width: 26px; height: 26px; display: grid; place-items: center; border-radius: 8px; background: rgba(152,75,255,.15); color: #bd8cff; }
-.mission-item.done .mission-check { background: rgba(96,231,176,.16); color: var(--success); }
+.mission-item { display: flex; align-items: center; gap: 13px; }
+.mission-check { display: grid; place-items: center; flex: 0 0 30px; width: 30px; height: 30px; background: transparent; color: #bd8cff; }
+.mission-check svg { overflow: visible; }
+.mission-icon-play { color: #c982ff; filter: drop-shadow(0 0 6px rgba(201,130,255,.34)); }
+.mission-icon-kills { color: #d97aff; filter: drop-shadow(0 0 6px rgba(217,122,255,.34)); }
+.mission-icon-combo { color: #ffd45b; filter: drop-shadow(0 0 6px rgba(255,212,91,.3)); }
+.mission-item.done .mission-check { color: var(--success); filter: drop-shadow(0 0 6px rgba(96,231,176,.32)); }
 .mission-body { min-width: 0; flex: 1; }
 .mission-body-top { display: flex; align-items: baseline; gap: 8px; }
 .mission-body-top strong { flex: 1; }
