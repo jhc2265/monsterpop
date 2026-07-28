@@ -3573,7 +3573,7 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
 .home-v2 .boss-card::before {
   position: absolute;
   z-index: 0;
-  top: -42px;
+  top: -28px;
   right: 0;
   bottom: -10px;
   left: 0;
