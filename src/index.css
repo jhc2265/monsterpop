@@ -726,6 +726,7 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
 .home-daily-greeting { position: relative; display: flex; min-width: 0; align-items: center; gap: 7px; margin: 0 0 0 3px; color: #c8c0d8; font-family: 'Paperlogy', sans-serif; font-size: 17px; font-weight: 700; line-height: 1; letter-spacing: -.02em; white-space: nowrap; animation: homeGreetingIn .46s ease-out both; }
 .home-greeting-text { display: block; line-height: 1.2; }
 .home-greeting-burst { position: relative; display: grid; place-items: center; flex: 0 0 22px; width: 22px; height: 22px; color: #f04cbd; isolation: isolate; }
+.home-daily-greeting > .home-greeting-burst:not(.home-greeting-burst-tail) { transform: translateY(2px); }
 .home-daily-greeting.signal .home-greeting-burst { color: #55e9e0; }
 .home-greeting-burst-tail { position: absolute; right: -11px; top: 50%; width: 12px; height: 22px; margin-top: -11px; pointer-events: none; }
 .home-greeting-burst-tail::before { inset: 5px 0; }
@@ -3594,4 +3595,19 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
 }
 .home-v2 .boss-main .boss-visual {
   opacity: .82;
+}
+
+/* 긴 모바일 화면에서는 보스 컬러 영역이 고정 내비게이션 위의 남는 높이를 채운다. */
+@media (max-width: 699px) and (min-height: 820px) {
+  .home-v2 {
+    display: flex;
+    min-height: 100svh;
+    min-height: 100dvh;
+    flex-direction: column;
+  }
+
+  .home-v2 .boss-card {
+    flex: 1 0 auto;
+    margin-bottom: 0;
+  }
 }
