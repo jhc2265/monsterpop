@@ -68,9 +68,12 @@ export default function Home() {
       : { label: 'TODAY’S HUNT', name: '번개 토끼 출현!', copy: '빠르게 움직이는 번개 토끼를 30초 안에 사냥하세요.', image: '/images/monsters/rabbit.webp', grade: '희귀 몬스터', score: '200점', difficulty: '★★☆', path: '/game' }
 
   return <main className="page home-page home-v2">
-    <p className={`home-daily-greeting ${isPopGreeting ? 'pop' : 'signal'}`}>
-      <i>✦</i> {isPopGreeting ? '오늘도 팝! 터뜨릴 준비됐나요?' : '몬스터 출현 신호를 발견했어요!'}
-    </p>
+    <div className="home-daily-row">
+      <p className={`home-daily-greeting ${isPopGreeting ? 'pop' : 'signal'}`}>
+        <i>✦</i> {isPopGreeting ? '오늘도 팝! 터뜨릴 준비됐나요?' : '몬스터 출현 신호를 발견했어요!'}
+      </p>
+      <button className="home-utility-btn" onClick={toggleMute} aria-label={muted ? '소리 켜기' : '소리 끄기'}><Icon name={muted ? 'mute' : 'sound'} size={19} /></button>
+    </div>
     <header className="home-welcome">
       <button className="home-hunter-identity" onClick={() => go('/profile')} aria-label="내 프로필 보기">
         <span className="home-hunter-avatar"><i /><img src={profile?.avatar_url || '/images/monsters/slime.webp'} alt="" /></span>
@@ -80,10 +83,7 @@ export default function Home() {
           <em>{best > 0 ? <>최고 <b>{best.toLocaleString()}점</b>{rank ? ` · ${rank}위` : ''} <i>›</i></> : <>첫 기록에 도전해보세요 <i>›</i></>}</em>
         </span>
       </button>
-      <div className="topbar-actions">
-        <button className="icon-btn" onClick={toggleMute} aria-label={muted ? '소리 켜기' : '소리 끄기'}><Icon name={muted ? 'mute' : 'sound'} /></button>
-        <button className="icon-btn" onClick={() => go('/settings')} aria-label="설정"><Icon name="settings" /></button>
-      </div>
+      <button className="home-utility-btn home-settings-btn" onClick={() => go('/settings')} aria-label="설정"><Icon name="settings" size={20} /></button>
     </header>
 
     <section className="hunter-progress mission-card" aria-label="오늘의 미션">

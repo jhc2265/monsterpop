@@ -720,10 +720,14 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
 .profile-save { width: 100%; margin-top: 15px; }
 
 /* The home header acts as a compact hunter identity card. */
-.home-daily-greeting { display: flex; align-items: center; gap: 7px; margin: 0 0 12px 3px; color: #c8c0d8; font-family: 'Paperlogy', sans-serif; font-size: 17px; font-weight: 700; line-height: 1.3; letter-spacing: -.02em; }
+.home-daily-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 10px; }
+.home-daily-greeting { display: flex; min-width: 0; align-items: center; gap: 7px; margin: 0 0 0 3px; color: #c8c0d8; font-family: 'Paperlogy', sans-serif; font-size: 17px; font-weight: 700; line-height: 1.3; letter-spacing: -.02em; white-space: nowrap; }
 .home-daily-greeting i { font-size: 14px; font-style: normal; }
 .home-daily-greeting.signal i { color: #55e9e0; text-shadow: 0 0 10px rgba(85,233,224,.5); }
 .home-daily-greeting.pop i { color: #f04cbd; text-shadow: 0 0 10px rgba(240,76,189,.5); }
+.home-utility-btn { display: grid; place-items: center; flex: 0 0 34px; width: 34px; height: 34px; padding: 0; border: 0; border-radius: 11px; background: transparent; color: #c9c2dc; transition: color .16s ease, background .16s ease, transform .16s ease; }
+.home-utility-btn:hover, .home-utility-btn:focus-visible { outline: 0; background: rgba(145,104,220,.14); color: #fff; }
+.home-utility-btn:active { background: rgba(145,104,220,.22); transform: scale(.92); }
 .home-welcome { align-items: center; }
 .home-hunter-identity { display: flex; align-items: center; min-width: 0; flex: 1; gap: 10px; padding: 2px 0; border: 0; background: transparent; color: inherit; text-align: left; }
 .home-hunter-avatar { position: relative; display: grid; place-items: center; flex: 0 0 62px; width: 62px; height: 66px; }
@@ -736,18 +740,18 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
 .home-hunter-copy > em { margin-top: 7px; color: #aaa1c0; font-size: 11px; font-style: normal; line-height: 1.2; white-space: nowrap; }
 .home-hunter-copy > em b { color: #ffd45b; font-size: 13px; }
 .home-hunter-copy > em i { margin-left: 2px; color: #d966d1; font-style: normal; }
-.home-welcome .topbar-actions { flex: 0 0 auto; }
+.home-settings-btn { margin-right: 2px; }
 .mission-card { padding-top: 14px; }
 .mission-card .mission-list { margin-top: 0; padding-top: 0; border-top: 0; }
 .mission-card .progress-mission { margin-top: 0; padding-top: 0; border-top: 0; }
 @media (max-width: 390px) {
   .home-welcome { gap: 6px; }
+  .home-daily-row { gap: 4px; }
+  .home-daily-greeting { gap: 5px; font-size: 15px; }
   .home-hunter-identity { gap: 7px; }
   .home-hunter-avatar { flex-basis: 54px; width: 54px; height: 62px; }
   .home-hunter-avatar img { width: 56px; height: 56px; }
   .home-hunter-copy > strong { font-size: 16px; }
-  .home-welcome .topbar-actions { gap: 4px; }
-  .home-welcome .icon-btn { width: 36px; height: 36px; }
 }
 .settings-section { margin-top: 24px; }
 .settings-section h2 { display: flex; align-items: center; gap: 8px; margin: 0 0 9px 4px; color: #b895ff; }
