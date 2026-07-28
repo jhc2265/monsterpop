@@ -7,7 +7,7 @@ import Icon from '../components/Icon'
 import BottomNav from '../components/BottomNav'
 import { getHunterTitle, getLevelProgress, getMonsterUnlockLevel, resolveProgress } from '../lib/progression'
 import { getDailyMissions } from '../lib/missions'
-import { getDailyBoss } from '../lib/bosses'
+import { getDailyBoss, koreaToday } from '../lib/bosses'
 
 export default function Home() {
   const { user, profile } = useAuth()
@@ -48,6 +48,7 @@ export default function Home() {
   const progress = getLevelProgress(resolveProgress(profile, user.id).xp)
   const missions = progress.level >= 2 ? getDailyMissions(user.id) : []
   const dailyBoss = getDailyBoss()
+  const isPopGreeting = Number(koreaToday().slice(-2)) % 2 === 0
   // 보스 카드는 최고 레벨이 아니라 보스 해금 레벨(MONSTER_LEVEL.boss)을 따른다
   const featured = progress.level >= getMonsterUnlockLevel('boss')
     ? {
@@ -67,6 +68,9 @@ export default function Home() {
       : { label: 'TODAY’S HUNT', name: '번개 토끼 출현!', copy: '빠르게 움직이는 번개 토끼를 30초 안에 사냥하세요.', image: '/images/monsters/rabbit.webp', grade: '희귀 몬스터', score: '200점', difficulty: '★★☆', path: '/game' }
 
   return <main className="page home-page home-v2">
+    <p className={`home-daily-greeting ${isPopGreeting ? 'pop' : 'signal'}`}>
+      <i>✦</i> {isPopGreeting ? '오늘도 팝! 터뜨릴 준비됐나요?' : '몬스터 출현 신호를 발견했어요!'}
+    </p>
     <header className="home-welcome">
       <button className="home-hunter-identity" onClick={() => go('/profile')} aria-label="내 프로필 보기">
         <span className="home-hunter-avatar"><i /><img src={profile?.avatar_url || '/images/monsters/slime.webp'} alt="" /></span>
