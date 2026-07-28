@@ -3560,6 +3560,7 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
 .home-v2 .boss-card {
   position: relative;
   isolation: isolate;
+  overflow: visible;
   width: calc(100% + 36px);
   margin-right: -18px;
   margin-left: -18px;
@@ -3572,7 +3573,10 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
 .home-v2 .boss-card::before {
   position: absolute;
   z-index: 0;
-  inset: 0;
+  top: -42px;
+  right: 0;
+  bottom: -10px;
+  left: 0;
   background:
     radial-gradient(circle at 82% 42%, color-mix(in srgb, var(--featured-boss-color, #b84dff) 24%, transparent), transparent 34%),
     linear-gradient(118deg, rgba(39,20,91,.9), color-mix(in srgb, var(--featured-boss-color, #b84dff) 16%, rgba(20,10,52,.94)));
