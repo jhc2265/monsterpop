@@ -1117,8 +1117,8 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
 .mission-check { display: grid; place-items: center; flex: 0 0 30px; width: 30px; height: 30px; background: transparent; color: #bd8cff; }
 .mission-check svg { overflow: visible; }
 .mission-icon-play { color: #c982ff; filter: drop-shadow(0 0 6px rgba(201,130,255,.34)); }
-.mission-icon-kills { color: #d97aff; filter: drop-shadow(0 0 6px rgba(217,122,255,.34)); }
-.mission-icon-combo { color: #ffd45b; filter: drop-shadow(0 0 6px rgba(255,212,91,.3)); }
+.mission-icon-kills { color: #c982ff; filter: drop-shadow(0 0 6px rgba(201,130,255,.34)); }
+.mission-icon-combo { color: #c982ff; filter: drop-shadow(0 0 6px rgba(201,130,255,.34)); }
 .mission-item.done .mission-check { color: var(--success); filter: drop-shadow(0 0 6px rgba(96,231,176,.32)); }
 .mission-body { min-width: 0; flex: 1; }
 .mission-body-top { display: flex; align-items: baseline; gap: 8px; }
