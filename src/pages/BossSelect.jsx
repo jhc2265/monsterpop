@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom'
-import { DAILY_BOSSES, getAvailableBosses, getBossRecord, getBossScheduleLabel, getDailyBoss, isSundayBossDay } from '../lib/bosses'
+import { DAILY_BOSSES, getBossRecord, getDailyBoss } from '../lib/bosses'
 import { useAuth } from '../context/AuthContext'
 import { getLevel, resolveProgress } from '../lib/progression'
 import { sound } from '../lib/sound'
@@ -10,8 +10,6 @@ export default function BossSelect() {
   const { user, profile } = useAuth()
   const level = getLevel(resolveProgress(profile, user.id).xp)
   const todayBossId = getDailyBoss().id
-  const sundayOpen = isSundayBossDay()
-  const availableBossIds = new Set(getAvailableBosses().map((boss) => boss.id))
 
   function challenge(boss) {
     sound.unlock()
@@ -26,20 +24,17 @@ export default function BossSelect() {
       <span className="topbar-spacer" />
     </header>
 
-    <p className="boss-select-intro">{sundayOpen
-      ? '일요일 자유 토벌이 열렸어요. 모든 보스에 도전할 수 있고, 첫 처치 한 번만 특별 보상을 받습니다.'
-      : '오늘 출현한 보스에 도전하세요. 첫 처치 보상 이후에도 자유롭게 연습할 수 있습니다.'}</p>
+    <p className="boss-select-intro">모든 보스는 자유롭게 도전할 수 있어요. 오늘의 보스를 처음 처치하면 일일 보너스 XP를 받습니다.</p>
 
     <ul className="boss-select-list">
       {DAILY_BOSSES.map((boss) => {
         const record = getBossRecord(user.id, boss.id)
         const levelLocked = level < boss.unlockLevel
-        const unavailable = !availableBossIds.has(boss.id)
-        const locked = levelLocked || unavailable
+        const locked = levelLocked
         const isToday = boss.id === todayBossId
         return <li key={boss.id}>
           <button
-            className={`boss-select-card${isToday ? ' today' : ''}${unavailable ? ' unavailable' : ''}${locked ? ' locked' : ''}`}
+            className={`boss-select-card${isToday ? ' today' : ''}${locked ? ' locked' : ''}`}
             style={{ '--boss-color': boss.color }}
             onClick={() => challenge(boss)}
             disabled={locked}
@@ -49,15 +44,14 @@ export default function BossSelect() {
               <span className="boss-select-tags">
                 <em>{boss.element}</em>
                 {isToday && <b className="tag-today">오늘의 보스</b>}
-                {sundayOpen && !isToday && <b className="tag-open">자유 토벌</b>}
-                {unavailable && <b className="tag-schedule">{getBossScheduleLabel(boss.id)}</b>}
+                {!isToday && <b className="tag-open">자유 도전</b>}
                 {record.clearedToday && <b className="tag-cleared">클리어</b>}
               </span>
               <strong>{boss.name}</strong>
               <small>{boss.title}</small>
               <span className="boss-select-meta">
                 <span>난이도 {'★'.repeat(boss.difficulty)}</span>
-                <span>+{boss.firstClearXp} XP</span>
+                <span>{isToday ? `첫 처치 +${boss.firstClearXp} XP` : '연습 · 기록'}</span>
                 <span>{boss.timeLimit}초 제한</span>
               </span>
             </span>

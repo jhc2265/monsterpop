@@ -119,11 +119,11 @@ export function isSundayBossDay(date = new Date()) {
 }
 
 export function getAvailableBosses(date = new Date()) {
-  return isSundayBossDay(date) ? DAILY_BOSSES : [getDailyBoss(date)]
+  return DAILY_BOSSES
 }
 
 export function isBossAvailableToday(bossId, date = new Date()) {
-  return getAvailableBosses(date).some((boss) => boss.id === bossId)
+  return DAILY_BOSSES.some((boss) => boss.id === bossId)
 }
 
 export function getBossScheduleLabel(bossId) {
@@ -166,6 +166,7 @@ function readState(userId) {
   if (!state || typeof state !== 'object') state = {}
   return {
     date: state.date || '',
+    rewardDate: state.rewardDate || state.date || '',
     clearedToday: Array.isArray(state.clearedToday) ? state.clearedToday : [],
     bestTimeLeft: state.bestTimeLeft && typeof state.bestTimeLeft === 'object' ? state.bestTimeLeft : {},
     streak: Number.isFinite(state.streak) ? state.streak : 0,
@@ -195,24 +196,24 @@ export function recordBossClear(userId, bossId, { timeLeft = 0 } = {}) {
   const today = koreaToday()
   const state = readState(userId)
   const isNewDay = state.date !== today
-  // 일요일은 전 보스를 열지만 큰 보상은 처음 처치한 한 마리에만 지급한다.
-  const firstToday = isNewDay || (isSundayBossDay()
-    ? state.clearedToday.length === 0
-    : !state.clearedToday.includes(bossId))
+  // 모든 보스는 자유롭게 플레이할 수 있지만 일일 XP는 오늘의 보스 첫 처치에만 지급한다.
+  const isDailyBoss = bossId === getDailyBoss().id
+  const firstToday = isDailyBoss && (isNewDay || !state.clearedToday.includes(bossId))
 
-  // 어제 클리어했으면 스트릭을 잇고, 하루라도 걸렀으면 1부터 다시 센다.
+  // 자유 도전은 스트릭에 영향을 주지 않고 오늘의 보스 첫 처치만 이어간다.
   const yesterday = koreaToday(new Date(Date.now() - 86400000))
-  const streak = isNewDay ? (state.date === yesterday ? state.streak + 1 : 1) : state.streak
+  const streak = firstToday ? (state.rewardDate === yesterday ? state.streak + 1 : 1) : state.streak
 
   const previousBest = state.bestTimeLeft[bossId] ?? -1
   const newRecord = timeLeft > previousBest
 
   writeState(userId, {
     date: today,
+    rewardDate: firstToday ? today : state.rewardDate,
     clearedToday: isNewDay ? [bossId] : [...new Set([...state.clearedToday, bossId])],
     bestTimeLeft: { ...state.bestTimeLeft, [bossId]: newRecord ? timeLeft : previousBest },
     streak,
   })
 
-  return { firstToday, newRecord, streak, bestTimeLeft: newRecord ? timeLeft : previousBest }
+  return { firstToday, isDailyBoss, newRecord, streak, bestTimeLeft: newRecord ? timeLeft : previousBest }
 }

@@ -5,7 +5,7 @@ import Icon from '../components/Icon'
 import BottomNav from '../components/BottomNav'
 import { getHunterTitle, getLevelProgress, getMonsterUnlockLevel, resolveProgress } from '../lib/progression'
 import { getDailyMissions } from '../lib/missions'
-import { getBossById, getDailyBoss, koreaToday } from '../lib/bosses'
+import { getBossById, getDailyBoss, hasClearedBossToday, koreaToday } from '../lib/bosses'
 import { resolveAvatarUrl } from '../lib/avatar'
 
 export default function Home() {
@@ -22,6 +22,7 @@ export default function Home() {
   const missions = progress.level >= 2 ? getDailyMissions(user.id) : []
   const previewBossId = new URLSearchParams(window.location.search).get('boss')
   const dailyBoss = getBossById(previewBossId) || getDailyBoss()
+  const dailyBossRewardClaimed = hasClearedBossToday(user.id, dailyBoss.id)
   const isPopGreeting = Number(koreaToday().slice(-2)) % 2 === 0
   // 보스 카드는 최고 레벨이 아니라 보스 해금 레벨(MONSTER_LEVEL.boss)을 따른다
   const featured = progress.level >= getMonsterUnlockLevel('boss')
@@ -31,15 +32,15 @@ export default function Home() {
         copy: dailyBoss.cardCopy || dailyBoss.description,
         image: dailyBoss.image,
         grade: '일일 보스',
-        score: `${dailyBoss.firstClearXp} XP`,
+        score: dailyBossRewardClaimed ? '보상 획득 완료' : `+${dailyBoss.firstClearXp} XP`,
         difficulty: '★'.repeat(dailyBoss.difficulty),
         path: '/boss',
         bossId: dailyBoss.id,
         bossColor: dailyBoss.color,
       }
     : progress.level >= 3
-      ? { label: 'TODAY’S HUNT', name: '불꽃 여우 출현!', copy: '고득점 몬스터 불꽃 여우를 30초 안에 사냥하세요.', image: '/images/monsters/fox.webp', grade: '영웅 몬스터', score: '300점', difficulty: '★★☆', path: '/game' }
-      : { label: 'TODAY’S HUNT', name: '번개 토끼 출현!', copy: '빠르게 움직이는 번개 토끼를 30초 안에 사냥하세요.', image: '/images/monsters/rabbit.webp', grade: '희귀 몬스터', score: '200점', difficulty: '★★☆', path: '/game' }
+      ? { label: 'TODAY’S HUNT', name: '불꽃 여우 출현!', copy: '고득점 몬스터 불꽃 여우를 30초 안에 사냥하세요.', image: '/images/monsters/fox.webp', grade: '영웅 몬스터', score: '+300점', difficulty: '★★☆', path: '/game' }
+      : { label: 'TODAY’S HUNT', name: '번개 토끼 출현!', copy: '빠르게 움직이는 번개 토끼를 30초 안에 사냥하세요.', image: '/images/monsters/rabbit.webp', grade: '희귀 몬스터', score: '+200점', difficulty: '★★☆', path: '/game' }
 
   return <main className="page home-page home-v2">
     <div className="home-daily-row">
@@ -96,7 +97,7 @@ export default function Home() {
       </div>
       {/* 메타는 boss-main 밖에 둔다. 안에 두면 몬스터가 가장 넓어지는 높이와 겹쳐,
           화면이 좁아질 때마다 칩이 그림 아래로 파고든다 */}
-      <div className="hunt-meta"><span>{featured.grade}</span><span>+{featured.score}</span><span>난이도 {featured.difficulty}</span></div>
+      <div className="hunt-meta"><span>{featured.grade}</span><span>{featured.score}</span><span>난이도 {featured.difficulty}</span></div>
       <button className="boss-start" onClick={() => go(featured.path)}><img src="/images/ui/hunt-swords.webp" alt="" /><span>{featured.path === '/boss' ? '보스 도전하기' : '지금 사냥하기'}</span><b>›</b></button>
     </section>
     <BottomNav />

@@ -56,8 +56,8 @@ export default function Result() {
     const missionBonus = recordGameForMissions(user.id, { maxCombo, totalKills })
     setMissionXp(missionBonus)
     setMissionsDone(getDailyMissions(user.id).filter((mission) => mission.done).length)
-    // 보스전은 사냥 공식(몬스터 수 기반)을 쓰면 32XP 밖에 안 나온다.
-    // 평일은 대표 보스 첫 클리어, 일요일은 자유 토벌 중 첫 처치 한 번만 XP를 준다.
+    // 보스전은 사냥 공식 대신 오늘의 보스 첫 처치 보상을 쓴다.
+    // 다른 보스와 반복 도전은 기록·연습용이며 일일 보스 XP를 중복 지급하지 않는다.
     let gained
     if (mode === 'boss') {
       const boss = activeBoss
@@ -143,7 +143,7 @@ export default function Result() {
         </div>
         <div className="reward-sources">
           {isBossMode ? bossClear ? <>
-            <div><small>{bossReward?.firstToday ? '첫 격파' : '반복 도전'}</small><strong>+{Math.max(0, xpGain - missionXp)}</strong></div>
+            <div><small>{bossReward?.firstToday ? '오늘의 보스' : bossReward?.isDailyBoss ? '보상 완료' : '자유 도전'}</small><strong>+{Math.max(0, xpGain - missionXp)}</strong></div>
             {missionTile}
             <div><small>남은 시간</small><strong>{bossTimeLeft}초</strong></div>
           </> : <>
@@ -160,7 +160,9 @@ export default function Result() {
           ? bossClear
             ? bossReward?.firstToday
               ? <>오늘 첫 격파! {bossReward.streak > 1 ? <><strong>{bossReward.streak}일 연속</strong> 달성</> : <>내일도 이어가 보세요</>}</>
-              : <>오늘은 이미 격파했어요. 반복 도전은 <strong>연습</strong>으로 기록됩니다</>
+              : bossReward?.isDailyBoss
+                ? <>오늘의 보상은 이미 받았어요. 재도전은 <strong>기록 갱신</strong>으로 남습니다</>
+                : <>자유 도전은 <strong>연습과 기록 갱신</strong>으로 남습니다</>
             : <>보스 XP는 <strong>격파에 성공</strong>해야 지급돼요</>
           : <>이번 사냥에서 몬스터 <strong>{totalKills}마리</strong>를 처치했어요</>}</p>
       </div>

@@ -58,7 +58,7 @@ export default function Collection() {
         <span className="collection-grade" data-grade={getGradeKey(monster.grade)}>{monster.grade}</span>
         <MonsterImage monster={monster} />
         {!unlocked && <span className="collection-lock"><Icon name="lock" size={18} /></span>}
-        <div><h2>{unlocked ? monster.name : '???'}</h2>{!unlocked ? <p><strong>Lv.{requiredLevel}</strong>에서 출현 가능</p> : !discovered ? <><p>{monster.isBoss ? '아직 쓰러뜨리지 못했습니다' : '흔적이 발견되었습니다'}</p><small>{monster.isBoss ? '보스전에서 도전해보세요' : '사냥터에서 직접 만나보세요'}</small></> : monster.isBoss ? <><p>첫 클리어 <strong>{monster.firstClearXp}</strong> XP</p><small>{monster.cycleDays}일마다 출현</small></> : <><p>처치 점수 <strong>{monster.score}</strong></p><small>출현 확률 {Math.round((monster.weight / totalWeight) * 100)}%</small></>}</div>
+        <div><h2>{unlocked ? monster.name : '???'}</h2>{!unlocked ? <p><strong>Lv.{requiredLevel}</strong>에서 출현 가능</p> : !discovered ? <><p>{monster.isBoss ? '아직 쓰러뜨리지 못했습니다' : '흔적이 발견되었습니다'}</p><small>{monster.isBoss ? '보스전에서 도전해보세요' : '사냥터에서 직접 만나보세요'}</small></> : monster.isBoss ? <><p>오늘의 보스 <strong>+{monster.firstClearXp}</strong> XP</p><small>언제든 자유롭게 도전할 수 있어요</small></> : <><p>처치 점수 <strong>{monster.score}</strong></p><small>출현 확률 {Math.round((monster.weight / totalWeight) * 100)}%</small></>}</div>
       </button>
       })}
     </section>
@@ -74,7 +74,7 @@ export default function Collection() {
       <div className="monster-howto"><span className="howto-cue">{selected.cue}</span><span className="howto-body"><small>처치 방법</small><strong>{selected.hint}</strong></span></div>
       {/* 보스는 처치 점수·출현 확률·이동 속도가 없다. 보스전에서 의미 있는 값으로 바꾼다. */}
       {selected.isBoss
-        ? <div className="monster-facts"><div><small>첫 클리어</small><strong>{selected.firstClearXp} XP</strong></div><div><small>제한 시간</small><strong>{selected.timeLimit}초</strong></div><div><small>출현 주기</small><strong>{selected.cycleDays}일마다</strong></div></div>
+        ? <div className="monster-facts"><div><small>일일 보너스</small><strong>+{selected.firstClearXp} XP</strong></div><div><small>제한 시간</small><strong>{selected.timeLimit}초</strong></div><div><small>도전 방식</small><strong>자유 도전</strong></div></div>
         : <div className="monster-facts"><div><small>처치 점수</small><strong>{selected.score}점</strong></div><div><small>이동 속도</small><strong>{selected.speed}</strong></div><div><small>출현 확률</small><strong>{Math.round((selected.weight / totalWeight) * 100)}%</strong></div></div>}
       <button className="btn btn-primary" onClick={() => navigate(selected.isBoss ? `/boss/${selected.id}` : '/game')}>{selected.isBoss ? '이 보스 도전하러 가기' : '이 몬스터 사냥하러 가기'}</button>
     </section></div>}

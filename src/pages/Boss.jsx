@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { getBossById, getDailyBoss, isBossAvailableToday } from '../lib/bosses'
+import { getBossById, getDailyBoss } from '../lib/bosses'
 import { sound } from '../lib/sound'
 import Icon from '../components/Icon'
 
@@ -82,10 +82,10 @@ const BOSS_MECHANICS = {
 export default function Boss() {
   const navigate = useNavigate()
   const { bossId } = useParams()
-  // 평일에는 오늘 출현한 보스만, 일요일에는 네 보스 모두 직접 도전할 수 있다.
+  // 오늘의 보스 여부는 보상만 결정한다. 전투 자체는 해금된 모든 보스를 자유롭게 연습할 수 있다.
   const [boss] = useState(() => {
     const requestedBoss = getBossById(bossId)
-    return requestedBoss && isBossAvailableToday(requestedBoss.id) ? requestedBoss : getDailyBoss()
+    return requestedBoss || getDailyBoss()
   })
   const pattern = BOSS_PATTERNS[boss.id] || BOSS_PATTERNS['neon-nightmare']
 
@@ -167,6 +167,8 @@ export default function Boss() {
       const startResponseWindow = () => {
         setCueScrambling(false)
         if (boss.id === 'glitch-king-slime') setJudge('신호 확인!')
+        // 그림자 장막은 어둡게 보이기만 하면 연출에 그친다. 반응 시간을 실제로 줄여 압박을 만든다.
+        const responseWindow = shadowVeilRef.current ? Math.round(settings.window * 0.72) : settings.window
         // 방어막은 버티면 통과, 나머지는 시간 내 반응하지 못하면 실패.
         cueTimerRef.current = setTimeout(() => {
           if (!playingRef.current) return
@@ -183,7 +185,7 @@ export default function Boss() {
           } else {
             punishRef.current('반응이 늦었어요!')
           }
-        }, type === 'shield' ? pattern.shieldMs : settings.window)
+        }, type === 'shield' ? pattern.shieldMs : responseWindow)
       }
 
       if (boss.id === 'glitch-king-slime') {
@@ -198,10 +200,13 @@ export default function Boss() {
   }, [boss.id, clearTimers, pattern, resetHold])
 
   // 실패 처리 — 콤보를 끊고 제한 시간을 깎는다.
-  function punish(message) {
+  function punish(message, options = {}) {
     let penalty = MISS_TIME_PENALTY
     let penaltyLabel = 'MISS'
-    if (boss.id === 'neon-nightmare' && shadowVeilRef.current) {
+    if (options.penalty) {
+      penalty = options.penalty
+      penaltyLabel = options.label || 'MISS'
+    } else if (boss.id === 'neon-nightmare' && shadowVeilRef.current) {
       penalty = 3
       penaltyLabel = 'SHADOW HIT'
     } else if (boss.id === 'glitch-king-slime') {
@@ -218,6 +223,18 @@ export default function Boss() {
         penalty += 4
         penaltyLabel = 'SOLAR BURST'
         message = '태양 폭발이 일어났어요!'
+        // 시간만 깎으면 타이머 숫자 하나가 바뀔 뿐이라 손해가 보이지 않는다.
+        // 불사조가 터진 열기를 흡수해 체력을 되찾게 해 체력바로 손해를 드러낸다.
+        // 다만 페이즈 경계는 넘지 않는다 — 패턴이 뒤로 돌아가면 억울한 난이도가 된다.
+        const phaseCeiling = phaseRef.current === 1 ? boss.maxHp : phaseRef.current === 2 ? boss.maxHp * 0.7 : boss.maxHp * 0.4
+        const healed = Math.min(Math.floor(phaseCeiling), hpRef.current + (boss.damagePerHit || 1) * 3)
+        const healAmount = healed - hpRef.current
+        if (healAmount > 0) {
+          hpRef.current = healed
+          setHp(healed)
+          message = `불사조가 열기를 흡수했어요 · HP ${healAmount} 회복`
+          penaltyLabel = `SOLAR BURST  +${healAmount}HP`
+        }
         setBurst(true)
         setTimeout(() => setBurst(false), 620)
         sound.mechanic()
@@ -244,7 +261,9 @@ export default function Boss() {
   punishRef.current = punish
 
   function hit(label) {
-    const damage = boss.damagePerHit || 1
+    // 장막은 반응 시간을 깎는 대신 뚫으면 피해가 커진다. 위험만 있고 이득이 없으면 세금일 뿐이다.
+    const veiled = boss.id === 'neon-nightmare' && shadowVeilRef.current
+    const damage = Math.round((boss.damagePerHit || 1) * (veiled ? 1.5 : 1))
     const ventedHeat = boss.id === 'solar-eclipse-phoenix' && cue?.type === 'hold' && heatRef.current > 0
     if (ventedHeat) {
       heatRef.current = Math.max(0, heatRef.current - 40)
@@ -260,8 +279,8 @@ export default function Boss() {
     sound.hit(nextCombo)
     shadowVeilRef.current = false
     setShadowVeil(false)
-    setJudge(ventedHeat ? 'COOLED DOWN!' : label)
-    flash(ventedHeat ? `COOL  -${damage}` : `-${damage}`, phaseRef.current === 3 ? 'rush' : 'hit')
+    setJudge(ventedHeat ? 'COOLED DOWN!' : veiled ? '장막을 뚫었어요!' : label)
+    flash(ventedHeat ? `COOL  -${damage}` : veiled ? `SHADOW BREAK  -${damage}` : `-${damage}`, phaseRef.current === 3 ? 'rush' : 'hit')
     resetHold()
     successfulHitsRef.current += 1
 
@@ -306,8 +325,11 @@ export default function Boss() {
   }
 
   function handlePointerDown(event) {
-    if (!playingRef.current || !cue || phaseBreak || cueScrambling || (frozen && cue.type !== 'thaw')) return
+    if (!playingRef.current || !cue || phaseBreak || (frozen && cue.type !== 'thaw')) return
     event.preventDefault()
+    // 신호가 확정되기 전에 누르면 오작동. 그냥 무시하면 페이크에 속아도 손해가 없어
+    // "기다렸다가 친다"는 이 보스의 요구가 성립하지 않는다. 판단 실수라 패널티는 기본치로 둔다.
+    if (cueScrambling) { punish('신호가 확정되기 전에 눌렀어요!', { penalty: MISS_TIME_PENALTY, label: 'MISFIRE' }); return }
     event.currentTarget.setPointerCapture?.(event.pointerId)
 
     if (cue.type === 'shield') { punish('방어막을 쳤어요!'); return }
@@ -425,10 +447,11 @@ export default function Boss() {
   const cueType = phaseBreak ? null : cue?.type
   const overheated = boss.id === 'solar-eclipse-phoenix' && heat >= 80
   const mechanicActive = shadowVeil || cueScrambling || frozen || overheated
+  // 기믹이 무슨 짓을 하는지 문장으로 못 박아야 플레이어가 대응을 선택할 수 있다.
   const mechanicNotice = shadowVeil
-    ? { title: 'SHADOW VEIL', copy: '그림자 장막이 펼쳐집니다' }
+    ? { title: 'SHADOW VEIL', copy: '반응 시간 단축 · 뚫으면 피해 1.5배' }
     : cueScrambling
-      ? { title: 'SIGNAL ERROR', copy: '신호를 해독하고 있어요' }
+      ? { title: 'SIGNAL ERROR', copy: '확정 전에 누르면 오작동' }
       : frozen
         ? { title: 'TIME FREEZE', copy: '제한 시간이 멈췄습니다' }
         : overheated
