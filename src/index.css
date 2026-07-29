@@ -768,6 +768,17 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
 .profile-identity { position: relative; z-index: 1; text-align: center; }
 .profile-identity small { color: var(--avatar-color); font-weight: 800; }
 .profile-identity h2 { margin: 3px 0 2px; font-size: 27px; }
+
+/* 닉네임 — 홈 카드 · 프로필 히어로 · 설정 계정 줄.
+   셋 다 그 화면의 표제라서 상단바 제목과 같은 표제 폰트를 쓴다.
+   예전에는 폰트를 지정하지 않아 본문 폰트를 물려받았고, 홈에서는 위아래 제목이
+   Paperlogy 인데 가운데 닉네임만 Pretendard 로 렌더됐다.
+   Paperlogy 는 700 · 800 두 굵기만 불러오므로 굵기를 그 아래로 낮추지 말 것. */
+.home-hunter-copy > strong,
+.profile-identity h2,
+.settings-profile strong {
+  font-family: var(--font-display);
+}
 .profile-identity p { margin: 0; color: var(--muted); }
 .profile-xp { position: relative; z-index: 1; margin-top: 17px; }
 .profile-xp > span { display: block; overflow: hidden; height: 8px; border-radius: 10px; background: rgba(255,255,255,.1); }
