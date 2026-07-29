@@ -43,7 +43,7 @@ export default function Home() {
   }
 
   const progress = getLevelProgress(resolveProgress(profile, user.id).xp)
-  const missions = progress.level >= 2 ? getDailyMissions(user.id) : []
+  const missions = progress.level >= 2 ? getDailyMissions(user.id, progress.level) : []
   const previewBossId = new URLSearchParams(window.location.search).get('boss')
   const dailyBoss = getBossById(previewBossId) || getDailyBoss()
   const dailyBossRewardClaimed = hasClearedBossToday(user.id, dailyBoss.id)
@@ -97,7 +97,9 @@ export default function Home() {
       {progress.level >= 2 ? <div className="mission-list">
         <div className="mission-list-head"><small>TODAY’S MISSIONS</small><span>{missions.filter((m) => m.done).length}/{missions.length} 완료</span></div>
         {missions.map((mission) => <div key={mission.id} className={`mission-item ${mission.done ? 'done' : ''}`}>
-          <span className={`mission-check mission-icon-${mission.id}`}><Icon name={{ play: 'missionSword', kills: 'skull', combo: 'bolt' }[mission.id]} size={23} strokeWidth={2.1} /></span>
+          {/* 아이콘·색 클래스는 미션 id 가 아니라 정의(icon)와 지표(metric)를 따른다.
+              id 로 짝을 맞추면 미션을 추가하거나 이름을 바꿀 때 조용히 기본 아이콘으로 떨어진다. */}
+          <span className={`mission-check mission-icon-${mission.metric}`}><Icon name={mission.icon} size={23} strokeWidth={2.1} /></span>
           <div className="mission-body">
             <div className="mission-body-top"><strong>{mission.title}</strong><em>{mission.value}/{mission.goal}</em><b>{mission.done ? '완료' : `+${mission.rewardXp} XP`}</b></div>
             <div className="mission-track"><i style={{ width: `${mission.percent}%` }} /></div>

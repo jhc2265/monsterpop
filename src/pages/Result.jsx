@@ -56,10 +56,22 @@ export default function Result() {
   }
   async function saveProgress(newBest) {
     const totalKills = Object.values(monsterCounts).reduce((sum, count) => sum + count, 0)
+    // 미션 후보가 레벨에 따라 달라지므로 기록 전에 레벨을 알아야 한다.
+    // 홈 화면과 같은 값(resolveProgress)을 써야 두 화면의 미션 목록이 어긋나지 않는다.
+    const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single()
+    const previous = resolveProgress(profile, user.id)
+    const level = getLevel(previous.xp)
     // 미션 지표 이름으로 맞춰 넘긴다. 콤보·점수는 한 판 최고값으로 기록된다.
-    const missionBonus = recordGameForMissions(user.id, { kills: totalKills, combo: maxCombo, score })
+    const missionBonus = recordGameForMissions(user.id, {
+      kills: totalKills,
+      rareKills: countRareKills(monsterCounts),
+      combo: maxCombo,
+      score,
+      bossDamage: mode === 'boss' ? bossDamage : 0,
+      bossClears: mode === 'boss' && bossClear ? 1 : 0,
+    }, level)
     setMissionXp(missionBonus)
-    setMissionsDone(getDailyMissions(user.id).filter((mission) => mission.done).length)
+    setMissionsDone(getDailyMissions(user.id, level).filter((mission) => mission.done).length)
     // 보스전은 사냥 공식 대신 오늘의 보스 첫 처치 보상을 쓴다.
     // 다른 보스와 반복 도전은 기록·연습용이며 일일 보스 XP를 중복 지급하지 않는다.
     let gained
@@ -82,8 +94,6 @@ export default function Result() {
       gained = 20 + totalKills * 2 + (monsterCounts.boss || 0) * 10 + (newBest ? 15 : 0) + missionBonus
     }
     setXpGain(gained)
-    const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single()
-    const previous = resolveProgress(profile, user.id)
     const next = {
       xp: previous.xp + gained,
       discovered: [...new Set([...previous.discovered, ...Object.keys(monsterCounts).filter((id) => monsterCounts[id] > 0)])],
@@ -91,7 +101,7 @@ export default function Result() {
     setXpProgress(getLevelProgress(next.xp))
     setNewDiscoveries(next.discovered.filter((id) => !previous.discovered.includes(id)))
     saveStoredProgress(user.id, next)
-    const oldLevel = getLevel(previous.xp)
+    const oldLevel = level
     const newLevel = getLevel(next.xp)
     if (newLevel > oldLevel) setLevelUp({ oldLevel, newLevel, unlock: LEVEL_UNLOCKS[newLevel] })
     const { error } = await supabase.from('profiles').update({ xp: next.xp, discovered_monsters: next.discovered }).eq('id', user.id)
@@ -212,6 +222,15 @@ export default function Result() {
     </>}
     {levelUp && <LevelUpModal levelUp={levelUp} onClose={() => setLevelUp(null)} onCollection={() => go('/collection')} onTrySkill={() => go('/game', { replace: true })} onOpenMission={() => go('/home')} />}
   </main>
+}
+
+// "희귀 이상"은 일반 등급이 아닌 모든 처치를 센다. 보스는 MONSTERS 에 없어서
+// 목록에 없는 id 는 보스로 보고 포함시킨다.
+function countRareKills(counts) {
+  return Object.entries(counts).reduce((sum, [id, count]) => {
+    const monster = MONSTERS.find((item) => item.id === id)
+    return monster && monster.grade === '일반' ? sum : sum + count
+  }, 0)
 }
 
 function getRepresentativeMonster(counts) {

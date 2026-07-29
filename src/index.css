@@ -648,7 +648,18 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
   justify-content: space-between;
   gap: 12px;
 }
-.collection-sort-row > span { color: var(--muted); }
+/* 발견 수는 이 화면의 성취 지표라 정렬 컨트롤(12px)보다 한 단계 크게 두고,
+   달성한 숫자만 강조해 "얼마나 채웠나"가 먼저 읽히게 한다. */
+.collection-progress {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  color: var(--muted);
+  font-size: var(--fs-body-sm);
+  font-variant-numeric: tabular-nums;
+}
+.collection-progress b { color: var(--primary-light); font-size: var(--fs-h3); font-weight: var(--fw-black); }
+.collection-progress em { margin-left: 2px; font-size: var(--fs-caption); font-style: normal; }
 .filter-chips { display: flex; gap: 7px; overflow-x: auto; padding: 1px 1px 8px; scrollbar-width: none; }
 .filter-chips::-webkit-scrollbar { display: none; }
 .filter-chips button { flex: 0 0 auto; min-height: 36px; padding: 0 13px; border: 1px solid var(--line); border-radius: 999px; background: rgba(18,13,48,.82); color: #9d95b5; cursor: pointer; }
@@ -1259,9 +1270,14 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
 .mission-item { display: flex; align-items: center; gap: 11px; }
 .mission-check { display: grid; place-items: center; flex: 0 0 26px; width: 26px; height: 26px; background: transparent; color: #bd8cff; }
 .mission-check svg { overflow: visible; }
-.mission-icon-play { color: #c982ff; filter: drop-shadow(0 0 6px rgba(201,130,255,.34)); }
-.mission-icon-kills { color: #c982ff; filter: drop-shadow(0 0 6px rgba(201,130,255,.34)); }
-.mission-icon-combo { color: #c982ff; filter: drop-shadow(0 0 6px rgba(201,130,255,.34)); }
+/* 미션 지표별 아이콘 색. 예전에는 미션 id 로 잡아서 미션을 늘리면 색이 빠졌다. */
+.mission-icon-games,
+.mission-icon-kills,
+.mission-icon-combo,
+.mission-icon-score,
+.mission-icon-rareKills,
+.mission-icon-bossDamage,
+.mission-icon-bossClears { color: #c982ff; filter: drop-shadow(0 0 6px rgba(201,130,255,.34)); }
 .mission-item.done .mission-check { color: var(--success); filter: drop-shadow(0 0 6px rgba(96,231,176,.32)); }
 .mission-body { min-width: 0; flex: 1; }
 .mission-body-top { display: flex; align-items: baseline; gap: 8px; }

@@ -31,6 +31,11 @@ export default function Collection() {
     if (sort === 'rare') return [...filtered].sort((a, b) => (a.weight ?? 0) - (b.weight ?? 0))
     return filtered
   }, [archive, filter, sort])
+  // 지금 보고 있는 목록 기준으로 센다 — 등급 필터를 걸면 그 등급의 달성률이 된다.
+  const discoveredCount = useMemo(
+    () => monsters.filter((monster) => isMonsterDiscovered(playerProgress.discovered, monster.id)).length,
+    [monsters, playerProgress.discovered],
+  )
 
   return <main className="page collection-page">
     <header className="topbar topbar-plain">
@@ -41,7 +46,8 @@ export default function Collection() {
       {/* '전체'는 등급이 아니라 필터 해제라서 data-grade 를 붙이지 않고 기본 선택색을 그대로 쓴다 */}
       <div className="filter-chips">{['전체', ...MONSTER_GRADES.map((grade) => grade.label)].map((grade) => <button key={grade} data-grade={grade === '전체' ? undefined : getGradeKey(grade)} className={filter === grade ? 'active' : ''} onClick={() => setFilter(grade)}>{grade}</button>)}</div>
       <div className="collection-sort-row">
-        <span>몬스터 {monsters.length}종</span>
+        {/* 총 개수만으로는 도감을 얼마나 채웠는지 알 수 없다. 발견 수를 분자로 둔다. */}
+        <span className="collection-progress"><b>{discoveredCount}</b> / {monsters.length}<em>발견</em></span>
         <select value={sort} onChange={(event) => setSort(event.target.value)} aria-label="몬스터 정렬">
           <option value="default">기본 순서</option>
           <option value="score">점수 높은 순</option>
