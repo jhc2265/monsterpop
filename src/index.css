@@ -579,7 +579,6 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
 
 /* Hall of Fame */
 .ranking-page { padding-top: 22px; }
-.ranking-topbar { margin-bottom: 22px; }
 .ranking-tabs { padding: 5px; border: 1px solid rgba(171,126,255,.17); border-radius: 18px; background: rgba(18,12,48,.72); }
 .ranking-tabs button { min-height: 42px; border-radius: 13px; color: #9d95b5; }
 .ranking-tabs button.active { background: linear-gradient(130deg, #7040ed, #a93ce3); box-shadow: 0 7px 18px rgba(114,51,218,.26), inset 0 1px rgba(255,255,255,.2); }
@@ -2571,13 +2570,6 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
    ============================================================ */
 
 /* --- 1. 헤더 -------------------------------------------------------- */
-.ranking-page .topbar h1 {
-  font-family: var(--font-display);
-  font-size: var(--fs-h1);
-  font-weight: var(--fw-black);
-  line-height: var(--lh-tight);
-  letter-spacing: var(--ls-tight);
-}
 
 /* --- 2. 히어로 · 시상대 --------------------------------------------- */
 .ranking-hero-title > span {            /* TOP HUNTERS */

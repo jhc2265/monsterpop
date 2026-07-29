@@ -61,7 +61,7 @@ export default function BossSelect() {
     <header className="topbar">
       <button className="icon-btn" onClick={() => navigate('/home')} aria-label="뒤로"><Icon name="back" /></button>
       <div className="title-stack"><span className="overline">DAILY BOSS</span><h1>보스 선택</h1></div>
-      <button className="icon-btn" onClick={() => { sound.button(); setTutorial(true) }} aria-label="조작 안내 다시 보기"><Icon name="info" /></button>
+      <button className="ghost-icon-btn" onClick={() => { sound.button(); setTutorial(true) }} aria-label="조작 안내 다시 보기"><Icon name="info" size={20} /></button>
     </header>
 
     <p className="boss-select-intro">모든 보스는 자유롭게 도전할 수 있어요. 오늘의 보스를 처음 처치하면 일일 보너스 XP를 받습니다.</p>
