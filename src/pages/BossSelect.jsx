@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom'
-import { DAILY_BOSSES, getAvailableBosses, getBossRecord, getDailyBoss, isSundayBossDay } from '../lib/bosses'
+import { DAILY_BOSSES, getAvailableBosses, getBossRecord, getBossScheduleLabel, getDailyBoss, isSundayBossDay } from '../lib/bosses'
 import { useAuth } from '../context/AuthContext'
 import { getLevel, resolveProgress } from '../lib/progression'
 import { sound } from '../lib/sound'
@@ -50,7 +50,7 @@ export default function BossSelect() {
                 <em>{boss.element}</em>
                 {isToday && <b className="tag-today">오늘의 보스</b>}
                 {sundayOpen && !isToday && <b className="tag-open">자유 토벌</b>}
-                {unavailable && <b className="tag-waiting">출현 대기</b>}
+                {unavailable && <b className="tag-schedule">{getBossScheduleLabel(boss.id)}</b>}
                 {record.clearedToday && <b className="tag-cleared">클리어</b>}
               </span>
               <strong>{boss.name}</strong>

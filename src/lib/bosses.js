@@ -103,6 +103,12 @@ const WEEKDAY_BOSS = {
   Sat: 'solar-eclipse-phoenix',
   Sun: 'polar-pod',
 }
+const BOSS_SCHEDULE_LABEL = {
+  'neon-nightmare': '월·목 출현',
+  'glitch-king-slime': '화·금 출현',
+  'solar-eclipse-phoenix': '수·토 출현',
+  'polar-pod': '일요일 출현',
+}
 
 export function getDailyBoss(date = new Date()) {
   return getBossById(WEEKDAY_BOSS[koreaWeekday(date)]) || DAILY_BOSSES[0]
@@ -118,6 +124,10 @@ export function getAvailableBosses(date = new Date()) {
 
 export function isBossAvailableToday(bossId, date = new Date()) {
   return getAvailableBosses(date).some((boss) => boss.id === bossId)
+}
+
+export function getBossScheduleLabel(bossId) {
+  return BOSS_SCHEDULE_LABEL[bossId] || '출현 일정 확인'
 }
 
 export function getBossById(bossId) {

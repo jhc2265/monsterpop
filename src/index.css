@@ -2999,6 +2999,15 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
 /* 홀드 신호일 때 도는 기본 링. 실제로 누르기 시작하면 진행 링에 자리를 내준다. */
 .boss-target.holding.action-hold::after { display: none; }
 .boss-target.action-swipe .action-cue { border-color: rgba(121, 220, 255, .62); color: #79dcff; }
+.boss-target.action-thaw .action-cue {
+  border-color: rgba(170,225,255,.82);
+  background: rgba(11,47,86,.9);
+  color: #d8f4ff;
+  box-shadow: 0 0 24px rgba(110,200,255,.62);
+}
+.boss-target.action-thaw img {
+  filter: drop-shadow(0 18px 24px rgba(2,0,16,.72)) saturate(.68) brightness(1.14) hue-rotate(8deg);
+}
 .boss-target.action-shield .action-cue { border-color: rgba(255, 97, 120, .68); color: #ff8b9c; }
 .boss-target.action-shield img { filter: drop-shadow(0 18px 24px rgba(2, 0, 16, .72)) saturate(.55) brightness(.72); }
 .boss-target.action-shield::after {
@@ -3525,7 +3534,7 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
   border: 1px solid rgba(85,245,202,.4);
   color: #9ff5df;
 }
-.boss-select-tags .tag-waiting {
+.boss-select-tags .tag-schedule {
   background: rgba(87,78,119,.2);
   border: 1px solid rgba(174,160,210,.22);
   color: #a49abf;
@@ -3881,7 +3890,7 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
     inset 0 0 0 2px rgba(195,235,255,.24);
 }
 .boss-polar-pod.mechanic-frozen .boss-arena::after {
-  z-index: 4;
+  z-index: 2;
   inset: 0;
   background:
     linear-gradient(128deg, transparent 0 26%, rgba(210,241,255,.16) 27% 28%, transparent 29% 63%, rgba(151,215,255,.14) 64% 65%, transparent 66%),

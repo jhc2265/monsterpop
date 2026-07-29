@@ -64,12 +64,13 @@ const SWIPE_MIN_PX = 34
 const MISS_TIME_PENALTY = 2  // 반격 — 이게 있어야 제한 시간이 실제 압박이 된다
 const PHASE_BREAK_MS = 900   // 페이즈 전환 무적 연출
 
-const CUE_LABEL = { tap: 'TAP', hold: 'HOLD', swipe: 'SWIPE', shield: 'WAIT' }
+const CUE_LABEL = { tap: 'TAP', hold: 'HOLD', swipe: 'SWIPE', shield: 'WAIT', thaw: 'SWIPE' }
 const CUE_HINT = {
   tap: '방어막이 열렸어요. 빠르게 터치하세요',
   hold: '왕관이 빛나요. 길게 눌러 힘을 모으세요',
   swipe: '틈이 생겼어요. 좌우로 밀어내세요',
   shield: '방어막이 올라왔어요. 건드리지 마세요',
+  thaw: '얼음을 깨도록 좌우로 빠르게 밀어내세요',
 }
 const BOSS_MECHANICS = {
   'neon-nightmare': { name: '그림자 장막', short: 'SHADOW VEIL' },
@@ -117,6 +118,7 @@ export default function Boss() {
   const timeRef = useRef(boss.timeLimit)
   const heatRef = useRef(0)
   const frozenRef = useRef(false)
+  const shadowVeilRef = useRef(false)
   const cueCountRef = useRef(0)
   const successfulHitsRef = useRef(0)
 
@@ -154,9 +156,10 @@ export default function Boss() {
       cueCountRef.current += 1
 
       setShadowVeil(false)
+      shadowVeilRef.current = false
       if (boss.id === 'neon-nightmare' && cueCountRef.current % 4 === 0) {
         setShadowVeil(true)
-        mechanicTimerRef.current = setTimeout(() => setShadowVeil(false), 720)
+        shadowVeilRef.current = true
       }
 
       const startResponseWindow = () => {
@@ -170,6 +173,10 @@ export default function Boss() {
             maxComboRef.current = Math.max(maxComboRef.current, comboRef.current)
             setCombo(comboRef.current)
             setJudge('잘 버텼어요!')
+            if (boss.id === 'neon-nightmare') {
+              shadowVeilRef.current = false
+              setShadowVeil(false)
+            }
             nextCue(240)
           } else {
             punishRef.current('반응이 늦었어요!')
@@ -180,7 +187,8 @@ export default function Boss() {
       if (boss.id === 'glitch-king-slime') {
         setCueScrambling(true)
         setJudge('신호 복구 중...')
-        revealTimerRef.current = setTimeout(startResponseWindow, 420)
+        const scrambleMs = phaseRef.current === 1 ? 520 : phaseRef.current === 2 ? 380 : 240
+        revealTimerRef.current = setTimeout(startResponseWindow, scrambleMs)
       } else {
         startResponseWindow()
       }
@@ -189,16 +197,36 @@ export default function Boss() {
 
   // 실패 처리 — 콤보를 끊고 제한 시간을 깎는다.
   function punish(message) {
+    let penalty = MISS_TIME_PENALTY
+    let penaltyLabel = 'MISS'
+    if (boss.id === 'neon-nightmare' && shadowVeilRef.current) {
+      penalty = 3
+      penaltyLabel = 'SHADOW HIT'
+    } else if (boss.id === 'glitch-king-slime') {
+      penalty = 3
+      penaltyLabel = 'SYSTEM ERROR'
+    }
+
+    if (boss.id === 'solar-eclipse-phoenix') {
+      const nextHeat = heatRef.current + 40
+      const erupted = nextHeat >= 100
+      heatRef.current = erupted ? 0 : nextHeat
+      setHeat(heatRef.current)
+      if (erupted) {
+        penalty += 4
+        penaltyLabel = 'SOLAR BURST'
+        message = '태양 폭발이 일어났어요!'
+      }
+    }
+
     comboRef.current = 0
     setCombo(0)
     sound.miss()
     setJudge(message)
-    if (boss.id === 'solar-eclipse-phoenix') {
-      heatRef.current = 0
-      setHeat(0)
-    }
-    flash(`MISS  -${MISS_TIME_PENALTY}초`, 'miss')
-    timeRef.current = Math.max(0, timeRef.current - MISS_TIME_PENALTY)
+    shadowVeilRef.current = false
+    setShadowVeil(false)
+    flash(`${penaltyLabel}  -${penalty}초`, 'miss')
+    timeRef.current = Math.max(0, timeRef.current - penalty)
     setTimeLeft(timeRef.current)
     resetHold()
     if (timeRef.current <= 0) { finish(false); return }
@@ -208,14 +236,11 @@ export default function Boss() {
   punishRef.current = punish
 
   function hit(label) {
-    let damage = boss.damagePerHit || 1
-    let overheat = false
-    if (boss.id === 'solar-eclipse-phoenix') {
-      const nextHeat = heatRef.current + 25
-      overheat = nextHeat >= 100
-      heatRef.current = overheat ? 0 : nextHeat
+    const damage = boss.damagePerHit || 1
+    const ventedHeat = boss.id === 'solar-eclipse-phoenix' && cue?.type === 'hold' && heatRef.current > 0
+    if (ventedHeat) {
+      heatRef.current = Math.max(0, heatRef.current - 40)
       setHeat(heatRef.current)
-      if (overheat) damage *= 2
     }
     const nextHp = Math.max(0, hpRef.current - damage)
     const nextCombo = comboRef.current + 1
@@ -225,8 +250,10 @@ export default function Boss() {
     setCombo(nextCombo)
     maxComboRef.current = Math.max(maxComboRef.current, nextCombo)
     sound.hit(nextCombo)
-    setJudge(overheat ? 'OVERHEAT!' : label)
-    flash(overheat ? `OVERHEAT  -${damage}` : `-${damage}`, phaseRef.current === 3 || overheat ? 'rush' : 'hit')
+    shadowVeilRef.current = false
+    setShadowVeil(false)
+    setJudge(ventedHeat ? 'COOLED DOWN!' : label)
+    flash(ventedHeat ? `COOL  -${damage}` : `-${damage}`, phaseRef.current === 3 ? 'rush' : 'hit')
     resetHold()
     successfulHitsRef.current += 1
 
@@ -247,23 +274,30 @@ export default function Boss() {
 
     if (boss.id === 'polar-pod' && successfulHitsRef.current % 5 === 0) {
       clearTimers()
-      setCue(null)
+      setCue({ type: 'thaw', id: Date.now() })
       frozenRef.current = true
       setFrozen(true)
-      setJudge('시간이 얼어붙었어요!')
+      setJudge('얼음을 깨세요!')
       mechanicTimerRef.current = setTimeout(() => {
         frozenRef.current = false
         setFrozen(false)
-        setJudge('동결 해제!')
-        nextCue(180)
-      }, 680)
+        setCue(null)
+        comboRef.current = 0
+        setCombo(0)
+        timeRef.current = Math.max(0, timeRef.current - 3)
+        setTimeLeft(timeRef.current)
+        setJudge('동상 피해를 입었어요!')
+        flash('FROSTBITE  -3초', 'miss')
+        if (timeRef.current <= 0) { finish(false); return }
+        nextCue(260)
+      }, 1600)
       return
     }
     nextCue()
   }
 
   function handlePointerDown(event) {
-    if (!playingRef.current || !cue || phaseBreak || cueScrambling || frozen) return
+    if (!playingRef.current || !cue || phaseBreak || cueScrambling || (frozen && cue.type !== 'thaw')) return
     event.preventDefault()
     event.currentTarget.setPointerCapture?.(event.pointerId)
 
@@ -284,7 +318,7 @@ export default function Boss() {
   }
 
   function handlePointerUp(event) {
-    if (!playingRef.current || !cue || !pointerRef.current || phaseBreak || cueScrambling || frozen) return
+    if (!playingRef.current || !cue || !pointerRef.current || phaseBreak || cueScrambling || (frozen && cue.type !== 'thaw')) return
     event.preventDefault()
     const pointer = pointerRef.current
     const heldFor = Date.now() - pointer.at
@@ -300,6 +334,20 @@ export default function Boss() {
     } else if (cue.type === 'swipe') {
       if (Math.abs(dx) >= SWIPE_MIN_PX && Math.abs(dx) > Math.abs(dy)) hit('SLASH!')
       else punish('좌우로 밀어주세요!')
+    } else if (cue.type === 'thaw') {
+      if (Math.abs(dx) >= SWIPE_MIN_PX && Math.abs(dx) > Math.abs(dy)) {
+        clearTimers()
+        frozenRef.current = false
+        setFrozen(false)
+        setCue(null)
+        resetHold()
+        setJudge('동결 해제!')
+        flash('ICE BREAK!', 'hit')
+        nextCue(180)
+      } else {
+        resetHold()
+        setJudge('더 빠르게 밀어 얼음을 깨세요!')
+      }
     }
   }
 
@@ -365,16 +413,16 @@ export default function Boss() {
 
   useEffect(() => () => { clearTimers(); sound.stopBossBGM() }, [clearTimers])
 
-  const cueType = phaseBreak || frozen ? null : cue?.type
-  const mechanicActive = shadowVeil || cueScrambling || frozen || (boss.id === 'solar-eclipse-phoenix' && heat >= 75)
+  const cueType = phaseBreak ? null : cue?.type
+  const mechanicActive = shadowVeil || cueScrambling || frozen || (boss.id === 'solar-eclipse-phoenix' && heat >= 80)
   const mechanicNotice = shadowVeil
     ? { title: 'SHADOW VEIL', copy: '그림자 장막이 펼쳐집니다' }
     : cueScrambling
       ? { title: 'SIGNAL ERROR', copy: '신호를 해독하고 있어요' }
       : frozen
         ? { title: 'TIME FREEZE', copy: '제한 시간이 멈췄습니다' }
-        : boss.id === 'solar-eclipse-phoenix' && heat >= 75
-          ? { title: 'OVERHEAT 75%', copy: '다음 성공 공격이 폭발합니다' }
+        : boss.id === 'solar-eclipse-phoenix' && heat >= 80
+          ? { title: `OVERHEAT ${heat}%`, copy: '다음 실수 시 태양 폭발 · HOLD로 냉각' }
           : null
   return <main className={`battle-page boss-battle boss-${boss.id} phase-${phase}${shadowVeil ? ' mechanic-shadow-active' : ''}${cueScrambling ? ' mechanic-glitch-active' : ''}${frozen ? ' mechanic-frozen' : ''}`}>
     <header className="battle-hud boss-hud">
@@ -428,7 +476,7 @@ export default function Boss() {
     <section className="boss-command">
       <small>{phase === 3 ? 'FINAL PHASE' : `PHASE ${phase}`}</small>
       <strong>{judge}</strong>
-      <span>{cueScrambling ? '신호가 확정된 뒤 판정이 시작됩니다' : frozen ? '동결 중에는 제한 시간도 멈춥니다' : cueType ? (cueType === 'hold' && boss.holdHint ? boss.holdHint : CUE_HINT[cueType]) : '다음 신호를 기다리세요'}</span>
+      <span>{cueScrambling ? '신호가 확정된 뒤 판정이 시작됩니다' : frozen ? CUE_HINT.thaw : cueType ? (cueType === 'hold' && boss.holdHint ? boss.holdHint : CUE_HINT[cueType]) : '다음 신호를 기다리세요'}</span>
     </section>
   </main>
 }
