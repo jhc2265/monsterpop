@@ -1708,10 +1708,15 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
   color: #ffe16c;
   filter: drop-shadow(0 0 8px rgba(255,213,78,.62));
 }
+/* 별 · 라벨 · 별을 한 줄로. 별이 제 줄을 차지하던 시절보다 카드가 한 층 낮아진다. */
 .reward-total small {
-  margin-top: 7px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
   color: #b892ff;
 }
+/* 오른쪽 별은 왼쪽을 뒤집어 좌우가 서로를 바라보게 한다(홈 인사말과 같은 방식). */
+.reward-total small svg:last-child { transform: scaleX(-1); }
 .reward-total strong {
   margin-top: 4px;
   color: #fff;

@@ -69,7 +69,7 @@ export default function Result() {
         setBossReward(record)
         gained = (record.firstToday ? boss.firstClearXp : BOSS_REPEAT_XP) + missionBonus
       } else {
-        // 격파하지 못해도 깎아낸 만큼은 돌려준다. 다만 오늘 최고 격파율을 넘어선 몫만 준다.
+        // 격파하지 못해도 깎아낸 만큼은 돌려준다. 다만 오늘 최고 피해를 넘어선 몫만 준다.
         const attempt = recordBossAttempt(user.id, boss.id, {
           progress: bossDamage / Math.max(1, bossMaxHp),
           maxXp: Math.round(boss.firstClearXp * ATTEMPT_XP_RATIO),
@@ -122,6 +122,10 @@ export default function Result() {
   const missionTile = missionXp > 0
     ? <div><small>미션</small><strong>+{missionXp}</strong></div>
     : <div><small>오늘의 미션</small><strong>{missionsDone === null ? '...' : `${missionsDone}/${DAILY_MISSIONS.length}`}</strong></div>
+  // 세 번째 칸에 격파율(%)을 두면 바로 옆 "가한 피해 90/300"을 나눗셈한 값이라 새 정보가 없다.
+  // 대신 이번 판 이전의 오늘 최고 피해를 보여준다 — 도전 보상의 기준선이라 비교할 값이 된다.
+  const todaysBestDamage = !bossAttempt ? '...'
+    : bossAttempt.previousBest > 0 ? `${Math.round(bossAttempt.previousBest * bossMaxHp)}` : '첫 도전'
   // "격파하면 전체 보상"은 오늘의 보스, 그것도 아직 안 잡았을 때만 참이다.
   // 자유 도전은 격파해도 0 XP 라, 재도전 버튼에 실제 값을 적어야 브리핑(격파 보상 '기록만')과 어긋나지 않는다.
   const retryNote = !isBossMode ? null
@@ -153,12 +157,13 @@ export default function Result() {
         <div className={`score-grade grade-${scoreGrade.toLowerCase()}`}><img src={`/images/ranks/rank-${scoreGrade.toLowerCase()}.webp`} alt={`${scoreGrade} 랭크 배지`} /></div>
         <div className="score-copy"><small>FINAL SCORE</small><strong className="result-score">{score.toLocaleString()}</strong></div>
       </div>
-      {isBossMode ? <div className="result-summary"><div><img src="/images/ui/stat-combo.webp" alt="" /><span>최고 콤보</span><strong>{maxCombo}</strong></div><i /><div><img src="/images/ui/stat-kills.webp" alt="" /><span>{bossClear ? '처치 시간' : '가한 피해'}</span><strong>{bossClear ? `${activeBoss.timeLimit - bossTimeLeft}초` : `${bossDamage}/${bossMaxHp}`}</strong></div><i /><div><img src="/images/ui/stat-rank.webp" alt="" /><span>{bossClear ? '남은 시간' : '격파율'}</span><strong>{bossClear ? `${bossTimeLeft}초` : `${Math.round((bossDamage / Math.max(1, bossMaxHp)) * 100)}%`}</strong></div></div> : <div className="result-summary"><div><img src="/images/ui/stat-combo.webp" alt="" /><span>최고 콤보</span><strong>{maxCombo}</strong></div><i /><div><img src="/images/ui/stat-kills.webp" alt="" /><span>처치 몬스터</span><strong>{totalKills}마리</strong></div><i /><div><img src="/images/ui/stat-rank.webp" alt="" /><span>현재 순위</span><strong>{saving ? '...' : rank ? `${rank}위` : '-'}</strong></div></div>}
+      {isBossMode ? <div className="result-summary"><div><img src="/images/ui/stat-combo.webp" alt="" /><span>최고 콤보</span><strong>{maxCombo}</strong></div><i /><div><img src="/images/ui/stat-kills.webp" alt="" /><span>{bossClear ? '처치 시간' : '가한 피해'}</span><strong>{bossClear ? `${activeBoss.timeLimit - bossTimeLeft}초` : `${bossDamage}/${bossMaxHp}`}</strong></div><i /><div><img src="/images/ui/stat-rank.webp" alt="" /><span>{bossClear ? '남은 시간' : '오늘 최고'}</span><strong>{bossClear ? `${bossTimeLeft}초` : todaysBestDamage}</strong></div></div> : <div className="result-summary"><div><img src="/images/ui/stat-combo.webp" alt="" /><span>최고 콤보</span><strong>{maxCombo}</strong></div><i /><div><img src="/images/ui/stat-kills.webp" alt="" /><span>처치 몬스터</span><strong>{totalKills}마리</strong></div><i /><div><img src="/images/ui/stat-rank.webp" alt="" /><span>현재 순위</span><strong>{saving ? '...' : rank ? `${rank}위` : '-'}</strong></div></div>}
     </section> : <section className="result-reward-card">
       <div className="reward-settlement">
         <div className="reward-total">
-          <Icon name="spark" size={17} />
-          <small>TOTAL XP</small>
+          {/* 별은 라벨과 한 줄로 묶는다. 이 앱의 다른 표제(REWARD COMPLETE · LEVEL UP · 홈 인사말)가
+              전부 그 규칙이고, 혼자 윗줄을 차지하면 주인공인 숫자가 밀린다. */}
+          <small><Icon name="spark" size={15} /> TOTAL XP <Icon name="spark" size={15} /></small>
           <strong>+{xpGain}</strong>
           <span>경험치를 획득했어요</span>
         </div>
@@ -185,8 +190,8 @@ export default function Result() {
                 ? <>오늘의 보상은 이미 받았어요. 재도전은 <strong>기록 갱신</strong>으로 남습니다</>
                 : <>자유 도전은 <strong>연습과 기록 갱신</strong>으로 남습니다</>
             : bossAttempt?.improved
-              ? <>오늘 최고 격파율 <strong>{Math.round(bossAttempt.best * 100)}%</strong> 갱신!</>
-              : <>오늘 최고 격파율 <strong>{Math.round((bossAttempt?.previousBest ?? 0) * 100)}%</strong>를 넘어야 도전 보상이 더 나와요</>
+              ? <>오늘 최고 기록 갱신! 다음은 피해 <strong>{Math.round(bossAttempt.best * bossMaxHp)}</strong> 넘게 줘야 추가 보상이 나와요</>
+              : <>피해 <strong>{Math.round((bossAttempt?.previousBest ?? 0) * bossMaxHp)}</strong> 넘게 줘야 도전 보상이 더 나와요</>
           : bonusParts.length > 0
             ? <>보너스 내역 · <strong>{bonusParts.join(' · ')}</strong></>
             : <>최고 기록을 세우거나 미션을 채우면 <strong>보너스 XP</strong>를 받아요</>}</p>
