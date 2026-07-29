@@ -138,7 +138,7 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
 .stat-icon { display: grid; place-items: center; flex: 0 0 auto; width: 40px; height: 40px; border-radius: 13px; }
 .stat-icon.purple { color: #d4baff; background: rgba(124,60,255,.18); }.stat-icon.pink { color: #ffaae2; background: rgba(240,76,189,.15); }.section-heading { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }.section-heading h2 { margin: 4px 0 0; }
 /* Ranking */
-.podium { min-height: 236px; display: flex; align-items: flex-end; justify-content: center; gap: 4px; padding: 20px 0 0; }.podium-item { position: relative; width: 31%; display: flex; flex-direction: column; align-items: center; text-align: center; }.podium-item .avatar { width: 58px; height: 58px; border: 3px solid #8c79bc; box-shadow: 0 0 20px rgba(142,121,188,.25); }.podium-item.rank-1 { width: 36%; }.podium-item.rank-1 .avatar { width: 78px; height: 78px; border-color: var(--gold); box-shadow: 0 0 25px rgba(255,200,87,.35); }.podium-item.me .avatar { outline: 2px solid var(--pink); outline-offset: 3px; }.podium-item strong { max-width: 100%; margin-top: 8px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }.podium-item span { color: var(--gold); }.rank-list { overflow: hidden; margin-top: 12px; border: 1px solid var(--line); border-radius: var(--radius-lg); background: rgba(18,14,48,.85); }.list-label { padding: 13px 15px 7px; color: var(--muted); }.rank-item { display: flex; align-items: center; gap: 11px; min-height: 66px; padding: 10px 14px; border-top: 1px solid var(--line); }.rank-item.me { background: linear-gradient(90deg, rgba(240,76,189,.13), rgba(124,60,255,.08)); }.rank-num { width: 24px; color: var(--text-2); text-align: center; }.avatar { display: grid; place-items: center; flex: 0 0 auto; width: 42px; height: 42px; overflow: hidden; border-radius: 50%; background: linear-gradient(135deg, #7941dc, #db43a8); color: #fff; }.avatar img { width: 100%; height: 100%; object-fit: cover; }.avatar.small { width: 35px; height: 35px; }.avatar.tiny { width: 30px; height: 30px; }.rank-name { min-width: 0; flex: 1; }.rank-name strong { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }.rank-score { color: var(--cyan); }
+.podium { min-height: 236px; display: flex; align-items: flex-end; justify-content: center; gap: 4px; padding: 20px 0 0; }.podium-item { position: relative; width: 31%; display: flex; flex-direction: column; align-items: center; text-align: center; }.podium-item .avatar { width: 58px; height: 58px; border: 3px solid #8c79bc; box-shadow: 0 0 20px rgba(142,121,188,.25); }.podium-item.rank-1 { width: 36%; }.podium-item.rank-1 .avatar { width: 78px; height: 78px; border-color: var(--gold); box-shadow: 0 0 25px rgba(255,200,87,.35); }.podium-item.me .avatar { outline: 2px solid var(--pink); outline-offset: 3px; }.podium-item strong { max-width: 100%; margin-top: 8px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }.podium-item span { color: var(--gold); }.rank-list { overflow: hidden; margin-top: 12px; border: 1px solid var(--line); border-radius: var(--radius-lg); background: rgba(18,14,48,.85); }.list-label { padding: 13px 15px 7px; color: var(--muted); }.rank-item { display: flex; align-items: center; gap: 11px; min-height: 66px; padding: 10px 14px; border-top: 1px solid var(--line); }.rank-item.me { background: linear-gradient(90deg, rgba(240,76,189,.13), rgba(124,60,255,.08)); }.rank-num { width: 24px; color: var(--text-2); text-align: center; }.avatar { display: grid; place-items: center; flex: 0 0 auto; width: 42px; height: 42px; overflow: hidden; border-radius: 30%; background: linear-gradient(135deg, #7941dc, #db43a8); color: #fff; }.avatar img { width: 100%; height: 100%; object-fit: cover; }.avatar.small { width: 35px; height: 35px; }.avatar.tiny { width: 30px; height: 30px; }.rank-name { min-width: 0; flex: 1; }.rank-name strong { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }.rank-score { color: var(--cyan); }
 /* Community */
 .post-list { display: grid; gap: 10px; }.post-item { padding: 16px; border: 1px solid var(--line); border-radius: var(--radius-md); background: rgba(21,16,54,.9); cursor: pointer; transition: transform .15s, border-color .15s; }.post-item:hover { transform: translateY(-2px); border-color: var(--line-strong); }.post-head { display: flex; align-items: center; gap: 9px; }.post-head strong, .post-head small { display: block; }.post-head small { margin-top: 1px; color: var(--muted); }.post-item h2 { margin: 13px 0 5px; }.post-item > p { display: -webkit-box; overflow: hidden; margin: 0; color: var(--text-2); -webkit-box-orient: vertical; -webkit-line-clamp: 2; }.post-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 13px; padding-top: 10px; border-top: 1px solid var(--line); color: var(--muted); }.post-footer span { display: flex; align-items: center; gap: 5px; }.fab { position: fixed; z-index: 15; right: max(18px, calc(50% - 212px)); bottom: max(22px, calc(env(safe-area-inset-bottom) + 16px)); width: 56px; height: 56px; display: grid; place-items: center; border: 0; border-radius: 18px; background: var(--gradient); box-shadow: 0 12px 28px rgba(148,50,231,.48); cursor: pointer; }.modal-overlay { position: fixed; z-index: 50; inset: 0; display: flex; align-items: flex-end; justify-content: center; padding-top: 50px; background: rgba(4,2,18,.78); backdrop-filter: blur(5px); }.modal { width: 100%; max-width: 460px; max-height: 92vh; overflow: auto; padding: 10px 18px calc(26px + env(safe-area-inset-bottom)); border: 1px solid var(--line-strong); border-bottom: 0; border-radius: 26px 26px 0 0; background: #121032; animation: slideUp .25s ease; }.modal-handle { width: 42px; height: 4px; margin: 0 auto 18px; border-radius: 4px; background: rgba(255,255,255,.18); }.modal-title { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 20px; }.modal-title h2 { margin: 4px 0 0; }
 
@@ -444,7 +444,6 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
 .boss-card .hero-copy h2 { margin: 0; }
 .boss-card .hero-copy p { margin: 10px 0 13px; color: #cbc5e1; }
 .boss-visual { position: absolute; right: 8px; top: 50%; width: 42%; height: 88%; transform: translateY(-50%); }
-.boss-visual > span { position: absolute; inset: 4%; border: 1px solid rgba(238,115,255,.2); border-radius: 50%; background: radial-gradient(circle, rgba(241,77,218,.2), transparent 66%); box-shadow: 0 0 28px rgba(238,61,215,.18), inset 0 0 24px rgba(255,255,255,.04); }
 .boss-card .hero-monster { width: 145px; max-width: 100%; right: 2px; bottom: 4px; }
 .art-tile img { width: 125%; height: 125%; object-fit: contain; filter: drop-shadow(0 5px 7px rgba(4,1,27,.28)); }
 
@@ -477,7 +476,6 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
 .boss-card { min-height: 172px; margin-bottom: 16px; padding: 18px 20px; }
 .boss-card .hero-copy p { margin: 8px 0 9px; }
 .boss-visual { right: 13px; width: 43%; height: 94%; }
-.boss-visual > span { inset: 7%; border: 0; box-shadow: 0 0 30px rgba(238,61,215,.17); }
 .boss-card .hero-monster { width: 154px; right: 0; bottom: -2px; }
 .boss-card .hero-monster { width: 165px; right: 5px; }
 
@@ -579,7 +577,8 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
 .podium-item.rank-1 { width: 40%; order: initial; transform: translateY(-9px); }
 .podium-medal { position: relative; width: 84px; height: 84px; display: grid; place-items: center; margin: 0 auto; }
 .rank-1 .podium-medal { width: 112px; height: 112px; }
-.podium-medal .avatar { width: 61%; height: 61%; border: 0; outline: 0; box-shadow: none; }
+/* 시상대만 예외 — 원형 메달 프레임 이미지 안에 들어가므로 여기서는 정원이 맞다. */
+.podium-medal .avatar { width: 61%; height: 61%; border: 0; border-radius: 50%; outline: 0; box-shadow: none; }
 .rank-1 .podium-medal .avatar { width: 59%; height: 59%; border: 0; }
 .podium-medal .avatar img { width: 100%; height: 100%; object-fit: contain; }
 .podium-frame { position: absolute; z-index: 2; inset: 0; width: 100%; height: 100%; object-fit: contain; pointer-events: none; filter: drop-shadow(0 6px 10px rgba(3,1,18,.44)); }
@@ -769,9 +768,12 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
 .home-hunter-copy > small b { display: inline-flex; align-items: center; min-height: 21px; padding: 2px 7px; border: 1px solid rgba(240,76,189,.28); border-radius: 7px; background: rgba(240,76,189,.11); color: #f56ac8; font-size: 11px; line-height: 1; }
 .home-hunter-copy > small span { padding-left: 9px; border-left: 1px solid rgba(255,255,255,.1); }
 .home-hunter-xp { width: 100%; margin-top: 13px; }
-.home-hunter-xp > em { display: flex; align-items: baseline; gap: 5px; color: #aaa1c0; font-size: 11px; font-style: normal; white-space: nowrap; }
+.home-hunter-xp > em { display: flex; align-items: baseline; gap: 6px; color: #aaa1c0; font-size: 11px; font-style: normal; white-space: nowrap; }
+/* 좁은 화면에서 남은 XP 문구가 길어지면 이쪽이 줄고, 분모는 끝까지 남는다.
+   예전에는 한 줄에 밀어넣어 320px 에서 오른쪽 숫자가 칸 밖으로 밀려났다. */
+.home-hunter-xp > em > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
 .home-hunter-xp > em b { color: #ffd45b; font-size: 13px; }
-.home-hunter-xp > em i { margin-left: auto; color: #bbb2cf; font-style: normal; font-weight: 700; }
+.home-hunter-xp > em i { flex: 0 0 auto; margin-left: auto; color: #bbb2cf; font-style: normal; font-weight: 700; }
 .home-hunter-xp > span { display: block; overflow: hidden; height: 6px; margin-top: 7px; border-radius: 999px; background: rgba(255,255,255,.08); }
 .home-hunter-xp > span > i { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #f04cbd, #8f4cff); box-shadow: 0 0 8px rgba(240,76,189,.3); }
 .home-profile-chevron { position: absolute; right: 17px; top: 20px; color: #817797; font-size: 25px; font-style: normal; font-weight: 400; }
@@ -797,6 +799,39 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
 .setting-row.action { width: 100%; border-top: 0; border-left: 0; border-right: 0; background: transparent; text-align: left; cursor: pointer; }
 .setting-row.action:disabled { opacity: 1; cursor: default; }
 .setting-row.action b { color: #9d95b5; }
+/* 라벨 아래 보조 문구 — 현재 볼륨 %, 미지원 안내 */
+.setting-hint { display: block; margin-top: 2px; color: #9d95b5; font-size: var(--fs-caption); font-style: normal; line-height: 1.4; }
+.setting-row-slider { gap: 16px; }
+.setting-row-slider > span { flex: 0 0 auto; }
+.setting-row-slider input[type="range"] {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 6px;
+  padding: 0;
+  border-radius: 999px;
+  background: rgba(255,255,255,.12);
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+}
+.setting-row-slider input[type="range"]::-webkit-slider-thumb {
+  width: 20px;
+  height: 20px;
+  border: 2px solid #17103c;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #8a43f1, #e64bbf);
+  box-shadow: 0 2px 8px rgba(0,0,0,.45);
+  appearance: none;
+  -webkit-appearance: none;
+}
+.setting-row-slider input[type="range"]::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border: 2px solid #17103c;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #8a43f1, #e64bbf);
+  box-shadow: 0 2px 8px rgba(0,0,0,.45);
+}
 .switch { width: 48px; height: 28px; padding: 3px; border: 0; border-radius: 999px; background: #37314f; cursor: pointer; transition: background .18s; }
 .switch i { display: block; width: 22px; height: 22px; border-radius: 50%; background: #aaa4b9; transition: transform .18s, background .18s; }
 .switch.on { background: #7c3cff; }
@@ -915,29 +950,6 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
   pointer-events: none;
 }
 .battle-enemy.holding { filter: brightness(1.2); }
-.gesture-legend {
-  position: absolute;
-  z-index: 8;
-  top: 10px;
-  left: 50%;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  padding: 5px 7px;
-  border: 1px solid rgba(183,143,255,.18);
-  border-radius: 999px;
-  background: rgba(8,5,29,.68);
-  transform: translateX(-50%);
-  backdrop-filter: blur(7px);
-  pointer-events: none;
-}
-.gesture-legend span {
-  padding: 2px 5px;
-  border-radius: 5px;
-  color: #c8bce5;
-  white-space: nowrap;
-}
-.gesture-legend span + span { border-left: 1px solid rgba(255,255,255,.1); }
 .gesture-rabbit { transition: left .16s ease, top .16s ease, filter .16s, transform .16s; }
 .gesture-fox .action-cue { color: #ffb199; }
 .gesture-rabbit .action-cue { color: #79f3ff; }
@@ -2295,12 +2307,6 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
 }
 
 /* --- 2. 아레나 ------------------------------------------------------- */
-.gesture-legend span {
-  font-size: var(--fs-caption);
-  font-weight: var(--fw-bold);
-  line-height: 1;
-  letter-spacing: 0;
-}
 .action-cue {                           /* 몬스터 위 동작 배지 */
   font-size: var(--fs-caption);
   font-weight: var(--fw-black);
@@ -3485,20 +3491,20 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
 }
 .boss-select-card.today .boss-select-go { color: var(--boss-color); }
 
-/* 공통 조작 튜토리얼 — 보스전 첫 진입에 한 번. 브리핑 시트의 뼈대를 그대로 쓴다. */
-.boss-tutorial { --boss-color: #a268ff; }
-.boss-tutorial-head { text-align: center; }
-.boss-tutorial-head .overline { color: var(--boss-color); }
-.boss-tutorial-head strong { display: block; margin-top: 3px; font-size: var(--fs-h1); }
-.boss-tutorial-head small { display: block; margin-top: 3px; color: var(--muted); }
-.boss-tutorial-rules {
+/* 조작 튜토리얼 — 사냥·보스전 첫 진입에 한 번. 브리핑 시트의 뼈대를 그대로 쓴다. */
+.cue-tutorial { --boss-color: #a268ff; }
+.cue-tutorial-head { text-align: center; }
+.cue-tutorial-head .overline { color: var(--boss-color); line-height: 1.5; }
+.cue-tutorial-head strong { display: block; margin-top: 5px; font-size: var(--fs-h1); line-height: 1.3; }
+.cue-tutorial-head small { display: block; margin-top: 5px; color: var(--muted); line-height: 1.55; }
+.cue-tutorial-notes {
   display: grid;
   gap: 7px;
   margin: 16px 0 0;
   padding: 0;
   list-style: none;
 }
-.boss-tutorial-rules li {
+.cue-tutorial-notes li {
   display: grid;
   align-items: center;
   grid-template-columns: 54px 1fr;
@@ -3508,15 +3514,95 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
   border-radius: 12px;
   background: rgba(10,6,32,.6);
 }
-.boss-tutorial-rules b {
+.cue-tutorial-notes b {
   color: var(--boss-color);
   font-size: var(--fs-caption);
   font-weight: 800;
 }
-.boss-tutorial-rules span { color: var(--text-2); font-size: var(--fs-caption); line-height: 1.35; }
+.cue-tutorial-notes span { color: var(--text-2); font-size: var(--fs-caption); line-height: 1.55; }
 
-/* 도전 브리핑 — 전투 중에는 신호를 읽느라 규칙을 읽을 여유가 없다. 들어가기 전에 알려준다. */
-.boss-briefing {
+/* 섀도우 버스트 데모 — 게이지가 차고, 터지고, 다시 빈다. 제스처가 아니라 자원이라 손가락 대신 게이지를 보여준다. */
+.burst-demo { margin-top: 15px; }
+.burst-demo-stage {
+  position: relative;
+  height: 96px;
+  display: grid;
+  overflow: hidden;
+  place-items: center;
+  border: 1px solid color-mix(in srgb, var(--boss-color) 34%, transparent);
+  border-radius: 16px;
+  background: radial-gradient(circle at 50% 60%, rgba(58,32,110,.7), rgba(10,6,32,.9));
+}
+.burst-demo-stage img {
+  width: 46px;
+  height: 46px;
+  animation: burstDemoIcon 3s ease-in-out infinite;
+}
+.burst-demo-flash {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 50%, rgba(255,244,214,.9), rgba(255,212,91,.55) 32%, transparent 68%);
+  opacity: 0;
+  animation: burstDemoFlash 3s ease-out infinite;
+}
+.burst-demo-label {
+  position: absolute;
+  top: 12px;
+  color: var(--boss-color);
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: .12em;
+  opacity: 0;
+  text-shadow: 0 0 12px rgba(255,212,91,.7);
+  animation: burstDemoLabel 3s ease-out infinite;
+}
+.burst-demo-meter {
+  display: block;
+  height: 8px;
+  overflow: hidden;
+  margin-top: 8px;
+  border-radius: 999px;
+  background: rgba(255,255,255,.12);
+}
+.burst-demo-meter i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #ffb347, var(--boss-color));
+  transform: scaleX(0);
+  transform-origin: left;
+  animation: burstDemoMeter 3s linear infinite;
+}
+/* 처치 6회를 6칸으로 끊어 보여준다. 매끄럽게 차면 "무엇으로 차는지"가 안 드러난다. */
+@keyframes burstDemoMeter {
+  0%, 6% { transform: scaleX(0); }
+  12%, 18% { transform: scaleX(.167); }
+  24%, 30% { transform: scaleX(.333); }
+  36%, 42% { transform: scaleX(.5); }
+  48%, 54% { transform: scaleX(.667); }
+  60%, 66% { transform: scaleX(.833); }
+  72%, 84% { transform: scaleX(1); }
+  90%, 100% { transform: scaleX(0); }
+}
+@keyframes burstDemoIcon {
+  0%, 70% { transform: scale(1); filter: none; }
+  78% { transform: scale(1.25); filter: brightness(1.5) drop-shadow(0 0 18px rgba(255,212,91,.9)); }
+  88%, 100% { transform: scale(1); filter: none; }
+}
+@keyframes burstDemoFlash {
+  0%, 72% { opacity: 0; transform: scale(.5); }
+  78% { opacity: 1; transform: scale(1.05); }
+  90%, 100% { opacity: 0; transform: scale(1.4); }
+}
+@keyframes burstDemoLabel {
+  0%, 72% { opacity: 0; transform: translateY(4px); }
+  78%, 86% { opacity: 1; transform: translateY(0); }
+  92%, 100% { opacity: 0; transform: translateY(-4px); }
+}
+
+/* 하단 시트 뼈대 — 튜토리얼과 도전 브리핑이 공유한다.
+   전투 중에는 신호를 읽느라 규칙을 읽을 여유가 없다. 들어가기 전에 알려준다. */
+.briefing-sheet {
   width: 100%;
   max-width: 460px;
   max-height: 92vh;
@@ -3541,9 +3627,10 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
   background: rgba(6,3,24,.55);
   object-fit: contain;
 }
-.boss-briefing-head .overline { color: var(--boss-color); }
-.boss-briefing-head strong { display: block; margin-top: 2px; font-size: var(--fs-h2); }
-.boss-briefing-head small { display: block; color: var(--muted); }
+/* 세 줄이 붙어 있으면 이름이 부제에 파묻힌다. 줄마다 숨을 준다. */
+.boss-briefing-head .overline { color: var(--boss-color); line-height: 1.5; }
+.boss-briefing-head strong { display: block; margin-top: 4px; font-size: var(--fs-h2); line-height: 1.3; }
+.boss-briefing-head small { display: block; margin-top: 4px; color: var(--muted); line-height: 1.5; }
 .boss-briefing-stats {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -3616,7 +3703,7 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
   grid-column: 2 / -1;
   color: var(--muted);
   font-size: var(--fs-caption);
-  line-height: 1.25;
+  line-height: 1.5;
 }
 
 /* TAP — 톡 찍고 물결 */
@@ -3958,7 +4045,7 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
 
 .mechanic-demo-beats {
   position: relative;
-  min-height: 42px;
+  min-height: 48px;
   margin: 10px 0 0;
   padding: 0;
   list-style: none;
@@ -3971,24 +4058,24 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
   gap: 8px;
   color: var(--text-2);
   font-size: var(--fs-caption);
-  line-height: 1.4;
+  line-height: 1.55;
   opacity: 0;
   animation: demoBeat 6.6s ease-in-out infinite;
   animation-delay: calc(var(--beat) * 2.2s);
 }
-.mechanic-demo-beats li::before {
-  content: counter(list-item);
+.mechanic-demo-beats li b {
   width: 17px;
   height: 17px;
   flex: 0 0 auto;
   display: grid;
-  margin-top: 1px;
+  margin-top: 2px;
   place-items: center;
   border-radius: 50%;
   background: var(--boss-color);
   color: #11061f;
   font-size: 10px;
   font-weight: 900;
+  line-height: 1;
 }
 @keyframes demoBeat {
   0% { opacity: 0; transform: translateY(4px); }
@@ -4182,14 +4269,14 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
   88% { opacity: 1; transform: translate(calc(-50% + 26px), -50%); }
   94%, 100% { opacity: 0; transform: translate(calc(-50% + 26px), -50%); }
 }
-.boss-briefing-note {
-  margin: 14px 0 0;
+.sheet-note {
+  margin: 16px 0 0;
   color: var(--muted);
   font-size: var(--fs-caption);
-  line-height: 1.45;
+  line-height: 1.65;
 }
-/* 작은 화면에서는 시트 안이 스크롤된다. 도전 버튼이 스크롤 아래로 숨으면 안 된다. */
-.boss-briefing-start {
+/* 작은 화면에서는 시트 안이 스크롤된다. 확인 버튼이 스크롤 아래로 숨으면 안 된다. */
+.sheet-cta {
   position: sticky;
   z-index: 2;
   bottom: calc(-1 * (22px + env(safe-area-inset-bottom)));
@@ -4197,7 +4284,7 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
   margin-top: 15px;
   box-shadow: 0 10px 0 10px #100c2c, 0 12px 28px rgba(148,50,231,.4);
 }
-.boss-briefing-start img { width: 21px; height: 21px; }
+.sheet-cta img { width: 21px; height: 21px; }
 
 @media (max-width: 340px) {
   .cue-demos { grid-template-columns: 1fr; }
@@ -4285,17 +4372,6 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
 }
 .home-v2 .boss-card.is-daily-boss .hunt-meta span:first-child {
   color: color-mix(in srgb, var(--featured-boss-color) 66%, #fff);
-}
-.home-v2 .boss-card.is-daily-boss .boss-visual > span {
-  inset: 10% 2% 7%;
-  border: 0;
-  border-radius: 0;
-  background:
-    radial-gradient(circle at 43% 42%, color-mix(in srgb, var(--featured-boss-color) 22%, transparent), transparent 39%),
-    radial-gradient(circle at 65% 61%, color-mix(in srgb, var(--featured-boss-color) 13%, transparent), transparent 43%);
-  box-shadow: none;
-  filter: blur(14px);
-  opacity: .86;
 }
 
 /* 홈 피처드는 카드가 아니라 오늘의 보스를 구분하는 풀블리드 컬러 구역이다. */

@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { getBossById, getDailyBoss } from '../lib/bosses'
 import { sound } from '../lib/sound'
+import { haptics } from '../lib/haptics'
 import Icon from '../components/Icon'
 
 // 보스마다 고유 신호가 하나씩 있다. 가중치만 다르면 한 판에 신호가 수십 번 뜨는 통에
@@ -90,7 +91,7 @@ const CUE_HINT = {
   hold: '길게 눌러 힘을 모으세요',
   swipe: '좌우로 밀어내세요',
   shield: '방어막이 올라왔어요. 건드리지 마세요',
-  thaw: '얼음을 깨도록 좌우로 빠르게 밀어내세요',
+  thaw: '좌우로 빠르게 밀어 시간 정지를 막으세요',
 }
 const GLITCH_SCRAMBLE_CHANCE = 0.4
 
@@ -138,7 +139,6 @@ export default function Boss() {
   const shadowVeilRef = useRef(false)
   const cueCountRef = useRef(0)
   const doubleTapRef = useRef(0)
-  const successfulHitsRef = useRef(0)
 
   const phase = hp > boss.maxHp * 0.7 ? 1 : hp > boss.maxHp * 0.4 ? 2 : 3
   const mechanic = boss.mechanic
@@ -179,7 +179,7 @@ export default function Boss() {
       if (boss.id === 'neon-nightmare' && cueCountRef.current % 4 === 0) {
         setShadowVeil(true)
         shadowVeilRef.current = true
-        sound.mechanic()
+        sound.mechanic(); haptics.mechanic()
       }
 
       const startResponseWindow = () => {
@@ -257,16 +257,16 @@ export default function Boss() {
         }
         setBurst(true)
         setTimeout(() => setBurst(false), 620)
-        sound.mechanic()
+        sound.mechanic(); haptics.mechanic()
       } else if (heatRef.current >= 80) {
         // 다음 실수에 폭발한다는 걸 이때 알려야 HOLD 냉각을 노릴 수 있다.
-        sound.mechanic()
+        sound.mechanic(); haptics.mechanic()
       }
     }
 
     comboRef.current = 0
     setCombo(0)
-    sound.miss()
+    sound.miss(); haptics.miss()
     setJudge(message)
     shadowVeilRef.current = false
     setShadowVeil(false)
@@ -283,10 +283,10 @@ export default function Boss() {
 
   punishRef.current = punish
 
-  function hit(label) {
+  function hit(label, options = {}) {
     // 장막은 반응 시간을 깎는 대신 뚫으면 피해가 커진다. 위험만 있고 이득이 없으면 세금일 뿐이다.
     const veiled = boss.id === 'neon-nightmare' && shadowVeilRef.current
-    const damage = Math.round((boss.damagePerHit || 1) * (veiled ? 1.5 : 1))
+    const damage = Math.round((boss.damagePerHit || 1) * (veiled ? 1.5 : 1) * (options.multiplier || 1))
     const ventedHeat = boss.id === 'solar-eclipse-phoenix' && (cue?.type === 'hold' || cue?.type === 'charge') && heatRef.current > 0
     if (ventedHeat) {
       heatRef.current = Math.max(0, heatRef.current - 40)
@@ -299,13 +299,15 @@ export default function Boss() {
     setHp(nextHp)
     setCombo(nextCombo)
     maxComboRef.current = Math.max(maxComboRef.current, nextCombo)
-    sound.hit(nextCombo)
+    sound.hit(nextCombo); haptics.hit()
     shadowVeilRef.current = false
     setShadowVeil(false)
     setJudge(ventedHeat ? 'COOLED DOWN!' : veiled ? '장막을 뚫었어요!' : label)
-    flash(ventedHeat ? `COOL  -${damage}` : veiled ? `SHADOW BREAK  -${damage}` : `-${damage}`, phaseRef.current === 3 ? 'rush' : 'hit')
+    flash(
+      options.flashLabel ? `${options.flashLabel}  -${damage}` : ventedHeat ? `COOL  -${damage}` : veiled ? `SHADOW BREAK  -${damage}` : `-${damage}`,
+      options.multiplier > 1 || phaseRef.current === 3 ? 'rush' : 'hit',
+    )
     resetHold()
-    successfulHitsRef.current += 1
 
     if (nextHp === 0) { finish(true); return }
 
@@ -322,13 +324,15 @@ export default function Boss() {
       return
     }
 
-    if (boss.id === 'polar-pod' && successfulHitsRef.current % 5 === 0) {
+    // 5연속으로 맞히면 보스가 시간을 멈추려 든다. 막으면 반격 기회, 놓치면 시간을 빼앗긴다.
+    // 예전에는 누적 성공 5회마다 걸려서 "잘하면 방해받는" 구조였고, 막아도 이득이 없었다.
+    if (boss.id === 'polar-pod' && nextCombo % 5 === 0) {
       clearTimers()
       setCue({ type: 'thaw', id: Date.now() })
       frozenRef.current = true
       setFrozen(true)
-      setJudge('얼음을 깨세요!')
-      sound.mechanic()
+      setJudge('보스가 시간을 멈추려 해요!')
+      sound.mechanic(); haptics.mechanic()
       mechanicTimerRef.current = setTimeout(() => {
         frozenRef.current = false
         setFrozen(false)
@@ -337,8 +341,10 @@ export default function Boss() {
         setCombo(0)
         timeRef.current = Math.max(0, timeRef.current - 3)
         setTimeLeft(timeRef.current)
-        setJudge('동상 피해를 입었어요!')
-        flash('FROSTBITE  -3초', 'miss')
+        setJudge('시간을 빼앗겼어요!')
+        flash('TIME STOLEN  -3초', 'miss')
+        setTimeHit({ amount: 3, id: Date.now() })
+        setTimeout(() => setTimeHit(null), 760)
         if (timeRef.current <= 0) { finish(false); return }
         nextCue(260)
       }, 1600)
@@ -427,14 +433,12 @@ export default function Boss() {
       else punish('너무 오래 달궜어요!')
     } else if (cue.type === 'thaw') {
       if (Math.abs(dx) >= SWIPE_MIN_PX && Math.abs(dx) > Math.abs(dy)) {
+        // 막아냈으면 그냥 원상복귀가 아니라 반격이다. 그래야 연속 성공이 벌이 아니라 기회가 된다.
         clearTimers()
         frozenRef.current = false
         setFrozen(false)
         setCue(null)
-        resetHold()
-        setJudge('동결 해제!')
-        flash('ICE BREAK!', 'hit')
-        nextCue(180)
+        hit('시간 정지를 깨뜨렸어요!', { multiplier: 2, flashLabel: 'ICE BREAK' })
       } else {
         resetHold()
         setJudge('더 빠르게 밀어 얼음을 깨세요!')
@@ -513,7 +517,7 @@ export default function Boss() {
     : cueScrambling
       ? { title: 'SIGNAL ERROR', copy: '확정 전에 누르면 오작동' }
       : frozen
-        ? { title: 'TIME FREEZE', copy: '제한 시간이 멈췄습니다' }
+        ? { title: 'TIME FREEZE', copy: '막으면 피해 2배 · 놓치면 시간 -3초' }
         : overheated
           ? { title: `OVERHEAT ${heat}%`, copy: '다음 실수 시 태양 폭발 · HOLD로 냉각' }
           : null

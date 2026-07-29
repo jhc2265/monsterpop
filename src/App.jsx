@@ -15,7 +15,7 @@ import Collection from './pages/Collection'
 import Settings from './pages/Settings'
 import Profile from './pages/Profile'
 import ErrorBoundary from './components/ErrorBoundary'
-import { applyPreferences, getPreferences } from './lib/preferences'
+import { applyPreferences } from './lib/preferences'
 import { sound } from './lib/sound'
 
 function Protected({ children }) {
@@ -28,12 +28,8 @@ function Protected({ children }) {
 export default function App() {
   const location = useLocation()
 
-  useEffect(() => {
-    const preferences = getPreferences()
-    applyPreferences(preferences)
-    sound.setBgmEnabled(preferences.bgm)
-    sound.setEffectsEnabled(preferences.effects)
-  }, [])
+  // applyPreferences 하나가 배경음·효과음·진동·모션을 모두 반영한다.
+  useEffect(() => { applyPreferences() }, [])
 
   useEffect(() => {
     let scene = 'silent'

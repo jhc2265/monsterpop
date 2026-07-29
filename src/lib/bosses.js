@@ -126,11 +126,11 @@ export const DAILY_BOSSES = [
     mechanic: {
       name: '시간 동결',
       short: 'TIME FREEZE',
-      meter: '해동',
+      meter: '저지',
       beats: [
-        '5번 성공하면 얼어붙어요',
-        '제한 시간은 멈추지만 1.6초 안에 깨야 해요',
-        '좌우로 밀어 탈출! 놓치면 시간 -3초',
+        '5연속으로 맞히면 보스가 시간을 멈추려 해요',
+        '1.6초 안에 좌우로 밀어 막으세요',
+        '막으면 피해 2배! 놓치면 시간을 3초 빼앗겨요',
       ],
     },
     description: '얼어붙은 시계 조각으로 사냥터의 시간을 늦추는 네 번째 일일 보스예요.',
@@ -249,19 +249,6 @@ function readState(userId) {
 
 function writeState(userId, state) {
   try { localStorage.setItem(storageKey(userId), JSON.stringify(state)) } catch { /* 저장 실패는 무시 */ }
-}
-
-// 공통 조작법은 보스마다 반복할 게 아니라 보스전에 처음 들어올 때 한 번만 보여준다.
-// 신호 구성이 바뀌면 VERSION 을 올려 다시 띄운다.
-const TUTORIAL_VERSION = 1
-const tutorialKey = (userId) => `monsterpop-boss-tutorial-${userId}`
-
-export function hasSeenBossTutorial(userId) {
-  try { return Number(localStorage.getItem(tutorialKey(userId))) >= TUTORIAL_VERSION } catch { return false }
-}
-
-export function markBossTutorialSeen(userId) {
-  try { localStorage.setItem(tutorialKey(userId), String(TUTORIAL_VERSION)) } catch { /* 저장 실패는 무시 */ }
 }
 
 export function hasClearedBossToday(userId, bossId) {

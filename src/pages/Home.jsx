@@ -3,10 +3,34 @@ import { useAuth } from '../context/AuthContext'
 import { sound } from '../lib/sound'
 import Icon from '../components/Icon'
 import BottomNav from '../components/BottomNav'
-import { getHunterTitle, getLevelProgress, getMonsterUnlockLevel, resolveProgress } from '../lib/progression'
+import { getHunterTitle, getLevelProgress, getMonsterUnlockLevel, getUnlockedMonsterIds, resolveProgress } from '../lib/progression'
+import { MONSTERS } from '../lib/monsters'
 import { getDailyMissions } from '../lib/missions'
 import { getBossById, getDailyBoss, hasClearedBossToday, koreaToday } from '../lib/bosses'
 import { resolveAvatarUrl } from '../lib/avatar'
+
+const GRADE_STARS = { 일반: '★☆☆', 희귀: '★★☆', 특수: '★★☆', 영웅: '★★★' }
+
+// 예전에는 카드 내용이 하드코딩이라 해금 테이블과 따로 놀았다.
+// Lv.1 에게 Lv.3 몬스터인 번개 토끼를, Lv.3 에게 Lv.5 인 불꽃 여우를 사냥하라고 띄웠다.
+// 실제 출현 목록에서 뽑아야 다시 어긋나지 않는다. weight 0 인 보스는 사냥터에 나오지 않으니 뺀다.
+function getTodaysHunt(level, today) {
+  const unlocked = getUnlockedMonsterIds(level)
+  const huntable = MONSTERS.filter((monster) => monster.weight > 0 && unlocked.includes(monster.id))
+  const pool = huntable.length ? huntable : [MONSTERS[0]]
+  // 'TODAY’S' 라고 써 붙였으면 날마다 바뀌어야 한다. 예전에는 레벨 구간마다 고정이었다.
+  const monster = pool[Number(today.replaceAll('-', '')) % pool.length]
+  return {
+    label: 'TODAY’S HUNT',
+    name: `${monster.name} 출현!`,
+    copy: monster.description,
+    image: monster.image,
+    grade: `${monster.grade} 몬스터`,
+    score: `+${monster.score}점`,
+    difficulty: GRADE_STARS[monster.grade] || '★★☆',
+    path: '/game',
+  }
+}
 
 export default function Home() {
   const { user, profile } = useAuth()
@@ -38,9 +62,7 @@ export default function Home() {
         bossId: dailyBoss.id,
         bossColor: dailyBoss.color,
       }
-    : progress.level >= 3
-      ? { label: 'TODAY’S HUNT', name: '불꽃 여우 출현!', copy: '고득점 몬스터 불꽃 여우를 30초 안에 사냥하세요.', image: '/images/monsters/fox.webp', grade: '영웅 몬스터', score: '+300점', difficulty: '★★☆', path: '/game' }
-      : { label: 'TODAY’S HUNT', name: '번개 토끼 출현!', copy: '빠르게 움직이는 번개 토끼를 30초 안에 사냥하세요.', image: '/images/monsters/rabbit.webp', grade: '희귀 몬스터', score: '+200점', difficulty: '★★☆', path: '/game' }
+    : getTodaysHunt(progress.level, koreaToday())
 
   return <main className="page home-page home-v2">
     <div className="home-daily-row">
@@ -58,7 +80,12 @@ export default function Home() {
           <small><b>LV.{progress.level}</b><span>{getHunterTitle(progress.level)}</span></small>
           <strong>{profile?.nickname || '헌터'} 헌터</strong>
           <span className="home-hunter-xp">
-            <em>{progress.needed > 0 ? <>다음 레벨까지 <b>{(progress.needed - progress.current).toLocaleString()} XP</b></> : <><b>MAX LEVEL</b></>}<i>{Math.round(progress.percent)}%</i></em>
+            {/* 퍼센트는 바로 아래 진행 바가 이미 보여준다. 그 자리에 분모를 적어야
+                "다음 레벨까지 얼마"가 전체 중 어디쯤인지 알 수 있다. */}
+            <em>
+              <span>{progress.needed > 0 ? <>다음 레벨까지 <b>{(progress.needed - progress.current).toLocaleString()} XP</b></> : <b>MAX LEVEL</b>}</span>
+              <i>{progress.needed > 0 ? `${progress.current.toLocaleString()} / ${progress.needed.toLocaleString()}` : progress.total.toLocaleString()}</i>
+            </em>
             <span><i style={{ width: `${progress.percent}%` }} /></span>
           </span>
         </span>
@@ -91,7 +118,6 @@ export default function Home() {
           <p>{featured.copy}</p>
         </div>
         <div className="boss-visual" aria-hidden="true">
-          <span />
           <img className="hero-monster" src={featured.image} alt="" />
         </div>
       </div>

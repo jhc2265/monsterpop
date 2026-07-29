@@ -3,8 +3,12 @@ import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../context/AuthContext'
 import { sound } from '../lib/sound'
+import { haptics } from '../lib/haptics'
 import { getPreferences, savePreferences } from '../lib/preferences'
 import Icon from '../components/Icon'
+
+// iOS 사파리는 Vibration API 자체가 없다. 켤 수는 있지만 아무 일도 안 일어나므로 미리 알려준다.
+const supportsVibration = typeof navigator !== 'undefined' && typeof navigator.vibrate === 'function'
 
 export default function Settings() {
   const navigate = useNavigate()
@@ -12,14 +16,15 @@ export default function Settings() {
   const [preferences, setPreferences] = useState(getPreferences)
   const [notice, setNotice] = useState('')
 
-  useEffect(() => {
-    sound.setBgmEnabled(preferences.bgm)
-    sound.setEffectsEnabled(preferences.effects)
-    savePreferences(preferences)
-  }, [preferences])
+  // savePreferences 가 applyPreferences 를 거쳐 배경음·효과음·진동·모션을 한 번에 반영한다.
+  useEffect(() => { savePreferences(preferences) }, [preferences])
 
   function toggle(key) {
     setPreferences((current) => ({ ...current, [key]: !current[key] }))
+  }
+
+  function setValue(key, value) {
+    setPreferences((current) => ({ ...current, [key]: value }))
   }
 
   async function resetPassword() {
@@ -38,8 +43,13 @@ export default function Settings() {
     <button className="settings-profile" onClick={() => navigate('/profile')}><div className="avatar">{profile?.avatar_url ? <img src={profile.avatar_url} alt="" /> : (profile?.nickname || '헌')[0]}</div><div><strong>{profile?.nickname || '헌터'} 헌터님</strong><span>{user.email}</span></div><b>›</b></button>
     <SettingsGroup icon="sound" title="게임">
       <SettingToggle label="배경음악" checked={preferences.bgm} onChange={() => toggle('bgm')} />
+      {preferences.bgm && <SettingSlider
+        label="배경음 크기"
+        value={preferences.bgmVolume ?? 1}
+        onChange={(value) => setValue('bgmVolume', value)}
+      />}
       <SettingToggle label="효과음" checked={preferences.effects} onChange={() => toggle('effects')} />
-      <SettingToggle label="진동" checked={preferences.vibration} onChange={() => toggle('vibration')} />
+      <SettingToggle label="진동" checked={preferences.vibration} onChange={() => { toggle('vibration'); if (!preferences.vibration) haptics.hit() }} hint={supportsVibration ? undefined : '이 브라우저는 진동을 지원하지 않아요'} />
       <SettingToggle label="애니메이션 줄이기" checked={preferences.reduceMotion} onChange={() => toggle('reduceMotion')} />
     </SettingsGroup>
     <SettingsGroup icon="bell" title="알림">
@@ -64,8 +74,26 @@ function SettingsGroup({ icon, title, children }) {
   return <section className="settings-section"><h2><Icon name={icon} size={18} />{title}</h2><div className="settings-card">{children}</div></section>
 }
 
-function SettingToggle({ label, checked, onChange }) {
-  return <div className="setting-row"><span>{label}</span><button className={`switch ${checked ? 'on' : ''}`} onClick={onChange} role="switch" aria-checked={checked} aria-label={label}><i /></button></div>
+function SettingToggle({ label, checked, onChange, hint }) {
+  return <div className="setting-row"><span>{label}{hint && <em className="setting-hint">{hint}</em>}</span><button className={`switch ${checked ? 'on' : ''}`} onClick={onChange} role="switch" aria-checked={checked} aria-label={label}><i /></button></div>
+}
+
+// 배경음만 슬라이더를 둔다. 효과음은 0.1초짜리 톤이라 미세 조절 수요가 없고,
+// 진동은 웹에서 세기 자체를 지정할 수 없다.
+function SettingSlider({ label, value, onChange }) {
+  const percent = Math.round(value * 100)
+  return <div className="setting-row setting-row-slider">
+    <span>{label}<em className="setting-hint">{percent}%</em></span>
+    <input
+      type="range"
+      min="0"
+      max="100"
+      step="5"
+      value={percent}
+      onChange={(event) => onChange(Number(event.target.value) / 100)}
+      aria-label={label}
+    />
+  </div>
 }
 
 function SettingAction({ label, muted, onClick, plain }) {

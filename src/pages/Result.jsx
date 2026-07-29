@@ -111,6 +111,13 @@ export default function Result() {
   const baseXp = 20
   const huntBonusXp = totalKills * 2 + (monsterCounts.boss || 0) * 10
   const recordBonusXp = isBest ? 15 : 0
+  // 내역 세 칸이 TOTAL 을 설명해야 한다. 예전에는 기본+사냥+기록만 보여줘서
+  // 미션으로 받은 XP 가 통째로 빠졌고, 합이 총합과 어긋났다.
+  const bonusXp = recordBonusXp + missionXp
+  const bonusParts = [
+    recordBonusXp > 0 && `최고 기록 +${recordBonusXp}`,
+    missionXp > 0 && `미션 +${missionXp}`,
+  ].filter(Boolean)
   // 이번 판에 미션을 새로 채우지 못하면 XP는 늘 +0 이다. 그때는 금액 대신 오늘 진행도를 보여준다.
   const missionTile = missionXp > 0
     ? <div><small>미션</small><strong>+{missionXp}</strong></div>
@@ -161,7 +168,7 @@ export default function Result() {
           </> : <>
             <div><small>기본</small><strong>+{baseXp}</strong></div>
             <div><small>사냥</small><strong>+{huntBonusXp}</strong></div>
-            <div><small>기록</small><strong>+{recordBonusXp}</strong></div>
+            <div><small>보너스</small><strong>+{bonusXp}</strong></div>
           </>}
         </div>
         <p className="reward-kills">{isBossMode
@@ -174,7 +181,9 @@ export default function Result() {
             : bossAttempt?.improved
               ? <>오늘 최고 진행도 <strong>{Math.round(bossAttempt.best * 100)}%</strong> 갱신! 격파하면 전체 보상을 받아요</>
               : <>오늘 최고 진행도 <strong>{Math.round((bossAttempt?.previousBest ?? 0) * 100)}%</strong>를 넘어야 도전 보상이 더 나와요</>
-          : <>이번 사냥에서 몬스터 <strong>{totalKills}마리</strong>를 처치했어요</>}</p>
+          : bonusParts.length > 0
+            ? <>보너스 내역 · <strong>{bonusParts.join(' · ')}</strong></>
+            : <>최고 기록을 세우거나 미션을 채우면 <strong>보너스 XP</strong>를 받아요</>}</p>
       </div>
       <div className="xp-progress-card">{xpProgress && <><div className="xp-level-head"><strong>LV.{xpProgress.level}</strong><span>{isMaxLevel(xpProgress.level) ? 'MAX LEVEL' : 'LEVEL PROGRESS'}</span><b>{isMaxLevel(xpProgress.level) ? 'MAX' : `LV.${xpProgress.level + 1}`}</b></div><div className="xp-progress-line"><span><i style={{ width: `${xpProgress.percent}%` }} /></span></div><div className="xp-progress-values"><small>{xpProgress.current} / {xpProgress.needed} XP</small><small>{isMaxLevel(xpProgress.level) ? '최고 레벨 달성' : `${(xpProgress.needed - xpProgress.current).toLocaleString()} XP 남음`}</small></div></>}</div>
       {nextUnlock && <div className="next-reward-card">{nextUnlockMonster ? <img src={nextUnlockMonster.image} alt="" /> : nextUnlock.image ? <img src={nextUnlock.image} alt="" /> : <span><Icon name={nextUnlock.skill ? 'sword' : 'spark'} size={27} /></span>}<div><small>NEXT UNLOCK · LV.{xpProgress.level + 1}</small><strong>{nextUnlock.title}</strong><p>{nextUnlock.description}</p></div><Icon name="lock" size={18} /></div>}

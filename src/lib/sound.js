@@ -18,21 +18,32 @@ let bossBattleAudio = null
 let sceneRequested = 'silent'
 let lobbyNeedsIntro = true
 
+// 트랙마다 기준 음량이 다르다(로비 0.17, 전투 0.22 …). 설정 슬라이더는 그 위에 곱하는 배율이라
+// 트랙 사이의 균형은 그대로 두고 전체만 오르내린다. 만들어진 트랙을 기억해 둬야 나중에 일괄 반영된다.
+const bgmTracks = new Map()
+let bgmVolume = 1
+
+function makeTrack(src, baseVolume, loop = false) {
+  const audio = new Audio(src)
+  audio.loop = loop
+  audio.preload = 'auto'
+  bgmTracks.set(audio, baseVolume)
+  audio.volume = baseVolume * bgmVolume
+  return audio
+}
+
+function applyBgmVolume() {
+  bgmTracks.forEach((baseVolume, audio) => { audio.volume = baseVolume * bgmVolume })
+}
+
 function ensureLobbyAudio() {
-  if (!lobbyAudio) {
-    lobbyAudio = new Audio('/audio/soundtrack/lobby-loop.mp3')
-    lobbyAudio.loop = true
-    lobbyAudio.preload = 'auto'
-    lobbyAudio.volume = 0.17
-  }
+  if (!lobbyAudio) lobbyAudio = makeTrack('/audio/soundtrack/lobby-loop.mp3', 0.17, true)
   return lobbyAudio
 }
 
 function ensureLobbyIntroAudio() {
   if (!lobbyIntroAudio) {
-    lobbyIntroAudio = new Audio('/audio/soundtrack/theme-intro.mp3')
-    lobbyIntroAudio.preload = 'auto'
-    lobbyIntroAudio.volume = 0.17
+    lobbyIntroAudio = makeTrack('/audio/soundtrack/theme-intro.mp3', 0.17)
     lobbyIntroAudio.addEventListener('ended', () => syncSceneBGM())
   }
   return lobbyIntroAudio
@@ -41,21 +52,11 @@ function ensureLobbyIntroAudio() {
 function ensureSceneAudio(scene) {
   if (scene === 'lobby') return ensureLobbyAudio()
   if (scene === 'collection') {
-    if (!collectionAudio) {
-      collectionAudio = new Audio('/audio/soundtrack/collection-loop.mp3')
-      collectionAudio.loop = true
-      collectionAudio.preload = 'auto'
-      collectionAudio.volume = 0.16
-    }
+    if (!collectionAudio) collectionAudio = makeTrack('/audio/soundtrack/collection-loop.mp3', 0.16, true)
     return collectionAudio
   }
   if (scene === 'ranking') {
-    if (!rankingAudio) {
-      rankingAudio = new Audio('/audio/soundtrack/ranking-loop.mp3')
-      rankingAudio.loop = true
-      rankingAudio.preload = 'auto'
-      rankingAudio.volume = 0.15
-    }
+    if (!rankingAudio) rankingAudio = makeTrack('/audio/soundtrack/ranking-loop.mp3', 0.15, true)
     return rankingAudio
   }
   return null
@@ -63,34 +64,18 @@ function ensureSceneAudio(scene) {
 
 function ensureThemeClip(type) {
   if (type === 'logo') {
-    if (!logoAudio) {
-      logoAudio = new Audio('/audio/soundtrack/theme-logo.mp3')
-      logoAudio.preload = 'auto'
-      logoAudio.volume = 0.2
-    }
+    if (!logoAudio) logoAudio = makeTrack('/audio/soundtrack/theme-logo.mp3', 0.2)
     return logoAudio
   }
   if (type === 'reward') {
-    if (!rewardAudio) {
-      rewardAudio = new Audio('/audio/soundtrack/reward-sting.mp3')
-      rewardAudio.preload = 'auto'
-      rewardAudio.volume = 0.2
-    }
+    if (!rewardAudio) rewardAudio = makeTrack('/audio/soundtrack/reward-sting.mp3', 0.2)
     return rewardAudio
   }
   if (type === 'result') {
-    if (!resultAudio) {
-      resultAudio = new Audio('/audio/soundtrack/result-jingle.mp3')
-      resultAudio.preload = 'auto'
-      resultAudio.volume = 0.19
-    }
+    if (!resultAudio) resultAudio = makeTrack('/audio/soundtrack/result-jingle.mp3', 0.19)
     return resultAudio
   }
-  if (!bossAlertAudio) {
-    bossAlertAudio = new Audio('/audio/soundtrack/boss-alert.mp3')
-    bossAlertAudio.preload = 'auto'
-    bossAlertAudio.volume = 0.22
-  }
+  if (!bossAlertAudio) bossAlertAudio = makeTrack('/audio/soundtrack/boss-alert.mp3', 0.22)
   return bossAlertAudio
 }
 
@@ -173,12 +158,7 @@ export const sound = {
   over() { if (!effectsEnabled) return; tone(659, 0.18, 'triangle', 0.28); tone(523, 0.18, 'triangle', 0.28, 0.14); tone(392, 0.3, 'triangle', 0.28, 0.28) },
   startBGM() {
     if (bgmOn || muted || !bgmEnabled) return
-    if (!battleAudio) {
-      battleAudio = new Audio('/audio/soundtrack/battle-loop.mp3')
-      battleAudio.loop = true
-      battleAudio.preload = 'auto'
-      battleAudio.volume = 0.22
-    }
+    if (!battleAudio) battleAudio = makeTrack('/audio/soundtrack/battle-loop.mp3', 0.22, true)
     bgmOn = true
     battleAudio.currentTime = 0
     battleAudio.play().catch(() => {})
@@ -194,12 +174,7 @@ export const sound = {
   },
   startBossBGM() {
     if (muted || !bgmEnabled) return
-    if (!bossBattleAudio) {
-      bossBattleAudio = new Audio('/audio/soundtrack/boss-loop.mp3')
-      bossBattleAudio.loop = true
-      bossBattleAudio.preload = 'auto'
-      bossBattleAudio.volume = 0.21
-    }
+    if (!bossBattleAudio) bossBattleAudio = makeTrack('/audio/soundtrack/boss-loop.mp3', 0.21, true)
     bossBattleAudio.currentTime = 0
     bossBattleAudio.play().catch(() => {})
   },
@@ -247,6 +222,11 @@ export const sound = {
     syncSceneBGM()
   },
   setEffectsEnabled(value) { effectsEnabled = value },
+  // 0~1 배율. 트랙별 기준 음량에 곱해지므로 로비·전투 사이의 균형은 유지된다.
+  setBgmVolume(value) {
+    bgmVolume = Math.min(1, Math.max(0, Number(value) || 0))
+    applyBgmVolume()
+  },
   unlock() {
     ensureContext()
     syncSceneBGM()

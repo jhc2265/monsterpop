@@ -1,22 +1,24 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { DAILY_BOSSES, getBossRecord, getDailyBoss, hasSeenBossTutorial, markBossTutorialSeen } from '../lib/bosses'
+import { DAILY_BOSSES, getBossRecord, getDailyBoss } from '../lib/bosses'
+import { hasSeenTutorial, markTutorialSeen } from '../lib/tutorial'
 import { useAuth } from '../context/AuthContext'
 import { getLevel, resolveProgress } from '../lib/progression'
 import { sound } from '../lib/sound'
 import Icon from '../components/Icon'
+import CueTutorial from '../components/CueTutorial'
 
 // 네 보스가 똑같이 쓰는 신호다. 보스마다 반복하면 읽지 않게 되므로
 // 보스전에 처음 들어올 때 한 번만 보여주고, 이후엔 상단 안내 버튼으로만 연다.
 // 글로 적어두면 안 읽는다. 손가락이 실제로 그 동작을 하는 걸 보여준다.
-const CUE_GUIDE = [
-  { id: 'tap', label: 'TAP', copy: '짧게 톡' },
-  { id: 'hold', label: 'HOLD', copy: '길게 꾹' },
-  { id: 'swipe', label: 'SWIPE', copy: '좌우로 슥' },
-  { id: 'wait', label: 'WAIT', copy: '손 떼고 대기' },
+const BOSS_CUES = [
+  { demo: 'tap', label: 'TAP', copy: '짧게 톡' },
+  { demo: 'hold', label: 'HOLD', copy: '길게 꾹' },
+  { demo: 'swipe', label: 'SWIPE', copy: '좌우로 슥' },
+  { demo: 'wait', label: 'WAIT', copy: '손 떼고 대기' },
 ]
 
-const BATTLE_RULES = [
+const BOSS_RULES = [
   { key: '시간', copy: '신호가 뜨면 제한 시간 안에 반응하세요' },
   { key: '실수', copy: '놓치거나 잘못 입력하면 남은 시간이 깎여요' },
   { key: '페이즈', copy: '보스 체력이 줄면 신호가 빨라지고 종류가 늘어요' },
@@ -36,11 +38,11 @@ export default function BossSelect() {
   const level = getLevel(resolveProgress(profile, user.id).xp)
   const todayBossId = getDailyBoss().id
   const [briefing, setBriefing] = useState(null)
-  const [tutorial, setTutorial] = useState(() => !hasSeenBossTutorial(user.id))
+  const [tutorial, setTutorial] = useState(() => !hasSeenTutorial('boss', user.id))
 
   function closeTutorial() {
     sound.button()
-    markBossTutorialSeen(user.id)
+    markTutorialSeen('boss', user.id)
     setTutorial(false)
   }
 
@@ -107,37 +109,16 @@ export default function BossSelect() {
     />}
 
     {/* 튜토리얼이 브리핑보다 뒤에 있어야 둘이 겹칠 때 위로 올라온다. */}
-    {tutorial && <BossTutorial onClose={closeTutorial} />}
+    {tutorial && <CueTutorial
+      kicker="BOSS BASICS"
+      title="보스전 조작법"
+      subtitle="네 보스 모두에게 공통으로 나오는 신호예요"
+      cues={BOSS_CUES}
+      notes={BOSS_RULES}
+      noteText="보스마다 저만 쓰는 신호와 기믹이 하나씩 더 있어요. 도전 전 브리핑에서 확인할 수 있습니다."
+      onClose={closeTutorial}
+    />}
   </main>
-}
-
-// 공통 조작법. 보스별 브리핑에서 이걸 반복하지 않는다 — 네 번 같은 걸 보면 아무도 안 읽는다.
-function BossTutorial({ onClose }) {
-  return <div className="modal-overlay boss-tutorial-overlay">
-    <section className="boss-briefing boss-tutorial">
-      <header className="boss-tutorial-head">
-        <span className="overline">BOSS BASICS</span>
-        <strong>보스전 조작법</strong>
-        <small>네 보스 모두에게 공통으로 나오는 신호예요</small>
-      </header>
-
-      <ul className="cue-demos">
-        {CUE_GUIDE.map((cue) => <li key={cue.id} className={`cue-demo cue-demo-${cue.id}`}>
-          <span className="cue-demo-stage" aria-hidden="true"><i className="cue-demo-hand" /></span>
-          <b>{cue.label}</b>
-          <span>{cue.copy}</span>
-        </li>)}
-      </ul>
-
-      <ul className="boss-tutorial-rules">
-        {BATTLE_RULES.map((rule) => <li key={rule.key}><b>{rule.key}</b><span>{rule.copy}</span></li>)}
-      </ul>
-
-      <p className="boss-briefing-note">보스마다 저만 쓰는 신호와 기믹이 하나씩 더 있어요. 도전 전 브리핑에서 확인할 수 있습니다.</p>
-
-      <button className="btn btn-primary boss-briefing-start" onClick={onClose}><span>알겠어요</span></button>
-    </section>
-  </div>
 }
 
 // 기믹을 글로 나열하는 대신 실제 전투 화면을 축소해 3박자로 재생한다.
@@ -153,15 +134,19 @@ function MechanicDemo({ boss }) {
       <span className="mechanic-demo-hp"><i /></span>
       <span className="mechanic-demo-meter"><em>{boss.mechanic.meter}</em><i /></span>
     </div>
+    {/* 번호는 CSS 카운터가 아니라 실제 요소로 찍는다. counter(list-item) 은 li 가
+        display:flex 라 증가하지 않아 세 박자 모두 0 으로 나왔다. */}
     <ol className="mechanic-demo-beats">
-      {boss.mechanic.beats.map((beat, index) => <li key={beat} style={{ '--beat': index }}>{beat}</li>)}
+      {boss.mechanic.beats.map((beat, index) => <li key={beat} style={{ '--beat': index }}>
+        <b>{index + 1}</b><span>{beat}</span>
+      </li>)}
     </ol>
   </div>
 }
 
 function BossBriefing({ boss, isToday, onClose, onStart }) {
   return <div className="modal-overlay boss-briefing-overlay" onClick={onClose}>
-    <section className="boss-briefing" style={{ '--boss-color': boss.color }} onClick={(event) => event.stopPropagation()}>
+    <section className="briefing-sheet boss-briefing" style={{ '--boss-color': boss.color }} onClick={(event) => event.stopPropagation()}>
       <header className="boss-briefing-head">
         <img src={boss.image} alt="" />
         <div>
@@ -196,9 +181,9 @@ function BossBriefing({ boss, isToday, onClose, onStart }) {
         <MechanicDemo boss={boss} />
       </div>
 
-      <p className="boss-briefing-note">격파하지 못해도 깎아낸 만큼 도전 보상을 받아요. 오늘 최고 진행도를 넘을 때마다 추가로 지급됩니다.</p>
+      <p className="sheet-note">격파하지 못해도 깎아낸 만큼 도전 보상을 받아요. 오늘 최고 진행도를 넘을 때마다 추가로 지급됩니다.</p>
 
-      <button className="btn btn-primary boss-briefing-start" onClick={onStart}>
+      <button className="btn btn-primary sheet-cta" onClick={onStart}>
         <img src="/images/ui/hunt-swords.webp" alt="" /><span>도전 시작</span>
       </button>
     </section>

@@ -4,8 +4,45 @@ import { pickRandomMonster, preloadMonsterImages } from '../lib/monsters'
 import MonsterImage from '../components/MonsterImage'
 import Icon from '../components/Icon'
 import { sound } from '../lib/sound'
+import { haptics } from '../lib/haptics'
 import { useAuth } from '../context/AuthContext'
 import { getLevel, getUnlockedMonsterIds, resolveProgress } from '../lib/progression'
+import { hasSeenTutorial, markTutorialSeen } from '../lib/tutorial'
+import CueTutorial from '../components/CueTutorial'
+
+// 아레나 상단에 상시 범례를 띄우던 걸 대체한다. 그 범례는 신호 10종 중 4종만 적혀 있었고,
+// 몬스터가 이미 머리 위에 자기 배지를 달고 있어서 자리만 차지했다.
+//
+// 신호는 해금된 몬스터에서만 뽑는다. 전부 나열하면 Lv.1 플레이어가
+// 슬라임(TAP) 하나만 만나는데 여섯 종을 배우게 된다.
+const HUNT_CUES = [
+  { demo: 'tap', label: 'TAP', copy: '짧게 톡', from: ['slime'] },
+  { demo: 'swipe', label: '↔', copy: '좌우로 밀기', from: ['rabbit'] },
+  { demo: 'double', label: '×2 · ×3', copy: '표시된 횟수만큼 연타', from: ['fox', 'golem'] },
+  { demo: 'wait', label: 'WAIT', copy: '가시가 내려갈 때 터치', from: ['hedgehog'] },
+  { demo: 'vertical', label: '↑', copy: '위로 밀어 얼음 깨기', from: ['penguin'] },
+  { demo: 'hold', label: 'HOLD', copy: '길게 누르기', from: ['jellyfish'] },
+]
+// 점수 규칙은 몬스터와 무관하게 처음부터 적용된다. 화면에 QUICK! 이 뜨긴 하지만
+// 그게 보너스라는 것도, 조건이 뭔지도 알려주는 곳이 없었다.
+const SCORE_RULES = [
+  { key: 'QUICK', copy: '몬스터 아래 도망 바가 절반 넘게 남았을 때 잡으면 점수 1.3배 · 콤보 +2' },
+  { key: '콤보', copy: '콤보가 오를수록 점수 배율이 올라요 (30에서 최대 3.4배)' },
+]
+const HUNT_NOTES = [
+  { key: '+2s', copy: '시간 부엉이 — 터치하면 사냥 시간이 2초 늘어요', from: ['owl'] },
+  { key: 'HOLD', copy: '별빛 해파리 — 빛이 가장 밝아질 때 손을 떼세요', from: ['jellyfish'] },
+  { key: 'FIND', copy: '환영 고양이 — 분신 사이에서 다이아 눈동자 본체를 찾으세요', from: ['cat'] },
+  { key: '↔×2', copy: '달빛 늑대 — 잔상 방향으로 두 번 미세요', from: ['wolf'] },
+]
+
+// 섀도우 버스트는 명시적으로 해금되는 유일한 액티브 스킬인데,
+// 레벨업 모달 한 줄 말고는 충전 방법도 효과도 알려주는 곳이 없었다.
+const BURST_NOTES = [
+  { key: '충전', copy: '몬스터를 처치할 때마다 +1, QUICK 처치는 +2' },
+  { key: '발동', copy: '화면 아래 게이지가 가득 차면 쌍검 버튼을 누르세요' },
+  { key: '효과', copy: '화면의 일반·희귀 몬스터를 한 번에 처치하고, 나머지는 체력을 1 깎아요' },
+]
 
 const GAME_TIME = 30
 const MAX_ENEMIES = 5
@@ -48,6 +85,13 @@ export default function Game() {
   const playerLevel = getLevel(resolveProgress(profile, user.id).xp)
   const allowedMonsterIds = getUnlockedMonsterIds(playerLevel)
   const skillUnlocked = playerLevel >= 4
+  // 큐로 둔다. Lv.4 를 막 찍고 들어오면 사냥 안내와 버스트 안내가 같이 떠야 하는데
+  // 겹쳐 띄우면 뒤엣것이 앞엣것을 가린다.
+  const [tutorials, setTutorials] = useState(() => [
+    !hasSeenTutorial('hunt', user.id) && 'hunt',
+    skillUnlocked && !hasSeenTutorial('burst', user.id) && 'burst',
+  ].filter(Boolean))
+  const tutorial = tutorials[0] || null
   const [countdown, setCountdown] = useState(3)
   const [playing, setPlaying] = useState(false)
   const [paused, setPaused] = useState(false)
@@ -80,12 +124,13 @@ export default function Game() {
 
   useEffect(() => { preloadMonsterImages() }, [])
 
+  // 튜토리얼을 읽는 동안 카운트다운이 돌면 안 된다. 닫아야 3초가 시작된다.
   useEffect(() => {
     sound.unlock()
-    if (countdown <= 0) return
+    if (tutorial || countdown <= 0) return
     const timer = setTimeout(() => setCountdown((value) => value - 1), 720)
     return () => clearTimeout(timer)
-  }, [countdown])
+  }, [countdown, tutorial])
 
   useEffect(() => {
     if (countdown !== 0 || playingRef.current) return
@@ -209,7 +254,7 @@ export default function Game() {
     const nextEnergy = skillUnlocked ? Math.min(SKILL_MAX, energyRef.current + 1 + (quick ? 1 : 0)) : 0
     energyRef.current = nextEnergy
     setEnergy(nextEnergy)
-    sound.hit(comboRef.current)
+    sound.hit(comboRef.current); haptics.hit()
     setLastJudge(`${label} ${target.name}`)
     addEffect(target.x, target.y, label, quick ? 'perfect' : 'good')
 
@@ -246,7 +291,7 @@ export default function Game() {
     comboRef.current = resetCombo ? 0 : Math.max(0, comboRef.current - 1)
     setCombo(comboRef.current)
     setLastJudge(message)
-    sound.miss()
+    sound.miss(); haptics.miss()
     addEffect(target.x, target.y, 'TRY AGAIN', 'miss')
   }
 
@@ -316,9 +361,15 @@ export default function Game() {
     setHoldingId(null)
   }
 
+  function closeTutorial(kind) {
+    sound.button()
+    markTutorialSeen(kind, user.id)
+    setTutorials((queue) => queue.filter((item) => item !== kind))
+  }
+
   function useBurst() {
     if (!skillUnlocked || !playing || paused || energyRef.current < SKILL_MAX) return
-    sound.combo()
+    sound.combo(); haptics.burst()
     let bonus = 0
     const defeated = []
     enemies.forEach((enemy) => {
@@ -375,7 +426,6 @@ export default function Game() {
     <section className={`battle-arena ${energy >= SKILL_MAX ? 'burst-ready' : ''} ${enemies.some((enemy) => enemy.behavior === 'freeze-field') ? 'frozen-field' : ''}`}>
       <img className="battle-background" src="/images/bg/battle-arena.webp" alt="" />
       <div className="battle-vignette" />
-      <div className="gesture-legend"><span>TAP</span><span>↔ SWIPE</span><span>×2</span><span>HOLD</span></div>
 
       {enemies.map((enemy) => {
         const guardOpen = enemy.behavior !== 'guard-cycle' || isGuardOpen(enemy)
@@ -403,7 +453,7 @@ export default function Game() {
       {effects.map((effect) => <div key={effect.id} className={`battle-effect ${effect.type}`} style={{ left: `${effect.x}%`, top: `${effect.y}%` }}>{effect.text}</div>)}
 
       {countdown > 0 && <div className="battle-countdown"><span>REACTION HUNT</span><strong key={countdown}>{countdown}</strong><p>표시를 보고 탭 · 스와이프 · 더블 탭 · 길게 누르기</p></div>}
-      {paused && <div className="battle-pause-overlay"><span className="eyebrow">GAME PAUSED</span><h2>잠시 쉬어갈까요?</h2><button className="btn btn-primary" onClick={togglePause}><Icon name="play" size={18} /> 계속하기</button><button className="btn btn-secondary" onClick={quit}>그만하기</button></div>}
+      {paused && <div className="battle-pause-overlay"><span className="eyebrow">GAME PAUSED</span><h2>잠시 쉬어갈까요?</h2><button className="btn btn-primary" onClick={togglePause}><Icon name="play" size={18} /> 계속하기</button><button className="btn btn-secondary" onClick={() => { sound.button(); setTutorials(skillUnlocked ? ['hunt', 'burst'] : ['hunt']) }}>조작 안내</button><button className="btn btn-secondary" onClick={quit}>그만하기</button></div>}
     </section>
 
     <section className="battle-controls">
@@ -414,5 +464,40 @@ export default function Game() {
       <div className="skill-meter"><span><i style={{ width: `${skillUnlocked ? (energy / SKILL_MAX) * 100 : 0}%` }} /></span><small>{skillUnlocked ? '섀도우 버스트' : 'Lv.4에서 스킬 해금'}</small></div>
     </section>
 
+    {tutorial === 'hunt' && <CueTutorial
+      kicker="HUNT BASICS"
+      title="사냥 조작법"
+      subtitle="몬스터 머리 위 표시를 보고 그대로 하면 돼요"
+      accent="#a268ff"
+      cues={HUNT_CUES.filter((cue) => cue.from.some((id) => allowedMonsterIds.includes(id)))}
+      notes={[...SCORE_RULES, ...HUNT_NOTES.filter((note) => note.from.some((id) => allowedMonsterIds.includes(id)))]}
+      noteText="도망가기 전에 처리해야 해요. 레벨이 오르면 새로운 몬스터와 신호가 열립니다."
+      ctaLabel="사냥 시작"
+      onClose={() => closeTutorial('hunt')}
+    />}
+
+    {tutorial === 'burst' && <CueTutorial
+      kicker="LV.4 SKILL"
+      title="섀도우 버스트"
+      subtitle="충전해서 한 번에 쓸어담는 쌍검 스킬이에요"
+      accent="#ffd45b"
+      visual={<BurstDemo />}
+      notes={BURST_NOTES}
+      noteText="황금 미믹(Lv.8)을 잡으면 게이지가 한 번에 가득 찹니다."
+      ctaLabel="사냥 시작"
+      onClose={() => closeTutorial('burst')}
+    />}
   </main>
+}
+
+// 버스트는 제스처가 아니라 게이지다. 손가락 데모 대신 차오르고 터지는 걸 보여준다.
+function BurstDemo() {
+  return <div className="burst-demo" aria-hidden="true">
+    <div className="burst-demo-stage">
+      <span className="burst-demo-flash" />
+      <img src="/images/ui/hunt-swords.webp" alt="" />
+      <span className="burst-demo-label">BURST!</span>
+    </div>
+    <span className="burst-demo-meter"><i /></span>
+  </div>
 }
