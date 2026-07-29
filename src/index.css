@@ -862,7 +862,7 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
 .home-hunter-copy > small { display: flex; align-items: center; gap: 9px; color: #aaa1c0; font-size: 12px; line-height: 1.2; }
 .home-hunter-copy > small b { display: inline-flex; align-items: center; min-height: 21px; padding: 2px 7px; border: 1px solid rgba(240,76,189,.28); border-radius: 7px; background: rgba(240,76,189,.11); color: #f56ac8; font-size: 11px; line-height: 1; }
 .home-hunter-copy > small span { padding-left: 9px; border-left: 1px solid rgba(255,255,255,.1); }
-.home-hunter-xp { width: 100%; margin-top: 13px; }
+.home-hunter-xp { width: 100%; margin-top: 8px; }
 .home-hunter-xp > em { display: flex; align-items: baseline; gap: 6px; color: #aaa1c0; font-size: 11px; font-style: normal; white-space: nowrap; }
 /* 좁은 화면에서 남은 XP 문구가 길어지면 이쪽이 줄고, 분모는 끝까지 남는다.
    예전에는 한 줄에 밀어넣어 320px 에서 오른쪽 숫자가 칸 밖으로 밀려났다. */
