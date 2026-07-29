@@ -4,7 +4,7 @@ import { supabase } from '../lib/supabase'
 import { useAuth } from '../context/AuthContext'
 import { sound } from '../lib/sound'
 import { timeAgo } from '../lib/format'
-import { attachAuthors } from '../lib/authors'
+import { attachPostMeta } from '../lib/postJoins'
 import Icon from '../components/Icon'
 import BottomNav from '../components/BottomNav'
 
@@ -16,14 +16,14 @@ export default function Community() {
   useEffect(() => { load() }, [])
   async function load() {
     setLoading(true); setLoadError('')
-    // 작성자는 임베드하지 않고 attachAuthors 로 따로 붙인다 — posts↔profiles 관계가 여러 개라 임베드가 깨진다.
-    const enhanced = await supabase.from('posts').select('id, title, content, category, created_at, user_id, post_likes(user_id)').order('created_at', { ascending: false }).limit(50)
-    if (!enhanced.error) { setPosts(await attachAuthors(enhanced.data)); setLoading(false); return }
-    // 폴백은 post_likes·category 가 없는 예전 스키마용이다.
-    // 예전에는 이쪽 에러를 버려서, 무슨 이유로 실패하든 화면에는 "첫 이야기를 기다리고 있어요"만 떴다.
+    // 작성자·좋아요는 임베드하지 않고 attachPostMeta 로 따로 붙인다.
+    // 폴백으로 넘어가도 좋아요가 빠지지 않아, 목록과 상세가 항상 같은 상태를 본다.
+    const enhanced = await supabase.from('posts').select('id, title, content, category, created_at, user_id').order('created_at', { ascending: false }).limit(50)
+    if (!enhanced.error) { setPosts(await attachPostMeta(enhanced.data)); setLoading(false); return }
+    // 폴백은 category 컬럼이 없는 예전 스키마용이다.
     const fallback = await supabase.from('posts').select('id, title, content, created_at, user_id').order('created_at', { ascending: false }).limit(50)
     if (fallback.error) { setPosts([]); setLoadError(`게시글을 불러오지 못했습니다: ${fallback.error.message}`) }
-    else setPosts((await attachAuthors(fallback.data)).map((post) => ({ ...post, category: '자유', post_likes: [] })))
+    else setPosts((await attachPostMeta(fallback.data)).map((post) => ({ category: '자유', ...post })))
     setLoading(false)
   }
   async function submit() {
@@ -52,8 +52,14 @@ export default function Community() {
     const result = mine
       ? await supabase.from('post_likes').delete().eq('post_id', post.id).eq('user_id', user.id)
       : await supabase.from('post_likes').insert({ post_id: post.id, user_id: user.id })
-    if (result.error) setPosts(previous)
-    else sound.button()
+    // 23505 는 기본키 중복 — 이미 눌러둔 좋아요라는 뜻이라 실패가 아니다. 화면 상태를 그대로 둔다.
+    if (result.error && result.error.code !== '23505') {
+      setPosts(previous)
+      setLoadError(`좋아요를 반영하지 못했습니다: ${result.error.message}`)
+      return
+    }
+    setLoadError('')
+    sound.button()
   }
   const normalizedSearch = search.trim().toLowerCase()
   const visiblePosts = posts.filter((post) => {

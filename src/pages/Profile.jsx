@@ -78,7 +78,7 @@ export default function Profile() {
     <header className="topbar">
       <button className="icon-btn" onClick={() => navigate('/home')} aria-label="뒤로"><Icon name="back" /></button>
       <div className="title-stack"><span className="overline">HUNTER PROFILE</span><h1>내 프로필</h1></div>
-      <button className="icon-btn" onClick={() => navigate('/settings')} aria-label="설정"><Icon name="settings" /></button>
+      <button className="ghost-icon-btn" onClick={() => navigate('/settings')} aria-label="설정"><Icon name="settings" size={20} /></button>
     </header>
 
     <section className="profile-hero" style={{ '--avatar-color': selected?.color || '#b84dff' }}>

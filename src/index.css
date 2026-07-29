@@ -751,9 +751,12 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
   72% { opacity: .65; }
   100% { opacity: 0; transform: scale(1); }
 }
-.home-utility-btn { display: grid; place-items: center; flex: 0 0 34px; width: 34px; height: 34px; padding: 0; border: 0; border-radius: 11px; background: transparent; color: #c9c2dc; transition: color .16s ease, background .16s ease, transform .16s ease; }
-.home-utility-btn:hover, .home-utility-btn:focus-visible { outline: 0; background: rgba(145,104,220,.14); color: #fff; }
-.home-utility-btn:active { background: rgba(145,104,220,.22); transform: scale(.92); }
+.ghost-icon-btn { display: grid; place-items: center; flex: 0 0 34px; width: 34px; height: 34px; padding: 0; border: 0; border-radius: 11px; background: transparent; color: #c9c2dc; transition: color .16s ease, background .16s ease, transform .16s ease; }
+.ghost-icon-btn:hover, .ghost-icon-btn:focus-visible { outline: 0; background: rgba(145,104,220,.14); color: #fff; }
+.ghost-icon-btn:active { background: rgba(145,104,220,.22); transform: scale(.92); }
+/* 상단바 안에서는 뒤로가기(.icon-btn 44px)와 같은 자리를 차지해야 제목이 가운데 남는다.
+   테두리·배경만 없애 시각적 무게를 낮춘다 — 설정은 뒤로가기와 같은 비중일 이유가 없다. */
+.topbar .ghost-icon-btn { flex: 0 0 44px; width: 44px; height: 44px; border-radius: 14px; }
 .home-welcome { align-items: center; }
 .home-hunter-identity { position: relative; display: flex; align-items: center; min-width: 0; width: 100%; gap: 20px; padding: 7px 34px 18px 4px; border: 0; border-bottom: 1px solid rgba(171,127,255,.14); border-radius: 0; background: transparent; box-shadow: none; color: inherit; text-align: left; }
 .home-hunter-identity:hover, .home-hunter-identity:focus-visible { outline: 0; background: linear-gradient(90deg, rgba(132,69,210,.06), transparent 72%); }
@@ -2724,13 +2727,24 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
   font-weight: var(--fw-regular);
   line-height: 1.8;
 }
+/* 좋아요·수정·삭제는 부가 동작이다. 본문(h2 22px)과 경쟁하지 않게 한 단계 낮춘다. */
+.detail-actions { margin-top: 14px; }
+.detail-like { min-height: 32px; padding: 0 12px; gap: 6px; }
+.detail-owner-actions { display: flex; align-items: center; gap: 2px; }
+.detail-owner-actions .text-button { padding: 6px 9px; font-size: var(--fs-caption); color: var(--muted); }
+.detail-owner-actions .text-button:hover { color: var(--text); }
+.detail-owner-actions .text-button.danger { padding-left: 9px; color: color-mix(in srgb, var(--danger) 72%, var(--muted)); }
+.detail-owner-actions .text-button.danger:hover { color: var(--danger); }
+.detail-edit { margin-top: 16px; }
+.detail-edit .btn-row { margin-top: 14px; }
+
 .detail-like {
-  font-size: var(--fs-body);
+  font-size: var(--fs-body-sm);
   font-weight: var(--fw-bold);
   line-height: 1;
   letter-spacing: var(--ls-tight);
 }
-.detail-like-heart { font-size: 1rem; line-height: 1; }                                   /* ♥ 글리프 */
+.detail-like-heart { font-size: .9rem; line-height: 1; }                                  /* ♥ 글리프 */
 
 /* --- 3. 댓글 --------------------------------------------------------- */
 .comments-section .muted {              /* "첫 댓글을 남겨보세요" */

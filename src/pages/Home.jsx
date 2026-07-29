@@ -71,7 +71,7 @@ export default function Home() {
         <span className="home-greeting-text">{isPopGreeting ? '오늘도 팝! 터뜨릴 준비됐나요?' : '몬스터 출현 신호를 발견했어요!'}</span>
         <span className="home-greeting-burst home-greeting-burst-tail" aria-hidden="true" />
       </p>
-      <button className="home-utility-btn" onClick={() => go('/settings')} aria-label="설정"><Icon name="settings" size={20} /></button>
+      <button className="ghost-icon-btn" onClick={() => go('/settings')} aria-label="설정"><Icon name="settings" size={20} /></button>
     </div>
     <header className="home-welcome">
       <button className="home-hunter-identity" onClick={() => go('/profile')} aria-label="내 프로필 보기">
