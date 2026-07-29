@@ -14,12 +14,16 @@ export const DAILY_BOSSES = [
     difficulty: 2,
     firstClearXp: 120,
     mechanics: ['shield', 'mixed-gestures', 'final-rush'],
+    // 데모 스테이지가 3박자로 돌아간다. beats 는 각 박자의 자막이라 순서가 곧 연출 순서다.
     mechanic: {
       name: '그림자 장막',
       short: 'SHADOW VEIL',
-      when: '네 번째 신호마다',
-      effect: '반응 시간이 28% 짧아지고, 이때 실수하면 시간이 3초 깎여요',
-      counter: '장막이 걷히기 전에 성공하면 피해가 1.5배가 돼요',
+      meter: '반응 시간',
+      beats: [
+        '네 번째 신호마다 장막이 내려와요',
+        '반응 시간이 28% 짧아져요',
+        '걷히기 전에 맞추면 피해 1.5배!',
+      ],
     },
     description: '깨진 네온 왕관으로 그림자 포털을 지배하는 첫 번째 일일 보스예요.',
     cardCopy: '깨진 네온 왕관의 지배자를\n사냥해 최고 기록에 도전하세요.',
@@ -43,9 +47,12 @@ export const DAILY_BOSSES = [
     mechanic: {
       name: '신호 오류',
       short: 'SIGNAL ERROR',
-      when: '신호 10번 중 4번쯤',
-      effect: '진짜 신호가 잠깐 ERROR로 가려져요. 확정되기 전에 누르면 오작동으로 시간이 2초 깎여요',
-      counter: 'ERROR 글자가 사라진 뒤에 입력하세요',
+      meter: '신호 복구',
+      beats: [
+        '신호 10번 중 4번은 ERROR로 가려져요',
+        '가려진 동안 누르면 오작동 · 시간 -2초',
+        'ERROR가 사라진 뒤에 누르세요',
+      ],
     },
     description: '픽셀 왕관에서 쏟아지는 오류로 사냥터를 뒤틀어 버리는 두 번째 일일 보스예요.',
     cardCopy: '왕관에 숨은 시스템 오류를 찾아\n뒤틀린 사냥터를 복구하세요.',
@@ -69,9 +76,12 @@ export const DAILY_BOSSES = [
     mechanic: {
       name: '과열',
       short: 'OVERHEAT',
-      when: '실수할 때마다 열기 +40%',
-      effect: '열기가 100%가 되면 태양 폭발 — 시간이 6초 깎이고 보스가 체력을 회복해요',
-      counter: '열기가 남아 있을 때 HOLD를 성공하면 40% 식힐 수 있어요',
+      meter: '열기',
+      beats: [
+        '실수할 때마다 열기가 40%씩 쌓여요',
+        '100%가 되면 태양 폭발 · 시간 -6초 + 보스 체력 회복',
+        'HOLD를 성공하면 열기가 40% 식어요',
+      ],
     },
     description: '검은 태양 파편을 품고 잿빛 사냥터에 잠든 세 번째 일일 보스예요.',
     cardCopy: '잠든 불새가 깨어나기 전에\n검은 태양의 열기를 식혀 주세요.',
@@ -95,9 +105,12 @@ export const DAILY_BOSSES = [
     mechanic: {
       name: '시간 동결',
       short: 'TIME FREEZE',
-      when: '5번 성공할 때마다',
-      effect: '제한 시간이 멈추는 대신, 1.6초 안에 좌우로 밀어 얼음을 깨야 해요',
-      counter: '놓치면 콤보가 끊기고 시간이 3초 깎여요',
+      meter: '해동',
+      beats: [
+        '5번 성공하면 얼어붙어요',
+        '제한 시간은 멈추지만 1.6초 안에 깨야 해요',
+        '좌우로 밀어 탈출! 놓치면 시간 -3초',
+      ],
     },
     description: '얼어붙은 시계 조각으로 사냥터의 시간을 늦추는 네 번째 일일 보스예요.',
     cardCopy: '빙하 예언자의 외눈을 피해\n멈춰 버린 시간을 움직이세요.',

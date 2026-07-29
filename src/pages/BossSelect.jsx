@@ -7,11 +7,12 @@ import { sound } from '../lib/sound'
 import Icon from '../components/Icon'
 
 // 전투 중에는 신호를 읽느라 설명을 볼 여유가 없다. 규칙은 들어가기 전에 알려준다.
+// 글로 적어두면 안 읽는다. 손가락이 실제로 그 동작을 하는 걸 보여준다.
 const CUE_GUIDE = [
-  { label: 'TAP', copy: '짧게 터치' },
-  { label: 'HOLD', copy: '게이지가 찰 때까지 누르기' },
-  { label: 'SWIPE', copy: '좌우로 밀기' },
-  { label: 'WAIT', copy: '건드리지 않고 버티기' },
+  { id: 'tap', label: 'TAP', copy: '짧게 톡' },
+  { id: 'hold', label: 'HOLD', copy: '길게 꾹' },
+  { id: 'swipe', label: 'SWIPE', copy: '좌우로 슥' },
+  { id: 'wait', label: 'WAIT', copy: '손 떼고 대기' },
 ]
 
 export default function BossSelect() {
@@ -85,6 +86,25 @@ export default function BossSelect() {
   </main>
 }
 
+// 기믹을 글로 나열하는 대신 실제 전투 화면을 축소해 3박자로 재생한다.
+// 자막(beats)과 연출은 같은 타임라인을 공유하므로 bosses.js 의 beats 순서를 바꾸면 연출도 어긋난다.
+function MechanicDemo({ boss }) {
+  return <div className={`mechanic-demo mechanic-demo-${boss.id}`} style={{ '--boss-color': boss.color }}>
+    <div className="mechanic-demo-stage" aria-hidden="true">
+      <img className="mechanic-demo-bg" src={boss.background} alt="" />
+      <span className="mechanic-demo-fx" />
+      <img className="mechanic-demo-boss" src={boss.image} alt="" />
+      <span className="mechanic-demo-cue" />
+      <i className="mechanic-demo-hand" />
+      <span className="mechanic-demo-hp"><i /></span>
+      <span className="mechanic-demo-meter"><em>{boss.mechanic.meter}</em><i /></span>
+    </div>
+    <ol className="mechanic-demo-beats">
+      {boss.mechanic.beats.map((beat, index) => <li key={beat} style={{ '--beat': index }}>{beat}</li>)}
+    </ol>
+  </div>
+}
+
 function BossBriefing({ boss, isToday, onClose, onStart }) {
   return <div className="modal-overlay boss-briefing-overlay" onClick={onClose}>
     <section className="boss-briefing" style={{ '--boss-color': boss.color }} onClick={(event) => event.stopPropagation()}>
@@ -106,19 +126,18 @@ function BossBriefing({ boss, isToday, onClose, onStart }) {
 
       <div className="boss-briefing-block">
         <span className="overline">신호 읽기</span>
-        <ul className="boss-briefing-cues">
-          {CUE_GUIDE.map((cue) => <li key={cue.label}><b>{cue.label}</b><span>{cue.copy}</span></li>)}
+        <ul className="cue-demos">
+          {CUE_GUIDE.map((cue) => <li key={cue.id} className={`cue-demo cue-demo-${cue.id}`}>
+            <span className="cue-demo-stage" aria-hidden="true"><i className="cue-demo-hand" /></span>
+            <b>{cue.label}</b>
+            <span>{cue.copy}</span>
+          </li>)}
         </ul>
       </div>
 
-      <div className="boss-briefing-block boss-briefing-mechanic">
-        <span className="overline">{boss.mechanic.short}</span>
-        <strong>{boss.mechanic.name}</strong>
-        <ul>
-          <li><em>언제</em><span>{boss.mechanic.when}</span></li>
-          <li><em>무슨 일이</em><span>{boss.mechanic.effect}</span></li>
-          <li><em>대응</em><span>{boss.mechanic.counter}</span></li>
-        </ul>
+      <div className="boss-briefing-block">
+        <span className="overline">{boss.mechanic.short} · {boss.mechanic.name}</span>
+        <MechanicDemo boss={boss} />
       </div>
 
       <p className="boss-briefing-note">격파하지 못해도 깎아낸 만큼 도전 보상을 받아요. 오늘 최고 진행도를 넘을 때마다 추가로 지급됩니다.</p>
