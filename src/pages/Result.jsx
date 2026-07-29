@@ -6,7 +6,7 @@ import { sound } from '../lib/sound'
 import Icon from '../components/Icon'
 import { getLevel, getLevelProgress, isMaxLevel, LEVEL_UNLOCKS, resolveProgress, saveStoredProgress } from '../lib/progression'
 import { DAILY_MISSIONS, getDailyMissions, recordGameForMissions } from '../lib/missions'
-import { getBossById, getDailyBoss, recordBossAttempt, recordBossClear } from '../lib/bosses'
+import { getBossById, getDailyBoss, hasClearedBossToday, recordBossAttempt, recordBossClear } from '../lib/bosses'
 import { MONSTERS } from '../lib/monsters'
 
 // 보스 반복 도전은 기록 갱신과 연습용이다. 큰 보상은 오늘 첫 클리어 한 번만 지급한다.
@@ -69,7 +69,7 @@ export default function Result() {
         setBossReward(record)
         gained = (record.firstToday ? boss.firstClearXp : BOSS_REPEAT_XP) + missionBonus
       } else {
-        // 격파하지 못해도 깎아낸 만큼은 돌려준다. 다만 오늘 최고 진행도를 넘어선 몫만 준다.
+        // 격파하지 못해도 깎아낸 만큼은 돌려준다. 다만 오늘 최고 격파율을 넘어선 몫만 준다.
         const attempt = recordBossAttempt(user.id, boss.id, {
           progress: bossDamage / Math.max(1, bossMaxHp),
           maxXp: Math.round(boss.firstClearXp * ATTEMPT_XP_RATIO),
@@ -118,10 +118,16 @@ export default function Result() {
     recordBonusXp > 0 && `최고 기록 +${recordBonusXp}`,
     missionXp > 0 && `미션 +${missionXp}`,
   ].filter(Boolean)
-  // 이번 판에 미션을 새로 채우지 못하면 XP는 늘 +0 이다. 그때는 금액 대신 오늘 진행도를 보여준다.
+  // 이번 판에 미션을 새로 채우지 못하면 XP는 늘 +0 이다. 그때는 금액 대신 오늘 미션 진행 상황을 보여준다.
   const missionTile = missionXp > 0
     ? <div><small>미션</small><strong>+{missionXp}</strong></div>
     : <div><small>오늘의 미션</small><strong>{missionsDone === null ? '...' : `${missionsDone}/${DAILY_MISSIONS.length}`}</strong></div>
+  // "격파하면 전체 보상"은 오늘의 보스, 그것도 아직 안 잡았을 때만 참이다.
+  // 자유 도전은 격파해도 0 XP 라, 재도전 버튼에 실제 값을 적어야 브리핑(격파 보상 '기록만')과 어긋나지 않는다.
+  const retryNote = !isBossMode ? null
+    : activeBoss.id === getDailyBoss().id && !hasClearedBossToday(user.id, activeBoss.id)
+      ? <>오늘의 보스예요. 격파하면 <strong>+{activeBoss.firstClearXp} XP</strong></>
+      : <>자유 도전은 XP 없이 <strong>기록 갱신</strong>만 남아요</>
   const nextUnlock = xpProgress && LEVEL_UNLOCKS[xpProgress.level + 1]
   const nextUnlockMonster = MONSTERS.find((item) => nextUnlock?.monsters?.includes(item.id))
   return <main
@@ -147,7 +153,7 @@ export default function Result() {
         <div className={`score-grade grade-${scoreGrade.toLowerCase()}`}><img src={`/images/ranks/rank-${scoreGrade.toLowerCase()}.webp`} alt={`${scoreGrade} 랭크 배지`} /></div>
         <div className="score-copy"><small>FINAL SCORE</small><strong className="result-score">{score.toLocaleString()}</strong></div>
       </div>
-      {isBossMode ? <div className="result-summary"><div><img src="/images/ui/stat-combo.webp" alt="" /><span>최고 콤보</span><strong>{maxCombo}</strong></div><i /><div><img src="/images/ui/stat-kills.webp" alt="" /><span>{bossClear ? '처치 시간' : '가한 피해'}</span><strong>{bossClear ? `${activeBoss.timeLimit - bossTimeLeft}초` : `${bossDamage}/${bossMaxHp}`}</strong></div><i /><div><img src="/images/ui/stat-rank.webp" alt="" /><span>{bossClear ? '남은 시간' : '진행도'}</span><strong>{bossClear ? `${bossTimeLeft}초` : `${Math.round((bossDamage / Math.max(1, bossMaxHp)) * 100)}%`}</strong></div></div> : <div className="result-summary"><div><img src="/images/ui/stat-combo.webp" alt="" /><span>최고 콤보</span><strong>{maxCombo}</strong></div><i /><div><img src="/images/ui/stat-kills.webp" alt="" /><span>처치 몬스터</span><strong>{totalKills}마리</strong></div><i /><div><img src="/images/ui/stat-rank.webp" alt="" /><span>현재 순위</span><strong>{saving ? '...' : rank ? `${rank}위` : '-'}</strong></div></div>}
+      {isBossMode ? <div className="result-summary"><div><img src="/images/ui/stat-combo.webp" alt="" /><span>최고 콤보</span><strong>{maxCombo}</strong></div><i /><div><img src="/images/ui/stat-kills.webp" alt="" /><span>{bossClear ? '처치 시간' : '가한 피해'}</span><strong>{bossClear ? `${activeBoss.timeLimit - bossTimeLeft}초` : `${bossDamage}/${bossMaxHp}`}</strong></div><i /><div><img src="/images/ui/stat-rank.webp" alt="" /><span>{bossClear ? '남은 시간' : '격파율'}</span><strong>{bossClear ? `${bossTimeLeft}초` : `${Math.round((bossDamage / Math.max(1, bossMaxHp)) * 100)}%`}</strong></div></div> : <div className="result-summary"><div><img src="/images/ui/stat-combo.webp" alt="" /><span>최고 콤보</span><strong>{maxCombo}</strong></div><i /><div><img src="/images/ui/stat-kills.webp" alt="" /><span>처치 몬스터</span><strong>{totalKills}마리</strong></div><i /><div><img src="/images/ui/stat-rank.webp" alt="" /><span>현재 순위</span><strong>{saving ? '...' : rank ? `${rank}위` : '-'}</strong></div></div>}
     </section> : <section className="result-reward-card">
       <div className="reward-settlement">
         <div className="reward-total">
@@ -179,8 +185,8 @@ export default function Result() {
                 ? <>오늘의 보상은 이미 받았어요. 재도전은 <strong>기록 갱신</strong>으로 남습니다</>
                 : <>자유 도전은 <strong>연습과 기록 갱신</strong>으로 남습니다</>
             : bossAttempt?.improved
-              ? <>오늘 최고 진행도 <strong>{Math.round(bossAttempt.best * 100)}%</strong> 갱신! 격파하면 전체 보상을 받아요</>
-              : <>오늘 최고 진행도 <strong>{Math.round((bossAttempt?.previousBest ?? 0) * 100)}%</strong>를 넘어야 도전 보상이 더 나와요</>
+              ? <>오늘 최고 격파율 <strong>{Math.round(bossAttempt.best * 100)}%</strong> 갱신!</>
+              : <>오늘 최고 격파율 <strong>{Math.round((bossAttempt?.previousBest ?? 0) * 100)}%</strong>를 넘어야 도전 보상이 더 나와요</>
           : bonusParts.length > 0
             ? <>보너스 내역 · <strong>{bonusParts.join(' · ')}</strong></>
             : <>최고 기록을 세우거나 미션을 채우면 <strong>보너스 XP</strong>를 받아요</>}</p>
@@ -192,7 +198,12 @@ export default function Result() {
     {saving && <p className="status-copy"><span className="loader small" /> 기록을 저장하는 중...</p>}{saveError && <div className="notice notice-error">{saveError}</div>}
     {resultStep === 1 ? <div className="result-next-wrap">
       <button className="btn btn-primary result-next-button" onClick={() => { sound.button(); setResultStep(2); window.scrollTo({ top: 0, behavior: 'smooth' }) }}>보상 확인하기 <span aria-hidden="true">→</span></button>
-    </div> : <div className="result-reward-actions"><button className="btn btn-primary" onClick={() => go(isBossMode ? `/boss/${activeBoss.id}` : '/game', { replace: true })}><img src="/images/ui/hunt-swords.webp" alt="" /><span>{isBossMode ? '보스 재도전' : '다시 사냥'}</span></button><button className="btn btn-secondary" onClick={() => go('/ranking')}><Icon name="trophy" size={19} /><span>랭킹</span></button><button className="btn btn-secondary" onClick={() => go('/home')}><Icon name="home" size={18} /><span>홈</span></button></div>}
+    </div> : <>
+      {/* 재도전 여부를 정하는 자리는 버튼 바로 앞이다. 격파 보상 안내가 화면 위쪽에 있으면
+          레벨 바와 다음 해금 카드를 지나오는 사이에 잊힌다. */}
+      {retryNote && <p className="result-retry-note">{retryNote}</p>}
+      <div className="result-reward-actions"><button className="btn btn-primary" onClick={() => go(isBossMode ? `/boss/${activeBoss.id}` : '/game', { replace: true })}><img src="/images/ui/hunt-swords.webp" alt="" /><span>{isBossMode ? '보스 재도전' : '다시 사냥'}</span></button><button className="btn btn-secondary" onClick={() => go('/ranking')}><Icon name="trophy" size={19} /><span>랭킹</span></button><button className="btn btn-secondary" onClick={() => go('/home')}><Icon name="home" size={18} /><span>홈</span></button></div>
+    </>}
     {levelUp && <LevelUpModal levelUp={levelUp} onClose={() => setLevelUp(null)} onCollection={() => go('/collection')} onTrySkill={() => go('/game', { replace: true })} onOpenMission={() => go('/home')} />}
   </main>
 }

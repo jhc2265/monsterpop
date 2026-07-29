@@ -181,7 +181,7 @@ function BossBriefing({ boss, isToday, onClose, onStart }) {
         <MechanicDemo boss={boss} />
       </div>
 
-      <p className="sheet-note">격파하지 못해도 깎아낸 만큼 도전 보상을 받아요. 오늘 최고 진행도를 넘을 때마다 추가로 지급됩니다.</p>
+      <p className="sheet-note">격파하지 못해도 깎아낸 만큼 도전 보상을 받아요. 오늘 최고 격파율을 넘을 때마다 추가로 지급됩니다.</p>
 
       <button className="btn btn-primary sheet-cta" onClick={onStart}>
         <img src="/images/ui/hunt-swords.webp" alt="" /><span>도전 시작</span>

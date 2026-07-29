@@ -1588,6 +1588,9 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
 .reward-discovery { display: flex; align-items: center; gap: 9px; margin-top: 12px; padding: 13px; border: 1px solid rgba(255,95,204,.2); border-radius: 14px; background: rgba(255,68,185,.08); text-align: left; }
 .reward-discovery span { padding: 4px 7px; border-radius: 6px; background: #c93a9e; color: white; }
 .reward-discovery strong { color: #e9e0f5; }
+/* 재도전 버튼 바로 위 — "다시 할 가치가 있나"를 판단하는 자리 */
+.result-retry-note { margin: 16px 0 -6px; color: var(--muted); font-size: var(--fs-caption); line-height: 1.6; text-align: center; }
+.result-retry-note strong { color: #ffd45b; }
 .result-reward-actions { display: grid; grid-template-columns: 1.35fr 1fr 1fr; gap: 8px; margin-top: 16px; }
 .result-reward-actions .btn { min-width: 0; min-height: 58px; flex-direction: column; gap: 3px; padding: 8px 5px; border-radius: 17px; }
 .result-reward-actions .btn span { white-space: nowrap; }

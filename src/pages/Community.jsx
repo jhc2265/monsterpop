@@ -4,25 +4,26 @@ import { supabase } from '../lib/supabase'
 import { useAuth } from '../context/AuthContext'
 import { sound } from '../lib/sound'
 import { timeAgo } from '../lib/format'
+import { attachAuthors } from '../lib/authors'
 import Icon from '../components/Icon'
 import BottomNav from '../components/BottomNav'
 
 export default function Community() {
-  const { user } = useAuth(); const navigate = useNavigate()
+  const { user, profile } = useAuth(); const navigate = useNavigate()
   const [posts, setPosts] = useState([]); const [loading, setLoading] = useState(true); const [showWrite, setShowWrite] = useState(false)
   const [title, setTitle] = useState(''); const [content, setContent] = useState(''); const [category, setCategory] = useState('자유'); const [busy, setBusy] = useState(false); const [error, setError] = useState('')
   const [activeCategory, setActiveCategory] = useState('전체'); const [search, setSearch] = useState(''); const [loadError, setLoadError] = useState('')
   useEffect(() => { load() }, [])
   async function load() {
     setLoading(true); setLoadError('')
-    const enhanced = await supabase.from('posts').select('id, title, content, category, created_at, profiles(nickname), post_likes(user_id)').order('created_at', { ascending: false }).limit(50)
-    if (!enhanced.error) { setPosts(enhanced.data || []); setLoading(false); return }
+    // 작성자는 임베드하지 않고 attachAuthors 로 따로 붙인다 — posts↔profiles 관계가 여러 개라 임베드가 깨진다.
+    const enhanced = await supabase.from('posts').select('id, title, content, category, created_at, user_id, post_likes(user_id)').order('created_at', { ascending: false }).limit(50)
+    if (!enhanced.error) { setPosts(await attachAuthors(enhanced.data)); setLoading(false); return }
     // 폴백은 post_likes·category 가 없는 예전 스키마용이다.
     // 예전에는 이쪽 에러를 버려서, 무슨 이유로 실패하든 화면에는 "첫 이야기를 기다리고 있어요"만 떴다.
-    // 글은 저장됐는데 목록이 비는 상황에서 원인을 알 방법이 없었다.
-    const fallback = await supabase.from('posts').select('id, title, content, created_at, profiles(nickname)').order('created_at', { ascending: false }).limit(50)
+    const fallback = await supabase.from('posts').select('id, title, content, created_at, user_id').order('created_at', { ascending: false }).limit(50)
     if (fallback.error) { setPosts([]); setLoadError(`게시글을 불러오지 못했습니다: ${fallback.error.message}`) }
-    else setPosts((fallback.data || []).map((post) => ({ ...post, category: '자유', post_likes: [] })))
+    else setPosts((await attachAuthors(fallback.data)).map((post) => ({ ...post, category: '자유', post_likes: [] })))
     setLoading(false)
   }
   async function submit() {
@@ -31,15 +32,15 @@ export default function Community() {
     // insert 뒤에 select 를 붙여 저장된 행을 곧바로 되읽는다.
     // 저장은 됐는데 읽기가 막혀 있으면 그 자리에서 드러난다 — 예전에는 저장만 확인하고
     // 목록에 안 뜨는 이유는 알 수 없었다.
-    const columns = 'id, title, content, category, created_at, profiles(nickname)'
+    const columns = 'id, title, content, category, created_at, user_id'
     let { data: inserted, error: submitError } = await supabase.from('posts').insert({ user_id: user.id, title: title.trim(), content: content.trim(), category }).select(columns).single()
-    if (submitError?.message?.includes('category')) ({ data: inserted, error: submitError } = await supabase.from('posts').insert({ user_id: user.id, title: title.trim(), content: content.trim() }).select('id, title, content, created_at, profiles(nickname)').single())
+    if (submitError?.message?.includes('category')) ({ data: inserted, error: submitError } = await supabase.from('posts').insert({ user_id: user.id, title: title.trim(), content: content.trim() }).select('id, title, content, created_at, user_id').single())
     setBusy(false)
     if (submitError) { setError(`작성하지 못했습니다: ${submitError.message}`); return }
     if (!inserted) { setError('글은 저장됐지만 목록에서 다시 읽지 못했습니다. 조회 권한을 확인해 주세요.'); return }
     sound.button(); setTitle(''); setContent(''); setShowWrite(false)
     // 되읽은 행을 바로 얹어 새로고침을 기다리지 않게 한다.
-    setPosts((items) => [{ category: '자유', post_likes: [], ...inserted }, ...items])
+    setPosts((items) => [{ category: '자유', post_likes: [], ...inserted, profiles: { nickname: profile?.nickname } }, ...items])
     setActiveCategory('전체'); setSearch('')
     load()
   }

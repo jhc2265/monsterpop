@@ -286,7 +286,7 @@ export function recordBossClear(userId, bossId, { timeLeft = 0 } = {}) {
     rewardDate: firstToday ? today : state.rewardDate,
     clearedToday: isNewDay ? [bossId] : [...new Set([...state.clearedToday, bossId])],
     bestTimeLeft: { ...state.bestTimeLeft, [bossId]: newRecord ? timeLeft : previousBest },
-    // 격파했으면 진행도는 100%. 이후 같은 보스에서 져도 도전 보상이 다시 나오지 않는다.
+    // 격파했으면 격파율은 100%. 이후 같은 보스에서 져도 도전 보상이 다시 나오지 않는다.
     attempts: { date: today, values: { ...todayAttempts(state, today), [bossId]: 1 } },
     streak,
   })
@@ -298,7 +298,7 @@ function todayAttempts(state, today) {
   return state.attempts.date === today ? state.attempts.values : {}
 }
 
-// 실패한 도전의 보상. 진행도에 비례하되 "오늘 세운 최고 기록을 넘어선 만큼"만 지급한다.
+// 실패한 도전의 보상. 격파율에 비례하되 "오늘 세운 최고 기록을 넘어선 만큼"만 지급한다.
 // 매번 전액을 주면 62% 에서 일부러 지고 반복하는 편이 격파보다 이득이 되어버린다.
 export function recordBossAttempt(userId, bossId, { progress = 0, maxXp = 0 } = {}) {
   const today = koreaToday()

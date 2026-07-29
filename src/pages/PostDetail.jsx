@@ -4,17 +4,23 @@ import { supabase } from '../lib/supabase'
 import { useAuth } from '../context/AuthContext'
 import { sound } from '../lib/sound'
 import { timeAgo } from '../lib/format'
+import { attachAuthor, attachAuthors } from '../lib/authors'
 import Icon from '../components/Icon'
 
 export default function PostDetail() {
   const { id } = useParams(); const { user } = useAuth(); const navigate = useNavigate()
-  const [post, setPost] = useState(null); const [comments, setComments] = useState([]); const [loading, setLoading] = useState(true); const [text, setText] = useState(''); const [busy, setBusy] = useState(false)
+  const [post, setPost] = useState(null); const [comments, setComments] = useState([]); const [loading, setLoading] = useState(true); const [text, setText] = useState(''); const [busy, setBusy] = useState(false); const [loadError, setLoadError] = useState('')
   useEffect(() => { load() }, [id])
   async function load() {
-    setLoading(true)
-    const withLikes = await supabase.from('posts').select('id, title, content, created_at, user_id, profiles(nickname), post_likes(user_id)').eq('id', id).single()
-    if (!withLikes.error) setPost(withLikes.data)
-    else { const { data } = await supabase.from('posts').select('id, title, content, created_at, user_id, profiles(nickname)').eq('id', id).single(); setPost(data ? { ...data, post_likes: [] } : null) }
+    setLoading(true); setLoadError('')
+    // 작성자는 임베드하지 않는다 — posts↔profiles 관계가 여러 개라 PostgREST 가 조인을 못 고른다.
+    const withLikes = await supabase.from('posts').select('id, title, content, created_at, user_id, post_likes(user_id)').eq('id', id).single()
+    if (!withLikes.error) setPost(await attachAuthor(withLikes.data))
+    else {
+      const fallback = await supabase.from('posts').select('id, title, content, created_at, user_id').eq('id', id).single()
+      if (fallback.error) { setPost(null); setLoadError(`게시글을 불러오지 못했습니다: ${fallback.error.message}`) }
+      else setPost({ ...(await attachAuthor(fallback.data)), post_likes: [] })
+    }
     await loadComments(); setLoading(false)
   }
   async function toggleLike() {
@@ -28,11 +34,11 @@ export default function PostDetail() {
     if (result.error) setPost(previous)
     else sound.button()
   }
-  async function loadComments() { const { data } = await supabase.from('comments').select('id, content, created_at, user_id, profiles(nickname)').eq('post_id', id).order('created_at', { ascending: true }); setComments(data || []) }
+  async function loadComments() { const { data } = await supabase.from('comments').select('id, content, created_at, user_id').eq('post_id', id).order('created_at', { ascending: true }); setComments(await attachAuthors(data)) }
   async function addComment() { if (!text.trim() || busy) return; setBusy(true); const { error } = await supabase.from('comments').insert({ post_id: Number(id), user_id: user.id, content: text.trim() }); setBusy(false); if (!error) { sound.button(); setText(''); loadComments() } }
   async function deletePost() { if (!window.confirm('이 게시글을 삭제할까요?')) return; await supabase.from('posts').delete().eq('id', id); navigate('/community', { replace: true }) }
   if (loading) return <main className="page"><div className="empty-state"><span className="loader" />게시글을 불러오는 중...</div></main>
-  if (!post) return <main className="page"><div className="empty-state"><h3>게시글을 찾을 수 없어요</h3><button className="btn btn-secondary" onClick={() => navigate('/community')}>목록으로</button></div></main>
+  if (!post) return <main className="page">{loadError && <div className="notice notice-error">{loadError}</div>}<div className="empty-state"><h3>게시글을 찾을 수 없어요</h3><button className="btn btn-secondary" onClick={() => navigate('/community')}>목록으로</button></div></main>
   const liked = post.post_likes?.some((like) => like.user_id === user.id); const likeCount = post.post_likes?.length || 0
   return <main className="page post-detail-page">
     <header className="topbar"><button className="icon-btn" onClick={() => navigate('/community')} aria-label="뒤로"><Icon name="back" /></button><div className="title-stack"><span className="overline">HUNTER STORY</span><h1>게시글</h1></div><span className="topbar-spacer" /></header>
