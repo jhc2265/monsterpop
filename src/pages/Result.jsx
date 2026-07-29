@@ -199,7 +199,7 @@ export default function Result() {
               ? <>오늘 첫 격파! {bossReward.streak > 1 ? <><strong>{bossReward.streak}일 연속</strong> 달성</> : <>내일도 이어가 보세요</>}</>
               : bossReward?.isDailyBoss
                 ? <>오늘의 보상은 이미 받았어요. 재도전은 <strong>기록 갱신</strong>으로 남습니다</>
-                : <>자유 도전은 <strong>연습과 기록 갱신</strong>으로 남습니다</>
+                : <>자유 도전이라 XP 없이 <strong>기록 갱신</strong>만 남습니다</>
             : bossAttempt?.improved
               ? <>오늘 최고 기록 갱신! 다음은 피해 <strong>{Math.round(bossAttempt.best * bossMaxHp)}</strong> 넘게 줘야 추가 보상이 나와요</>
               : <>피해 <strong>{Math.round((bossAttempt?.previousBest ?? 0) * bossMaxHp)}</strong> 넘게 줘야 도전 보상이 더 나와요</>

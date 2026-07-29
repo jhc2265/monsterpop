@@ -4164,12 +4164,13 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
   animation: demoBeat 6.6s ease-in-out infinite;
   animation-delay: calc(var(--beat) * 2.2s);
 }
+/* 배지 높이(17px)와 첫 줄 높이(11px x 1.55 = 17.05px)가 거의 같아 여백을 주면 그만큼 내려간다.
+   margin-top: 2px 일 때 배지 중심이 글자 중심보다 2px 아래로 밀렸다. */
 .mechanic-demo-beats li b {
   width: 17px;
   height: 17px;
   flex: 0 0 auto;
   display: grid;
-  margin-top: 2px;
   place-items: center;
   border-radius: 50%;
   background: var(--boss-color);

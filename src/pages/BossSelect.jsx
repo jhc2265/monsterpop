@@ -64,7 +64,7 @@ export default function BossSelect() {
       <button className="ghost-icon-btn" onClick={() => { sound.button(); setTutorial(true) }} aria-label="조작 안내 다시 보기"><Icon name="info" size={20} /></button>
     </header>
 
-    <p className="boss-select-intro">모든 보스는 자유롭게 도전할 수 있어요. 오늘의 보스를 처음 처치하면 일일 보너스 XP를 받습니다.</p>
+    <p className="boss-select-intro">모든 보스는 자유롭게 도전할 수 있어요.<br />오늘의 보스를 처음 처치하면 일일 보너스 XP를 받습니다.</p>
 
     <ul className="boss-select-list">
       {DAILY_BOSSES.map((boss) => {
@@ -91,7 +91,9 @@ export default function BossSelect() {
               <small>{boss.title}</small>
               <span className="boss-select-meta">
                 <span>난이도 {'★'.repeat(boss.difficulty)}</span>
-                <span>{isToday ? `첫 처치 +${boss.firstClearXp} XP` : '연습 · 기록'}</span>
+                {/* 메타는 난이도·제한시간과 나란한 스펙 칸이라 "무엇을 얻나"를 사실대로 적는다.
+                    '자유 도전'은 위 뱃지가 이미 말하고, '기록만'은 그것뿐이라는 뉘앙스가 붙는다. */}
+                <span>{isToday ? `첫 처치 +${boss.firstClearXp} XP` : '기록 갱신'}</span>
                 <span>{boss.timeLimit}초 제한</span>
               </span>
             </span>
@@ -160,7 +162,8 @@ function BossBriefing({ boss, isToday, onClose, onStart }) {
       <div className="boss-briefing-stats">
         <div><small>제한 시간</small><strong>{boss.timeLimit}초</strong></div>
         <div><small>체력</small><strong>{boss.maxHp}</strong></div>
-        <div><small>격파 보상</small><strong>{isToday ? `+${boss.firstClearXp} XP` : '기록만'}</strong></div>
+        {/* 카드 메타와 같은 말을 쓴다. 카드에서 한 탭 만에 여기로 오는데 표현이 갈리면 다른 얘기로 읽힌다. */}
+        <div><small>격파 보상</small><strong>{isToday ? `+${boss.firstClearXp} XP` : '기록 갱신'}</strong></div>
       </div>
 
       {/* 공통 신호(TAP/HOLD/SWIPE/WAIT)는 보스전 첫 진입 튜토리얼에서 한 번만 다룬다.
