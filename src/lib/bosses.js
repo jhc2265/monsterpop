@@ -251,6 +251,19 @@ function writeState(userId, state) {
   try { localStorage.setItem(storageKey(userId), JSON.stringify(state)) } catch { /* 저장 실패는 무시 */ }
 }
 
+// 공통 조작법은 보스마다 반복할 게 아니라 보스전에 처음 들어올 때 한 번만 보여준다.
+// 신호 구성이 바뀌면 VERSION 을 올려 다시 띄운다.
+const TUTORIAL_VERSION = 1
+const tutorialKey = (userId) => `monsterpop-boss-tutorial-${userId}`
+
+export function hasSeenBossTutorial(userId) {
+  try { return Number(localStorage.getItem(tutorialKey(userId))) >= TUTORIAL_VERSION } catch { return false }
+}
+
+export function markBossTutorialSeen(userId) {
+  try { localStorage.setItem(tutorialKey(userId), String(TUTORIAL_VERSION)) } catch { /* 저장 실패는 무시 */ }
+}
+
 export function hasClearedBossToday(userId, bossId) {
   const state = readState(userId)
   return state.date === koreaToday() && state.clearedToday.includes(bossId)

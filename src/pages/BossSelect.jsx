@@ -1,18 +1,25 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { DAILY_BOSSES, getBossRecord, getDailyBoss } from '../lib/bosses'
+import { DAILY_BOSSES, getBossRecord, getDailyBoss, hasSeenBossTutorial, markBossTutorialSeen } from '../lib/bosses'
 import { useAuth } from '../context/AuthContext'
 import { getLevel, resolveProgress } from '../lib/progression'
 import { sound } from '../lib/sound'
 import Icon from '../components/Icon'
 
-// 전투 중에는 신호를 읽느라 설명을 볼 여유가 없다. 규칙은 들어가기 전에 알려준다.
+// 네 보스가 똑같이 쓰는 신호다. 보스마다 반복하면 읽지 않게 되므로
+// 보스전에 처음 들어올 때 한 번만 보여주고, 이후엔 상단 안내 버튼으로만 연다.
 // 글로 적어두면 안 읽는다. 손가락이 실제로 그 동작을 하는 걸 보여준다.
 const CUE_GUIDE = [
   { id: 'tap', label: 'TAP', copy: '짧게 톡' },
   { id: 'hold', label: 'HOLD', copy: '길게 꾹' },
   { id: 'swipe', label: 'SWIPE', copy: '좌우로 슥' },
   { id: 'wait', label: 'WAIT', copy: '손 떼고 대기' },
+]
+
+const BATTLE_RULES = [
+  { key: '시간', copy: '신호가 뜨면 제한 시간 안에 반응하세요' },
+  { key: '실수', copy: '놓치거나 잘못 입력하면 남은 시간이 깎여요' },
+  { key: '페이즈', copy: '보스 체력이 줄면 신호가 빨라지고 종류가 늘어요' },
 ]
 
 // 보스마다 저만 쓰는 신호가 하나씩 있다. 이게 그 보스를 다른 보스와 구분한다.
@@ -29,6 +36,13 @@ export default function BossSelect() {
   const level = getLevel(resolveProgress(profile, user.id).xp)
   const todayBossId = getDailyBoss().id
   const [briefing, setBriefing] = useState(null)
+  const [tutorial, setTutorial] = useState(() => !hasSeenBossTutorial(user.id))
+
+  function closeTutorial() {
+    sound.button()
+    markBossTutorialSeen(user.id)
+    setTutorial(false)
+  }
 
   function openBriefing(boss) {
     sound.button()
@@ -45,7 +59,7 @@ export default function BossSelect() {
     <header className="topbar">
       <button className="icon-btn" onClick={() => navigate('/home')} aria-label="뒤로"><Icon name="back" /></button>
       <div className="title-stack"><span className="overline">DAILY BOSS</span><h1>보스 선택</h1></div>
-      <span className="topbar-spacer" />
+      <button className="icon-btn" onClick={() => { sound.button(); setTutorial(true) }} aria-label="조작 안내 다시 보기"><Icon name="info" /></button>
     </header>
 
     <p className="boss-select-intro">모든 보스는 자유롭게 도전할 수 있어요. 오늘의 보스를 처음 처치하면 일일 보너스 XP를 받습니다.</p>
@@ -91,7 +105,39 @@ export default function BossSelect() {
       onClose={() => { sound.button(); setBriefing(null) }}
       onStart={() => challenge(briefing)}
     />}
+
+    {/* 튜토리얼이 브리핑보다 뒤에 있어야 둘이 겹칠 때 위로 올라온다. */}
+    {tutorial && <BossTutorial onClose={closeTutorial} />}
   </main>
+}
+
+// 공통 조작법. 보스별 브리핑에서 이걸 반복하지 않는다 — 네 번 같은 걸 보면 아무도 안 읽는다.
+function BossTutorial({ onClose }) {
+  return <div className="modal-overlay boss-tutorial-overlay">
+    <section className="boss-briefing boss-tutorial">
+      <header className="boss-tutorial-head">
+        <span className="overline">BOSS BASICS</span>
+        <strong>보스전 조작법</strong>
+        <small>네 보스 모두에게 공통으로 나오는 신호예요</small>
+      </header>
+
+      <ul className="cue-demos">
+        {CUE_GUIDE.map((cue) => <li key={cue.id} className={`cue-demo cue-demo-${cue.id}`}>
+          <span className="cue-demo-stage" aria-hidden="true"><i className="cue-demo-hand" /></span>
+          <b>{cue.label}</b>
+          <span>{cue.copy}</span>
+        </li>)}
+      </ul>
+
+      <ul className="boss-tutorial-rules">
+        {BATTLE_RULES.map((rule) => <li key={rule.key}><b>{rule.key}</b><span>{rule.copy}</span></li>)}
+      </ul>
+
+      <p className="boss-briefing-note">보스마다 저만 쓰는 신호와 기믹이 하나씩 더 있어요. 도전 전 브리핑에서 확인할 수 있습니다.</p>
+
+      <button className="btn btn-primary boss-briefing-start" onClick={onClose}><span>알겠어요</span></button>
+    </section>
+  </div>
 }
 
 // 기믹을 글로 나열하는 대신 실제 전투 화면을 축소해 3박자로 재생한다.
@@ -132,19 +178,15 @@ function BossBriefing({ boss, isToday, onClose, onStart }) {
         <div><small>격파 보상</small><strong>{isToday ? `+${boss.firstClearXp} XP` : '기록만'}</strong></div>
       </div>
 
+      {/* 공통 신호(TAP/HOLD/SWIPE/WAIT)는 보스전 첫 진입 튜토리얼에서 한 번만 다룬다.
+          여기엔 이 보스에서만 나오는 것만 남긴다. */}
       <div className="boss-briefing-block">
-        <span className="overline">신호 읽기</span>
+        <span className="overline">이 보스만의 신호</span>
         <ul className="cue-demos">
-          {CUE_GUIDE.map((cue) => <li key={cue.id} className={`cue-demo cue-demo-${cue.id}`}>
-            <span className="cue-demo-stage" aria-hidden="true"><i className="cue-demo-hand" /></span>
-            <b>{cue.label}</b>
-            <span>{cue.copy}</span>
-          </li>)}
           <li className={`cue-demo cue-demo-signature cue-demo-${boss.signature}`}>
             <span className="cue-demo-stage" aria-hidden="true"><i className="cue-demo-hand" /></span>
             <b>{SIGNATURE_GUIDE[boss.signature].label}</b>
             <span>{SIGNATURE_GUIDE[boss.signature].copy}</span>
-            <em>이 보스만</em>
           </li>
         </ul>
       </div>
