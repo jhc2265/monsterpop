@@ -27,7 +27,14 @@ export const DAILY_BOSSES = [
     },
     description: '깨진 네온 왕관으로 그림자 포털을 지배하는 첫 번째 일일 보스예요.',
     cardCopy: '깨진 네온 왕관의 지배자를\n사냥해 최고 기록에 도전하세요.',
-    holdHint: '왕관이 빛나요. 길게 눌러 힘을 모으세요',
+    signature: 'double',
+    hints: {
+      tap: '그림자가 걷혔어요. 빠르게 터치하세요',
+      hold: '왕관이 빛나요. 길게 눌러 힘을 모으세요',
+      swipe: '틈이 생겼어요. 좌우로 밀어내세요',
+      shield: '어둠의 방어막이 올라왔어요. 건드리지 마세요',
+      double: '그림자가 둘로 갈라졌어요. 두 번 연속 터치!',
+    },
   },
   {
     id: 'glitch-king-slime',
@@ -56,7 +63,14 @@ export const DAILY_BOSSES = [
     },
     description: '픽셀 왕관에서 쏟아지는 오류로 사냥터를 뒤틀어 버리는 두 번째 일일 보스예요.',
     cardCopy: '왕관에 숨은 시스템 오류를 찾아\n뒤틀린 사냥터를 복구하세요.',
-    holdHint: '몸 안의 코어가 열렸어요. 길게 눌러 오류를 멈추세요',
+    signature: 'reverse',
+    hints: {
+      tap: '코어가 노출됐어요. 빠르게 터치하세요',
+      hold: '몸 안의 코어가 열렸어요. 길게 눌러 오류를 멈추세요',
+      swipe: '픽셀이 흩어졌어요. 좌우로 밀어내세요',
+      shield: '오류 방벽이 섰어요. 건드리지 마세요',
+      reverse: '신호가 뒤집혔어요. 화살표 반대로 미세요!',
+    },
   },
   {
     id: 'solar-eclipse-phoenix',
@@ -85,7 +99,14 @@ export const DAILY_BOSSES = [
     },
     description: '검은 태양 파편을 품고 잿빛 사냥터에 잠든 세 번째 일일 보스예요.',
     cardCopy: '잠든 불새가 깨어나기 전에\n검은 태양의 열기를 식혀 주세요.',
-    holdHint: '불꽃이 잦아들었어요. 길게 눌러 열기를 흡수하세요',
+    signature: 'charge',
+    hints: {
+      tap: '불꽃이 흩어졌어요. 빠르게 터치하세요',
+      hold: '불꽃이 잦아들었어요. 길게 눌러 열기를 흡수하세요',
+      swipe: '잿바람이 불어요. 좌우로 밀어내세요',
+      shield: '태양 방벽이 타올라요. 건드리지 마세요',
+      charge: '초록 구간에서 떼세요. 넘기면 터집니다!',
+    },
   },
   {
     id: 'polar-pod',
@@ -114,7 +135,14 @@ export const DAILY_BOSSES = [
     },
     description: '얼어붙은 시계 조각으로 사냥터의 시간을 늦추는 네 번째 일일 보스예요.',
     cardCopy: '빙하 예언자의 외눈을 피해\n멈춰 버린 시간을 움직이세요.',
-    holdHint: '시계가 멈췄어요. 길게 눌러 얼음을 녹이세요',
+    signature: 'vertical',
+    hints: {
+      tap: '얼음이 갈라졌어요. 빠르게 터치하세요',
+      hold: '시계가 멈췄어요. 길게 눌러 얼음을 녹이세요',
+      swipe: '서리가 얇아졌어요. 좌우로 밀어내세요',
+      shield: '빙벽이 세워졌어요. 건드리지 마세요',
+      vertical: '결이 세로로 났어요. 위아래로 미세요!',
+    },
   },
 ]
 

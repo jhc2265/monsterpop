@@ -4,17 +4,17 @@ import { getBossById, getDailyBoss } from '../lib/bosses'
 import { sound } from '../lib/sound'
 import Icon from '../components/Icon'
 
-// 보스마다 신호 구성과 속도가 다르다. 뒤로 갈수록 입력 종류가 일찍 늘고
-// 반응 시간이 짧아지지만, 각 보스의 제한 시간 안에서 숙련 플레이로 완주할 수 있게 맞춘다.
+// 보스마다 고유 신호가 하나씩 있다. 가중치만 다르면 한 판에 신호가 수십 번 뜨는 통에
+// tap 20% 와 35% 를 구분할 방법이 없어서, 네 보스가 사실상 같은 게임이 된다.
 const BOSS_PATTERNS = {
   'neon-nightmare': {
     cueDelay: 340,
     holdMs: 600,
     shieldMs: 900,
     phases: {
-      1: { weights: { tap: 70, hold: 30 }, window: 2800 },
-      2: { weights: { tap: 45, hold: 30, swipe: 15, shield: 10 }, window: 2300 },
-      3: { weights: { tap: 35, hold: 25, swipe: 25, shield: 15 }, window: 1850 },
+      1: { weights: { tap: 55, hold: 25, double: 20 }, window: 2800 },
+      2: { weights: { tap: 35, hold: 25, swipe: 12, shield: 8, double: 20 }, window: 2300 },
+      3: { weights: { tap: 26, hold: 20, swipe: 18, shield: 12, double: 24 }, window: 1850 },
     },
   },
   'glitch-king-slime': {
@@ -22,9 +22,9 @@ const BOSS_PATTERNS = {
     holdMs: 620,
     shieldMs: 860,
     phases: {
-      1: { weights: { tap: 55, hold: 25, swipe: 20 }, window: 2500 },
-      2: { weights: { tap: 30, hold: 25, swipe: 30, shield: 15 }, window: 1900 },
-      3: { weights: { tap: 22, hold: 22, swipe: 34, shield: 22 }, window: 1450 },
+      1: { weights: { tap: 45, hold: 20, swipe: 15, reverse: 20 }, window: 2500 },
+      2: { weights: { tap: 25, hold: 20, swipe: 20, shield: 12, reverse: 23 }, window: 1900 },
+      3: { weights: { tap: 18, hold: 16, swipe: 22, shield: 18, reverse: 26 }, window: 1450 },
     },
   },
   'solar-eclipse-phoenix': {
@@ -32,9 +32,9 @@ const BOSS_PATTERNS = {
     holdMs: 720,
     shieldMs: 940,
     phases: {
-      1: { weights: { tap: 45, hold: 55 }, window: 2600 },
-      2: { weights: { tap: 25, hold: 45, swipe: 15, shield: 15 }, window: 1950 },
-      3: { weights: { tap: 20, hold: 40, swipe: 20, shield: 20 }, window: 1450 },
+      1: { weights: { tap: 40, hold: 35, charge: 25 }, window: 2600 },
+      2: { weights: { tap: 22, hold: 28, swipe: 12, shield: 12, charge: 26 }, window: 1950 },
+      3: { weights: { tap: 16, hold: 24, swipe: 16, shield: 16, charge: 28 }, window: 1450 },
     },
   },
   'polar-pod': {
@@ -42,9 +42,9 @@ const BOSS_PATTERNS = {
     holdMs: 680,
     shieldMs: 800,
     phases: {
-      1: { weights: { tap: 45, hold: 35, swipe: 20 }, window: 2350 },
-      2: { weights: { tap: 25, hold: 25, swipe: 25, shield: 25 }, window: 1700 },
-      3: { weights: { tap: 18, hold: 22, swipe: 30, shield: 30 }, window: 1250 },
+      1: { weights: { tap: 40, hold: 25, swipe: 15, vertical: 20 }, window: 2350 },
+      2: { weights: { tap: 22, hold: 20, swipe: 18, shield: 18, vertical: 22 }, window: 1700 },
+      3: { weights: { tap: 15, hold: 18, swipe: 20, shield: 22, vertical: 25 }, window: 1250 },
     },
   },
 }
@@ -59,16 +59,36 @@ function pickCue(weights) {
   return 'tap'
 }
 
+// 방향이 있는 신호는 매번 다른 쪽을 가리켜야 외워서 치지 못한다.
+function pickDir(type) {
+  if (type === 'reverse') return Math.random() < 0.5 ? 'left' : 'right'
+  if (type === 'vertical') return Math.random() < 0.5 ? 'up' : 'down'
+  return null
+}
+
 const TAP_MAX_MS = 320       // 이보다 오래 누르면 탭으로 인정하지 않는다
 const SWIPE_MIN_PX = 34
 const MISS_TIME_PENALTY = 2  // 반격 — 이게 있어야 제한 시간이 실제 압박이 된다
 const PHASE_BREAK_MS = 900   // 페이즈 전환 무적 연출
+const DOUBLE_TAP_MAX_MS = 520 // 두 번째 탭까지의 여유
+// CHARGE 는 HOLD 와 달리 "더 눌러도 손해 없음"이 아니다. 구간을 지나치면 터진다.
+const CHARGE_MIN = 0.7
+const CHARGE_BURST = 1.3
 
-const CUE_LABEL = { tap: 'TAP', hold: 'HOLD', swipe: 'SWIPE', shield: 'WAIT', thaw: 'SWIPE' }
+const CUE_LABEL = { tap: 'TAP', hold: 'HOLD', swipe: 'SWIPE', shield: 'WAIT', thaw: 'SWIPE', double: 'DOUBLE', charge: 'CHARGE' }
+function cueLabel(cue) {
+  if (!cue) return ''
+  if (cue.type === 'reverse') return cue.dir === 'left' ? 'REVERSE ←' : 'REVERSE →'
+  if (cue.type === 'vertical') return cue.dir === 'up' ? 'UP ↑' : 'DOWN ↓'
+  return CUE_LABEL[cue.type]
+}
+
+// 힌트는 보스별로 갈라둔다. 예전에는 하나를 공유해서 폴라포드를 치는데
+// 네온의 "왕관이 빛나요"가 떴다.
 const CUE_HINT = {
-  tap: '방어막이 열렸어요. 빠르게 터치하세요',
-  hold: '왕관이 빛나요. 길게 눌러 힘을 모으세요',
-  swipe: '틈이 생겼어요. 좌우로 밀어내세요',
+  tap: '빠르게 터치하세요',
+  hold: '길게 눌러 힘을 모으세요',
+  swipe: '좌우로 밀어내세요',
   shield: '방어막이 올라왔어요. 건드리지 마세요',
   thaw: '얼음을 깨도록 좌우로 빠르게 밀어내세요',
 }
@@ -117,6 +137,7 @@ export default function Boss() {
   const frozenRef = useRef(false)
   const shadowVeilRef = useRef(false)
   const cueCountRef = useRef(0)
+  const doubleTapRef = useRef(0)
   const successfulHitsRef = useRef(0)
 
   const phase = hp > boss.maxHp * 0.7 ? 1 : hp > boss.maxHp * 0.4 ? 2 : 3
@@ -148,8 +169,9 @@ export default function Boss() {
       if (!playingRef.current) return
       const settings = pattern.phases[phaseRef.current]
       const type = pickCue(settings.weights)
-      setCue({ type, id: Date.now() })
+      setCue({ type, id: Date.now(), dir: pickDir(type) })
       resetHold()
+      doubleTapRef.current = 0
       cueCountRef.current += 1
 
       setShadowVeil(false)
@@ -265,7 +287,7 @@ export default function Boss() {
     // 장막은 반응 시간을 깎는 대신 뚫으면 피해가 커진다. 위험만 있고 이득이 없으면 세금일 뿐이다.
     const veiled = boss.id === 'neon-nightmare' && shadowVeilRef.current
     const damage = Math.round((boss.damagePerHit || 1) * (veiled ? 1.5 : 1))
-    const ventedHeat = boss.id === 'solar-eclipse-phoenix' && cue?.type === 'hold' && heatRef.current > 0
+    const ventedHeat = boss.id === 'solar-eclipse-phoenix' && (cue?.type === 'hold' || cue?.type === 'charge') && heatRef.current > 0
     if (ventedHeat) {
       heatRef.current = Math.max(0, heatRef.current - 40)
       setHeat(heatRef.current)
@@ -347,6 +369,20 @@ export default function Boss() {
       }
       holdRafRef.current = requestAnimationFrame(step)
     }
+
+    // CHARGE 는 링이 다 차기를 기다리는 게 아니라 구간 안에서 떼는 신호다.
+    // 지나치면 손을 떼기도 전에 터진다 — 그래야 HOLD 와 다른 긴장이 생긴다.
+    if (cue.type === 'charge') {
+      const step = () => {
+        if (!pointerRef.current) return
+        const ratio = (Date.now() - pointerRef.current.at) / pattern.holdMs
+        setHoldProgress(Math.min(1, ratio / CHARGE_BURST))
+        setHoldReady(ratio >= CHARGE_MIN && ratio <= 1)
+        if (ratio >= CHARGE_BURST) { resetHold(); punish('너무 오래 달궜어요!'); return }
+        holdRafRef.current = requestAnimationFrame(step)
+      }
+      holdRafRef.current = requestAnimationFrame(step)
+    }
   }
 
   function handlePointerUp(event) {
@@ -366,6 +402,29 @@ export default function Boss() {
     } else if (cue.type === 'swipe') {
       if (Math.abs(dx) >= SWIPE_MIN_PX && Math.abs(dx) > Math.abs(dy)) hit('SLASH!')
       else punish('좌우로 밀어주세요!')
+    } else if (cue.type === 'double') {
+      // 첫 탭은 판정하지 않고 세기만 한다. 두 번째가 안 오면 응답 시간 타이머가 실패로 잡는다.
+      if (heldFor > TAP_MAX_MS) { punish('짧게 두 번 터치하세요!'); return }
+      doubleTapRef.current += 1
+      if (doubleTapRef.current >= 2) hit('DOUBLE HIT!')
+      else {
+        pointerRef.current = null
+        setJudge('한 번 더!')
+      }
+    } else if (cue.type === 'reverse') {
+      // 화살표가 가리키는 쪽의 반대로 밀어야 한다.
+      const wanted = cue.dir === 'left' ? 1 : -1
+      if (Math.abs(dx) >= SWIPE_MIN_PX && Math.abs(dx) > Math.abs(dy) && Math.sign(dx) === wanted) hit('REVERSED!')
+      else punish('화살표 반대로 미세요!')
+    } else if (cue.type === 'vertical') {
+      const wanted = cue.dir === 'up' ? -1 : 1
+      if (Math.abs(dy) >= SWIPE_MIN_PX && Math.abs(dy) > Math.abs(dx) && Math.sign(dy) === wanted) hit('BREAK!')
+      else punish(cue.dir === 'up' ? '위로 밀어주세요!' : '아래로 밀어주세요!')
+    } else if (cue.type === 'charge') {
+      const ratio = heldFor / pattern.holdMs
+      if (ratio >= CHARGE_MIN && ratio <= 1) hit('PERFECT CHARGE!')
+      else if (ratio < CHARGE_MIN) punish('덜 달궈졌어요!')
+      else punish('너무 오래 달궜어요!')
     } else if (cue.type === 'thaw') {
       if (Math.abs(dx) >= SWIPE_MIN_PX && Math.abs(dx) > Math.abs(dy)) {
         clearTimers()
@@ -497,12 +556,16 @@ export default function Boss() {
         onPointerUp={handlePointerUp}
         onPointerCancel={resetHold}
       >
-        {cueType && <span className="action-cue">{cueScrambling ? 'ERROR' : CUE_LABEL[cueType]}</span>}
+        {cueType && <span className="action-cue">{cueScrambling ? 'ERROR' : cueLabel(cue)}</span>}
         <img src={boss.image} alt={boss.name} draggable="false" />
       </button>
       {/* 홀드 링은 boss-target(z-index 3) 밖에 둬야 진행 표시가 보스 이미지에 가리지 않는다. */}
-      {cue?.type === 'hold' && holdProgress > 0 && <div className={`boss-hold-ring ${holdReady ? 'ready' : ''}`} style={{ '--hold-progress': holdProgress }} aria-hidden="true">
-        <b>{holdReady ? '지금 떼세요!' : '유지'}</b>
+      {(cue?.type === 'hold' || cue?.type === 'charge') && holdProgress > 0 && <div
+        className={`boss-hold-ring ${cue.type === 'charge' ? 'charge' : ''} ${holdReady ? 'ready' : ''}`}
+        style={{ '--hold-progress': holdProgress }}
+        aria-hidden="true"
+      >
+        <b>{cue.type === 'charge' ? (holdReady ? '지금 떼세요!' : '더 달구기') : holdReady ? '지금 떼세요!' : '유지'}</b>
       </div>}
       {effect && <div key={effect.id} className={`boss-hit-effect ${effect.type}`}>{effect.text}</div>}
       {mechanicNotice && <div className="boss-mechanic-notice" aria-live="polite"><small>{mechanicNotice.title}</small><strong>{mechanicNotice.copy}</strong></div>}
@@ -513,7 +576,7 @@ export default function Boss() {
     <section className="boss-command">
       <small>{phase === 3 ? 'FINAL PHASE' : `PHASE ${phase}`}</small>
       <strong>{judge}</strong>
-      <span>{cueScrambling ? '신호가 확정된 뒤 판정이 시작됩니다' : frozen ? CUE_HINT.thaw : cueType ? (cueType === 'hold' && boss.holdHint ? boss.holdHint : CUE_HINT[cueType]) : '다음 신호를 기다리세요'}</span>
+      <span>{cueScrambling ? '신호가 확정된 뒤 판정이 시작됩니다' : frozen ? CUE_HINT.thaw : cueType ? (boss.hints?.[cueType] || CUE_HINT[cueType]) : '다음 신호를 기다리세요'}</span>
     </section>
   </main>
 }

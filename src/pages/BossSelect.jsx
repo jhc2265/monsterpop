@@ -15,6 +15,14 @@ const CUE_GUIDE = [
   { id: 'wait', label: 'WAIT', copy: '손 떼고 대기' },
 ]
 
+// 보스마다 저만 쓰는 신호가 하나씩 있다. 이게 그 보스를 다른 보스와 구분한다.
+const SIGNATURE_GUIDE = {
+  double: { label: 'DOUBLE', copy: '두 번 연속 톡톡' },
+  reverse: { label: 'REVERSE', copy: '화살표와 반대로 밀기' },
+  charge: { label: 'CHARGE', copy: '초록 구간에서 떼기 · 넘기면 폭발' },
+  vertical: { label: 'VERTICAL', copy: '좌우가 아니라 위아래로' },
+}
+
 export default function BossSelect() {
   const navigate = useNavigate()
   const { user, profile } = useAuth()
@@ -132,6 +140,12 @@ function BossBriefing({ boss, isToday, onClose, onStart }) {
             <b>{cue.label}</b>
             <span>{cue.copy}</span>
           </li>)}
+          <li className={`cue-demo cue-demo-signature cue-demo-${boss.signature}`}>
+            <span className="cue-demo-stage" aria-hidden="true"><i className="cue-demo-hand" /></span>
+            <b>{SIGNATURE_GUIDE[boss.signature].label}</b>
+            <span>{SIGNATURE_GUIDE[boss.signature].copy}</span>
+            <em>이 보스만</em>
+          </li>
         </ul>
       </div>
 
