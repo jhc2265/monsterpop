@@ -6,11 +6,13 @@ import { sound } from '../lib/sound'
 import Icon from '../components/Icon'
 import { getLevel, getLevelProgress, isMaxLevel, LEVEL_UNLOCKS, resolveProgress, saveStoredProgress } from '../lib/progression'
 import { DAILY_MISSIONS, getDailyMissions, recordGameForMissions } from '../lib/missions'
-import { getBossById, getDailyBoss, recordBossClear } from '../lib/bosses'
+import { getBossById, getDailyBoss, recordBossAttempt, recordBossClear } from '../lib/bosses'
 import { MONSTERS } from '../lib/monsters'
 
 // 보스 반복 도전은 기록 갱신과 연습용이다. 큰 보상은 오늘 첫 클리어 한 번만 지급한다.
 const BOSS_REPEAT_XP = 0
+// 실패한 도전의 보상 상한 — 첫 격파 보상 대비 비율. 격파와의 격차가 충분해야 지고 반복하지 않는다.
+const ATTEMPT_XP_RATIO = 0.3
 
 export default function Result() {
   const { user, refreshProfile } = useAuth(); const navigate = useNavigate(); const location = useLocation(); const { score = 0, maxCombo = 0, monsterCounts = {}, mode = 'hunt', bossClear = false, bossId = '', bossTimeLeft = 0, bossDamage = 0, bossMaxHp = 30 } = location.state || {}
@@ -19,6 +21,7 @@ export default function Result() {
   const [bossReward, setBossReward] = useState(null)
   const [missionXp, setMissionXp] = useState(0)
   const [missionsDone, setMissionsDone] = useState(null)
+  const [bossAttempt, setBossAttempt] = useState(null)
   const rewardThemePlayedRef = useRef(false)
   const [resultStep, setResultStep] = useState(1)
   useEffect(() => {
@@ -66,8 +69,13 @@ export default function Result() {
         setBossReward(record)
         gained = (record.firstToday ? boss.firstClearXp : BOSS_REPEAT_XP) + missionBonus
       } else {
-        // 실패 기록은 남기되 보스 XP는 지급하지 않는다.
-        gained = Math.round((bossDamage / Math.max(1, bossMaxHp)) * BOSS_REPEAT_XP) + missionBonus
+        // 격파하지 못해도 깎아낸 만큼은 돌려준다. 다만 오늘 최고 진행도를 넘어선 몫만 준다.
+        const attempt = recordBossAttempt(user.id, boss.id, {
+          progress: bossDamage / Math.max(1, bossMaxHp),
+          maxXp: Math.round(boss.firstClearXp * ATTEMPT_XP_RATIO),
+        })
+        setBossAttempt(attempt)
+        gained = attempt.gain + missionBonus
       }
     } else {
       gained = 20 + totalKills * 2 + (monsterCounts.boss || 0) * 10 + (newBest ? 15 : 0) + missionBonus
@@ -147,8 +155,8 @@ export default function Result() {
             {missionTile}
             <div><small>남은 시간</small><strong>{bossTimeLeft}초</strong></div>
           </> : <>
+            <div><small>도전 보상</small><strong>+{bossAttempt?.gain ?? 0}</strong></div>
             <div><small>입힌 피해</small><strong>{bossDamage}/{bossMaxHp}</strong></div>
-            <div><small>진행도</small><strong>{Math.round((bossDamage / Math.max(1, bossMaxHp)) * 100)}%</strong></div>
             {missionTile}
           </> : <>
             <div><small>기본</small><strong>+{baseXp}</strong></div>
@@ -163,7 +171,9 @@ export default function Result() {
               : bossReward?.isDailyBoss
                 ? <>오늘의 보상은 이미 받았어요. 재도전은 <strong>기록 갱신</strong>으로 남습니다</>
                 : <>자유 도전은 <strong>연습과 기록 갱신</strong>으로 남습니다</>
-            : <>보스 XP는 <strong>격파에 성공</strong>해야 지급돼요</>
+            : bossAttempt?.improved
+              ? <>오늘 최고 진행도 <strong>{Math.round(bossAttempt.best * 100)}%</strong> 갱신! 격파하면 전체 보상을 받아요</>
+              : <>오늘 최고 진행도 <strong>{Math.round((bossAttempt?.previousBest ?? 0) * 100)}%</strong>를 넘어야 도전 보상이 더 나와요</>
           : <>이번 사냥에서 몬스터 <strong>{totalKills}마리</strong>를 처치했어요</>}</p>
       </div>
       <div className="xp-progress-card">{xpProgress && <><div className="xp-level-head"><strong>LV.{xpProgress.level}</strong><span>{isMaxLevel(xpProgress.level) ? 'MAX LEVEL' : 'LEVEL PROGRESS'}</span><b>{isMaxLevel(xpProgress.level) ? 'MAX' : `LV.${xpProgress.level + 1}`}</b></div><div className="xp-progress-line"><span><i style={{ width: `${xpProgress.percent}%` }} /></span></div><div className="xp-progress-values"><small>{xpProgress.current} / {xpProgress.needed} XP</small><small>{isMaxLevel(xpProgress.level) ? '최고 레벨 달성' : `${(xpProgress.needed - xpProgress.current).toLocaleString()} XP 남음`}</small></div></>}</div>

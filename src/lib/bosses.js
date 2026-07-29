@@ -14,6 +14,13 @@ export const DAILY_BOSSES = [
     difficulty: 2,
     firstClearXp: 120,
     mechanics: ['shield', 'mixed-gestures', 'final-rush'],
+    mechanic: {
+      name: '그림자 장막',
+      short: 'SHADOW VEIL',
+      when: '네 번째 신호마다',
+      effect: '반응 시간이 28% 짧아지고, 이때 실수하면 시간이 3초 깎여요',
+      counter: '장막이 걷히기 전에 성공하면 피해가 1.5배가 돼요',
+    },
     description: '깨진 네온 왕관으로 그림자 포털을 지배하는 첫 번째 일일 보스예요.',
     cardCopy: '깨진 네온 왕관의 지배자를\n사냥해 최고 기록에 도전하세요.',
     holdHint: '왕관이 빛나요. 길게 눌러 힘을 모으세요',
@@ -33,6 +40,13 @@ export const DAILY_BOSSES = [
     difficulty: 3,
     firstClearXp: 130,
     mechanics: ['shield', 'mixed-gestures', 'final-rush'],
+    mechanic: {
+      name: '신호 오류',
+      short: 'SIGNAL ERROR',
+      when: '신호 10번 중 4번쯤',
+      effect: '진짜 신호가 잠깐 ERROR로 가려져요. 확정되기 전에 누르면 오작동으로 시간이 2초 깎여요',
+      counter: 'ERROR 글자가 사라진 뒤에 입력하세요',
+    },
     description: '픽셀 왕관에서 쏟아지는 오류로 사냥터를 뒤틀어 버리는 두 번째 일일 보스예요.',
     cardCopy: '왕관에 숨은 시스템 오류를 찾아\n뒤틀린 사냥터를 복구하세요.',
     holdHint: '몸 안의 코어가 열렸어요. 길게 눌러 오류를 멈추세요',
@@ -52,6 +66,13 @@ export const DAILY_BOSSES = [
     difficulty: 4,
     firstClearXp: 140,
     mechanics: ['shield', 'mixed-gestures', 'final-rush'],
+    mechanic: {
+      name: '과열',
+      short: 'OVERHEAT',
+      when: '실수할 때마다 열기 +40%',
+      effect: '열기가 100%가 되면 태양 폭발 — 시간이 6초 깎이고 보스가 체력을 회복해요',
+      counter: '열기가 남아 있을 때 HOLD를 성공하면 40% 식힐 수 있어요',
+    },
     description: '검은 태양 파편을 품고 잿빛 사냥터에 잠든 세 번째 일일 보스예요.',
     cardCopy: '잠든 불새가 깨어나기 전에\n검은 태양의 열기를 식혀 주세요.',
     holdHint: '불꽃이 잦아들었어요. 길게 눌러 열기를 흡수하세요',
@@ -71,6 +92,13 @@ export const DAILY_BOSSES = [
     difficulty: 5,
     firstClearXp: 150,
     mechanics: ['shield', 'mixed-gestures', 'final-rush'],
+    mechanic: {
+      name: '시간 동결',
+      short: 'TIME FREEZE',
+      when: '5번 성공할 때마다',
+      effect: '제한 시간이 멈추는 대신, 1.6초 안에 좌우로 밀어 얼음을 깨야 해요',
+      counter: '놓치면 콤보가 끊기고 시간이 3초 깎여요',
+    },
     description: '얼어붙은 시계 조각으로 사냥터의 시간을 늦추는 네 번째 일일 보스예요.',
     cardCopy: '빙하 예언자의 외눈을 피해\n멈춰 버린 시간을 움직이세요.',
     holdHint: '시계가 멈췄어요. 길게 눌러 얼음을 녹이세요',
@@ -169,6 +197,11 @@ function readState(userId) {
     rewardDate: state.rewardDate || state.date || '',
     clearedToday: Array.isArray(state.clearedToday) ? state.clearedToday : [],
     bestTimeLeft: state.bestTimeLeft && typeof state.bestTimeLeft === 'object' ? state.bestTimeLeft : {},
+    // 도전 보상은 스트릭용 date 와 따로 날짜를 물고 있어야 한다.
+    // 여기서 date 를 건드리면 실패 후 클리어했을 때 recordBossClear 가 "새 날"을 놓친다.
+    attempts: state.attempts && typeof state.attempts === 'object'
+      ? { date: state.attempts.date || '', values: state.attempts.values || {} }
+      : { date: '', values: {} },
     streak: Number.isFinite(state.streak) ? state.streak : 0,
   }
 }
@@ -212,8 +245,29 @@ export function recordBossClear(userId, bossId, { timeLeft = 0 } = {}) {
     rewardDate: firstToday ? today : state.rewardDate,
     clearedToday: isNewDay ? [bossId] : [...new Set([...state.clearedToday, bossId])],
     bestTimeLeft: { ...state.bestTimeLeft, [bossId]: newRecord ? timeLeft : previousBest },
+    // 격파했으면 진행도는 100%. 이후 같은 보스에서 져도 도전 보상이 다시 나오지 않는다.
+    attempts: { date: today, values: { ...todayAttempts(state, today), [bossId]: 1 } },
     streak,
   })
 
   return { firstToday, isDailyBoss, newRecord, streak, bestTimeLeft: newRecord ? timeLeft : previousBest }
+}
+
+function todayAttempts(state, today) {
+  return state.attempts.date === today ? state.attempts.values : {}
+}
+
+// 실패한 도전의 보상. 진행도에 비례하되 "오늘 세운 최고 기록을 넘어선 만큼"만 지급한다.
+// 매번 전액을 주면 62% 에서 일부러 지고 반복하는 편이 격파보다 이득이 되어버린다.
+export function recordBossAttempt(userId, bossId, { progress = 0, maxXp = 0 } = {}) {
+  const today = koreaToday()
+  const state = readState(userId)
+  const attempts = todayAttempts(state, today)
+  const previousBest = attempts[bossId] ?? 0
+  const best = Math.max(previousBest, Math.min(1, progress))
+  const gain = Math.max(0, Math.round(maxXp * best) - Math.round(maxXp * previousBest))
+
+  writeState(userId, { ...state, attempts: { date: today, values: { ...attempts, [bossId]: best } } })
+
+  return { gain, best, previousBest, improved: best > previousBest }
 }

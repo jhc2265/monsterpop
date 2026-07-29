@@ -72,12 +72,7 @@ const CUE_HINT = {
   shield: '방어막이 올라왔어요. 건드리지 마세요',
   thaw: '얼음을 깨도록 좌우로 빠르게 밀어내세요',
 }
-const BOSS_MECHANICS = {
-  'neon-nightmare': { name: '그림자 장막', short: 'SHADOW VEIL' },
-  'glitch-king-slime': { name: '신호 오류', short: 'SIGNAL ERROR' },
-  'solar-eclipse-phoenix': { name: '과열', short: 'OVERHEAT' },
-  'polar-pod': { name: '시간 동결', short: 'TIME FREEZE' },
-}
+const GLITCH_SCRAMBLE_CHANCE = 0.4
 
 export default function Boss() {
   const navigate = useNavigate()
@@ -103,6 +98,7 @@ export default function Boss() {
   const [shadowVeil, setShadowVeil] = useState(false)
   const [heat, setHeat] = useState(0)
   const [burst, setBurst] = useState(false)
+  const [timeHit, setTimeHit] = useState(null)   // { amount, id } — 깎인 초를 타이머 위에 띄운다
   const [frozen, setFrozen] = useState(false)
 
   const playingRef = useRef(false)
@@ -124,7 +120,7 @@ export default function Boss() {
   const successfulHitsRef = useRef(0)
 
   const phase = hp > boss.maxHp * 0.7 ? 1 : hp > boss.maxHp * 0.4 ? 2 : 3
-  const mechanic = BOSS_MECHANICS[boss.id] || BOSS_MECHANICS['neon-nightmare']
+  const mechanic = boss.mechanic
 
   function flash(text, type) {
     setEffect({ text, type, id: Date.now() + Math.random() })
@@ -188,7 +184,9 @@ export default function Boss() {
         }, type === 'shield' ? pattern.shieldMs : responseWindow)
       }
 
-      if (boss.id === 'glitch-king-slime') {
+      // 매 신호마다 가리면 그건 페이크가 아니라 그냥 딜레이다.
+      // 일부만 가려야 "이번 건 진짜인가"라는 판단이 생긴다.
+      if (boss.id === 'glitch-king-slime' && Math.random() < GLITCH_SCRAMBLE_CHANCE) {
         setCueScrambling(true)
         setJudge('신호 복구 중...')
         const scrambleMs = phaseRef.current === 1 ? 520 : phaseRef.current === 2 ? 380 : 240
@@ -253,6 +251,9 @@ export default function Boss() {
     flash(`${penaltyLabel}  -${penalty}초`, 'miss')
     timeRef.current = Math.max(0, timeRef.current - penalty)
     setTimeLeft(timeRef.current)
+    // 아레나 한복판의 문구만으로는 "시간이 깎였다"가 안 읽힌다. 줄어드는 당사자인 타이머가 직접 반응해야 한다.
+    setTimeHit({ amount: penalty, id: Date.now() })
+    setTimeout(() => setTimeHit(null), 760)
     resetHold()
     if (timeRef.current <= 0) { finish(false); return }
     nextCue(460)
@@ -464,7 +465,7 @@ export default function Boss() {
     <header className="battle-hud boss-hud">
       <button className="battle-pause" onClick={quit} aria-label="보스전 나가기"><Icon name="back" size={18} /></button>
       <div className="battle-score"><small>DAILY BOSS</small><strong>{boss.name}</strong><span>{boss.element}</span></div>
-      <div className="battle-timer"><span>◆</span><strong>00:{String(Math.max(0, timeLeft)).padStart(2, '0')}</strong></div>
+      <div className={`battle-timer${timeHit ? ' time-damaged' : ''}`}><span>◆</span><strong>00:{String(Math.max(0, timeLeft)).padStart(2, '0')}</strong>{timeHit && <b key={timeHit.id} className="timer-penalty">-{timeHit.amount}초</b>}</div>
       <div className={`battle-combo ${combo > 0 ? 'active' : ''}`}><small>COMBO</small><strong>{combo}</strong></div>
     </header>
 
@@ -489,7 +490,6 @@ export default function Boss() {
           같은 z-index 2 안에서 젬 비보다 뒤에 둬야 폭발이 가려지지 않는다. */}
       <div className="boss-mechanic-field" aria-hidden="true" />
       <div className="boss-crown-glow" />
-      <div className="boss-aurora-ring ring-back" aria-hidden="true"><i /><b /></div>
       <button
         className={`boss-target ${cueType ? `action-${cueType}` : 'action-idle'} ${effect ? `react-${effect.type}` : ''} ${holdProgress > 0 ? 'holding' : ''} ${holdReady ? 'hold-ready' : ''} ${phaseBreak ? 'phase-break' : ''}`}
         style={{ '--hold-progress': holdProgress }}
@@ -500,9 +500,7 @@ export default function Boss() {
         {cueType && <span className="action-cue">{cueScrambling ? 'ERROR' : CUE_LABEL[cueType]}</span>}
         <img src={boss.image} alt={boss.name} draggable="false" />
       </button>
-      <div className="boss-aurora-ring ring-front" aria-hidden="true"><i /><b /></div>
-      {/* 홀드 링은 boss-target 밖에 둔다 — 안에 두면 오로라 ring-front(z-index 4)가
-          boss-target(z-index 3) 통째로 덮어서 진행 표시가 가려진다. */}
+      {/* 홀드 링은 boss-target(z-index 3) 밖에 둬야 진행 표시가 보스 이미지에 가리지 않는다. */}
       {cue?.type === 'hold' && holdProgress > 0 && <div className={`boss-hold-ring ${holdReady ? 'ready' : ''}`} style={{ '--hold-progress': holdProgress }} aria-hidden="true">
         <b>{holdReady ? '지금 떼세요!' : '유지'}</b>
       </div>}

@@ -953,15 +953,14 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
   flex-basis: 64px;
   grid-template-columns: 43px minmax(0, 1fr) auto 56px;
 }
+/* 두 줄로 접히면 58px HUD 안에서 뒤로가기 버튼·타이머와 서로 밀어내며 미어터진다.
+   보스 이름은 한 줄로 고정하고, 넘치면 잘라낸다. */
 .boss-hud .battle-score strong {
-  display: -webkit-box;
   overflow: hidden;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-  line-height: 1.02;
-  overflow-wrap: anywhere;
-  text-overflow: clip;
-  white-space: normal;
+  font-size: var(--fs-body);
+  line-height: 1.15;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .boss-hud .battle-score span { display: none; }
 .boss-healthbar { flex: 0 0 auto; padding: 2px 6px 5px; }
@@ -3098,64 +3097,7 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
   100% { opacity: 0; transform: translate(-50%, -50%) scale(.96); }
 }
 
-/* ============================================================
-   보스 궤도 링 — 이미지 대신 CSS 로 그린다.
-   기존 webp 는 캔버스가 3:2 인데 실제 고리는 2.275:1 이라 위아래에 빈 여백이
-   있었고, 화면 평면에서 rotate 하니 타원이 통째로 기울어 궤도로 보이지 않았다.
-
-   여기서는 정원(正圓)을 rotateX 로 눕혀 타원처럼 보이게 하고, 그 평면 안에서
-   rotateZ 로 돌린다. 링의 외곽선은 그대로 있고 빛띠만 궤도를 따라 흐른다.
-   ============================================================ */
-.boss-aurora-ring {
-  position: absolute; z-index: 2; left: 50%; top: 52%;
-  width: min(104%, 500px); aspect-ratio: 1;
-  transform: translate(-50%, -50%);
-  transform-style: preserve-3d;
-  pointer-events: none;
-}
-/* i = 빛띠 본체, b = 궤도를 도는 밝은 점 */
-.boss-aurora-ring i,
-.boss-aurora-ring b {
-  position: absolute; inset: 0; border-radius: 50%;
-  animation: orbitSpin 9s linear infinite;
-}
-.boss-aurora-ring i {
-  background: conic-gradient(from 0deg,
-    transparent 0 4%, rgba(70, 229, 255, .95) 13%, rgba(162, 104, 255, .95) 26%,
-    rgba(240, 76, 189, .95) 38%, transparent 47% 57%,
-    rgba(125, 255, 208, .9) 68%, rgba(240, 76, 189, .95) 82%, transparent 92% 100%);
-  mask: radial-gradient(closest-side, transparent 76%, #000 79%, #000 89%, transparent 92%);
-  -webkit-mask: radial-gradient(closest-side, transparent 76%, #000 79%, #000 89%, transparent 92%);
-  filter: drop-shadow(0 0 9px rgba(212, 70, 255, .6));
-}
-/* 궤도 위를 도는 점 하나 — 회전이 눈에 확실히 보이게 하는 기준점 */
-.boss-aurora-ring b::after {
-  content: ''; position: absolute; left: 50%; top: 2%;
-  width: 12px; height: 12px; border-radius: 50%;
-  background: #fff;
-  box-shadow: 0 0 10px 3px rgba(125, 255, 208, .9), 0 0 22px 6px rgba(240, 76, 189, .5);
-  transform: translateX(-50%);
-}
-/* 뒤쪽 반은 보스 뒤로, 앞쪽 반은 보스 앞으로 — 감싸는 느낌을 만든다 */
-.boss-aurora-ring.ring-back { z-index: 2; clip-path: inset(0 0 50% 0); opacity: .68; }
-.boss-aurora-ring.ring-front { z-index: 4; clip-path: inset(50% 0 0 0); opacity: .96; }
-
-/* 페이즈가 오를수록 궤도가 빨라진다 */
-.boss-battle.phase-2 .boss-aurora-ring i,
-.boss-battle.phase-2 .boss-aurora-ring b { animation-duration: 6s; }
-.boss-battle.phase-3 .boss-aurora-ring i,
-.boss-battle.phase-3 .boss-aurora-ring b { animation-duration: 3.4s; }
-.boss-arena:has(.boss-target.holding) .boss-aurora-ring i,
-.boss-arena:has(.boss-target.holding) .boss-aurora-ring b { animation-duration: 1.8s; }
-.boss-arena:has(.boss-target.holding) .boss-aurora-ring i { filter: brightness(1.3) saturate(1.2) drop-shadow(0 0 14px rgba(255, 196, 79, .6)); }
-
-/* rotateX 로 눕힌 각도. cos(64deg) ≈ 0.44 로 원본 고리의 납작함과 비슷하다. */
-@keyframes orbitSpin {
-  from { transform: rotateX(64deg) rotateZ(0deg); }
-  to { transform: rotateX(64deg) rotateZ(360deg); }
-}
-
-/* 글리치 킹은 네온 나이트메어의 보석/오로라 문법을 공유하지 않는다. */
+/* 글리치 킹은 네온 나이트메어의 보석 문법을 공유하지 않는다. */
 .boss-glitch-king-slime .boss-gem-rain { display: none; }
 .boss-glitch-field { display: none; }
 .boss-glitch-king-slime .boss-glitch-field {
@@ -3220,86 +3162,9 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
 .boss-glitch-king-slime .boss-crown-glow {
   display: none;
 }
-.boss-glitch-king-slime .boss-aurora-ring.ring-front { display: none; }
-.boss-glitch-king-slime .boss-aurora-ring.ring-back {
-  top: 57%;
-  width: min(78%, 380px);
-  opacity: .38;
-  clip-path: none;
-}
-.boss-glitch-king-slime .boss-aurora-ring.ring-back i {
-  border-radius: 50%;
-  background: conic-gradient(from 12deg,
-    transparent 0 7%, rgba(67,226,224,.68) 7% 10%, transparent 10% 27%,
-    rgba(84,248,203,.5) 27% 31%, transparent 31% 58%,
-    rgba(151,255,77,.55) 58% 60%, transparent 60% 82%,
-    rgba(52,192,229,.52) 82% 85%, transparent 85% 100%);
-  mask: radial-gradient(closest-side, transparent 82%, #000 84%, #000 87%, transparent 89%);
-  -webkit-mask: radial-gradient(closest-side, transparent 82%, #000 84%, #000 87%, transparent 89%);
-  filter: drop-shadow(0 0 4px rgba(68,224,218,.38));
-  animation: glitchOrbit 13s steps(24) infinite;
-}
-.boss-glitch-king-slime .boss-aurora-ring.ring-back b {
-  border-radius: 0;
-  animation: glitchOrbitReverse 17s steps(20) infinite;
-}
-.boss-glitch-king-slime .boss-aurora-ring.ring-back b::before,
-.boss-glitch-king-slime .boss-aurora-ring.ring-back b::after {
-  content: '';
-  position: absolute;
-  width: 7px;
-  height: 7px;
-  border-radius: 1px;
-  background: rgba(76,232,220,.72);
-  box-shadow: 0 0 5px rgba(76,232,220,.45);
-}
-.boss-glitch-king-slime .boss-aurora-ring.ring-back b::before {
-  left: 15%;
-  top: 35%;
-}
-.boss-glitch-king-slime .boss-aurora-ring.ring-back b::after {
-  left: auto;
-  right: 12%;
-  top: 62%;
-  width: 5px;
-  height: 5px;
-  background: rgba(177,255,66,.7);
-  box-shadow: 0 0 5px rgba(177,255,66,.38);
-  transform: none;
-}
-/* 입력 신호가 나타나는 짧은 순간에만 포털 윤곽이 완성됐다가 다시 깨진다. */
-.boss-glitch-king-slime .boss-aurora-ring.ring-back::after {
-  content: '';
-  position: absolute;
-  inset: 10%;
-  border-radius: 50%;
-  background: conic-gradient(from 30deg,
-    rgba(80,239,220,.58), transparent 9% 18%, rgba(70,204,237,.45) 23%,
-    transparent 31% 52%, rgba(168,255,70,.48) 59%, transparent 68% 100%);
-  mask: radial-gradient(closest-side, transparent 86%, #000 88%, #000 90%, transparent 92%);
-  -webkit-mask: radial-gradient(closest-side, transparent 86%, #000 88%, #000 90%, transparent 92%);
-  opacity: 0;
-}
-.boss-glitch-king-slime .boss-arena:has(.boss-target:not(.action-idle)) .boss-aurora-ring.ring-back::after {
-  animation: glitchPortalSignal 1.15s steps(2) infinite;
-}
-@keyframes glitchOrbit {
-  from { transform: rotateX(67deg) rotateZ(0deg); }
-  to { transform: rotateX(67deg) rotateZ(360deg); }
-}
-@keyframes glitchOrbitReverse {
-  from { transform: rotateX(67deg) rotateZ(360deg); }
-  to { transform: rotateX(67deg) rotateZ(0deg); }
-}
-@keyframes glitchPortalSignal {
-  0%, 20% { opacity: 0; transform: rotateX(67deg) scale(.96); }
-  21%, 62% { opacity: .48; transform: rotateX(67deg) scale(1); }
-  63%, 100% { opacity: .08; transform: rotateX(67deg) scale(1.025); }
-}
 
-/* 이클립스 피닉스는 링이나 보석비 대신 낮은 열기와 재만 사용한다. */
+/* 이클립스 피닉스는 보석비 대신 낮은 열기와 재만 사용한다. */
 .boss-solar-eclipse-phoenix .boss-gem-rain { display: none; }
-.boss-solar-eclipse-phoenix .boss-aurora-ring { display: none; }
 .boss-solar-eclipse-phoenix .boss-crown-glow {
   top: 24%;
   width: 68%;
@@ -3599,7 +3464,112 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
 }
 .boss-select-card.today .boss-select-go { color: var(--boss-color); }
 
+/* 도전 브리핑 — 전투 중에는 신호를 읽느라 규칙을 읽을 여유가 없다. 들어가기 전에 알려준다. */
+.boss-briefing {
+  width: 100%;
+  max-width: 460px;
+  max-height: 92vh;
+  overflow: auto;
+  padding: 18px 18px calc(22px + env(safe-area-inset-bottom));
+  border: 1px solid color-mix(in srgb, var(--boss-color) 34%, transparent);
+  border-bottom: 0;
+  border-radius: 26px 26px 0 0;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--boss-color) 12%, #14103a), #100c2c 42%);
+  animation: slideUp .25s ease;
+}
+.boss-briefing-head {
+  display: grid;
+  align-items: center;
+  grid-template-columns: 58px 1fr 34px;
+  gap: 12px;
+}
+.boss-briefing-head img {
+  width: 58px;
+  height: 58px;
+  border-radius: 16px;
+  background: rgba(6,3,24,.55);
+  object-fit: contain;
+}
+.boss-briefing-head .overline { color: var(--boss-color); }
+.boss-briefing-head strong { display: block; margin-top: 2px; font-size: var(--fs-h2); }
+.boss-briefing-head small { display: block; color: var(--muted); }
+.boss-briefing-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-top: 15px;
+}
+.boss-briefing-stats > div {
+  padding: 9px 6px;
+  border: 1px solid var(--line);
+  border-radius: 13px;
+  background: rgba(10,6,32,.6);
+  text-align: center;
+}
+.boss-briefing-stats small { display: block; color: var(--muted); font-size: var(--fs-caption); }
+.boss-briefing-stats strong { display: block; margin-top: 3px; font-size: var(--fs-body); }
+.boss-briefing-block { margin-top: 16px; }
+.boss-briefing-block .overline { color: var(--boss-color); }
+.boss-briefing-cues {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 7px;
+  margin: 9px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.boss-briefing-cues li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: rgba(10,6,32,.6);
+}
+.boss-briefing-cues b {
+  flex: 0 0 auto;
+  color: var(--boss-color);
+  font-size: var(--fs-caption);
+  font-weight: 900;
+  letter-spacing: .06em;
+}
+.boss-briefing-cues span { color: var(--text-2); font-size: var(--fs-caption); line-height: 1.3; }
+.boss-briefing-mechanic {
+  padding: 13px 14px;
+  border: 1px solid color-mix(in srgb, var(--boss-color) 40%, transparent);
+  border-radius: 17px;
+  background: color-mix(in srgb, var(--boss-color) 10%, rgba(10,6,32,.72));
+}
+.boss-briefing-mechanic > strong { display: block; margin-top: 2px; font-size: var(--fs-h3); }
+.boss-briefing-mechanic ul { display: grid; gap: 7px; margin: 11px 0 0; padding: 0; list-style: none; }
+.boss-briefing-mechanic li { display: grid; grid-template-columns: 62px 1fr; gap: 9px; }
+.boss-briefing-mechanic em {
+  color: var(--boss-color);
+  font-size: var(--fs-caption);
+  font-style: normal;
+  font-weight: 800;
+}
+.boss-briefing-mechanic li span { color: var(--text-2); font-size: var(--fs-caption); line-height: 1.4; }
+.boss-briefing-note {
+  margin: 14px 0 0;
+  color: var(--muted);
+  font-size: var(--fs-caption);
+  line-height: 1.45;
+}
+/* 작은 화면에서는 시트 안이 스크롤된다. 도전 버튼이 스크롤 아래로 숨으면 안 된다. */
+.boss-briefing-start {
+  position: sticky;
+  z-index: 2;
+  bottom: calc(-1 * (22px + env(safe-area-inset-bottom)));
+  width: 100%;
+  margin-top: 15px;
+  box-shadow: 0 10px 0 10px #100c2c, 0 12px 28px rgba(148,50,231,.4);
+}
+.boss-briefing-start img { width: 21px; height: 21px; }
+
 @media (max-width: 340px) {
+  .boss-briefing-cues { grid-template-columns: 1fr; }
   .boss-select-card { grid-template-columns: 68px 1fr 14px; gap: 10px; padding: 11px 12px; }
   .boss-select-body strong { font-size: var(--fs-h3); }
 }
@@ -3608,7 +3578,6 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
    POLAR POD — 전투, 결과, 보상 정산 전용 연출
    ============================================================ */
 .boss-polar-pod .boss-gem-rain,
-.boss-polar-pod .boss-aurora-ring { display: none; }
 .boss-polar-pod .boss-crown-glow {
   top: 24%;
   width: 70%;
@@ -3952,6 +3921,16 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
     inset 0 0 62px rgba(255,110,32,.46),
     inset 0 0 0 2px rgba(255,170,90,.38);
 }
+/* 과열은 보스가 약해지는 상태가 아니다. 보스를 덮어 채도를 죽이면 피해 입는 것처럼 읽히므로
+   반대로 밝고 진하게 타오르게 해서 "힘을 모으는 중"으로 보이게 한다. */
+.boss-solar-eclipse-phoenix.mechanic-overheat .boss-target img {
+  filter: brightness(1.2) saturate(1.35) drop-shadow(0 18px 24px rgba(2,0,16,.72)) drop-shadow(0 0 20px rgba(255,150,50,.7));
+}
+.boss-solar-eclipse-phoenix.mechanic-burst .boss-target img {
+  filter: brightness(1.55) saturate(1.6) drop-shadow(0 0 36px rgba(255,196,96,.95));
+  animation: phoenixRevive .62s ease-out both;
+}
+
 /* 폭발로 되찾은 체력은 체력바가 되돌아가는 걸로 보여준다 — 타이머 숫자보다 훨씬 잘 읽힌다. */
 .boss-solar-eclipse-phoenix.mechanic-burst .boss-healthbar > span {
   border-color: rgba(255,184,96,.9);
@@ -3977,6 +3956,29 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
 .boss-polar-pod.mechanic-frozen .battle-timer span { color: #cdeeff; }
 
 .boss-mechanic-chip.active { animation: mechanicChipPulse .9s ease-in-out infinite; }
+
+/* 깎인 초는 줄어드는 당사자인 타이머가 알려야 한다. 아레나 한복판 문구는 시선이 보스에 있어 놓친다. */
+.battle-timer { position: relative; transition: border-color .2s, background .2s; }
+.battle-timer.time-damaged {
+  border-color: rgba(255,86,120,.9);
+  background: rgba(58,8,26,.92);
+  animation: timerHitShake .42s ease-out;
+}
+.battle-timer.time-damaged strong { color: #ff96aa; }
+.battle-timer.time-damaged span { color: #ff5678; }
+.timer-penalty {
+  position: absolute;
+  z-index: 2;
+  left: 50%;
+  top: 100%;
+  color: #ff5f7d;
+  font-size: 13px;
+  font-weight: 900;
+  white-space: nowrap;
+  text-shadow: 0 2px 8px rgba(4,0,16,.85);
+  pointer-events: none;
+  animation: timerPenaltyDrop .76s ease-out both;
+}
 
 .boss-mechanic-notice {
   position: absolute;
@@ -4043,6 +4045,21 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
   0% { opacity: 0; transform: scale(.4); }
   28% { opacity: 1; transform: scale(1.06); }
   100% { opacity: 0; transform: scale(1.5); }
+}
+@keyframes phoenixRevive {
+  0%, 100% { transform: scale(1); }
+  26% { transform: scale(1.12); }
+}
+@keyframes timerHitShake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-5px); }
+  45% { transform: translateX(4px); }
+  70% { transform: translateX(-2px); }
+}
+@keyframes timerPenaltyDrop {
+  0% { opacity: 0; transform: translate(-50%, -8px) scale(.9); }
+  22% { opacity: 1; transform: translate(-50%, 2px) scale(1.12); }
+  100% { opacity: 0; transform: translate(-50%, 16px) scale(1); }
 }
 @keyframes healSurge {
   0%, 100% { transform: scale(1); }
