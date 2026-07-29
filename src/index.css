@@ -627,7 +627,10 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
 .ranking-page .podium-medal .avatar img { transform: translateY(8%) scale(1.08); }
 .ranking-page .rank-score { color: #58e7ff; text-shadow: 0 0 11px rgba(64,220,255,.16); }
 
-.collection-tools { margin-bottom: 15px; }
+/* 칩과 정렬을 한 줄에 둔다. 정렬을 아래 줄 오른쪽에 붙였더니 왼쪽이 통째로 비었다.
+   칩은 남는 폭을 쓰며 가로 스크롤하고, 정렬은 끝에 고정된다. */
+.collection-tools { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; }
+.collection-tools .filter-chips { flex: 1 1 auto; min-width: 0; padding-bottom: 1px; }
 .filter-chips { display: flex; gap: 7px; overflow-x: auto; padding: 1px 1px 8px; scrollbar-width: none; }
 .filter-chips::-webkit-scrollbar { display: none; }
 .filter-chips button { flex: 0 0 auto; min-height: 36px; padding: 0 13px; border: 1px solid var(--line); border-radius: 999px; background: rgba(18,13,48,.82); color: #9d95b5; cursor: pointer; }
@@ -658,7 +661,7 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
 }
 /* 전체 폭을 채우면 등급 필터와 같은 비중의 두 번째 줄처럼 보인다.
    내용만큼만 차지하고 오른쪽에 붙여 보조 컨트롤로 읽히게 한다. */
-.collection-tools select { width: auto; min-width: 124px; min-height: 36px; display: block; margin-left: auto; }
+.collection-tools select { flex: 0 0 auto; width: auto; min-width: 116px; min-height: 36px; }
 .collection-tools select:hover, .field select:hover { border-color: var(--line-strong); }
 .collection-tools select:focus-visible, .field select:focus-visible { border-color: rgba(179,105,255,.55); }
 .collection-card { width: 100%; color: var(--text); font: inherit; cursor: pointer; }
@@ -695,7 +698,9 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
 /* space-between 이라 이 버튼 폭이 변하면 옆의 이야기 보기가 따라 움직인다.
    숫자 폭을 고정(tabular-nums)하고 최소 폭을 줘서 좋아요를 눌러도 자리가 흔들리지 않게 한다. */
 .post-footer button { min-width: 58px; display: inline-flex; align-items: center; justify-content: flex-start; gap: 4px; padding: 3px 7px; border: 0; border-radius: 8px; background: transparent; color: #9d95b5; font-variant-numeric: tabular-nums; cursor: pointer; }
-.post-footer button.liked { color: #ff73c7; background: rgba(240,76,189,.1); }
+/* 폭을 고정해 두면 배경이 내용에 붙지 않고 넓은 사각형으로 보인다.
+   눌린 상태는 색만으로 충분하다. */
+.post-footer button.liked { color: #ff73c7; }
 /* 좋아요와 댓글 수는 같은 성격이라 한 덩어리로 묶고, 진입 링크만 오른쪽에 둔다. */
 .post-stats { gap: 12px; }
 .post-comment-count { color: #9d95b5; font-variant-numeric: tabular-nums; }
