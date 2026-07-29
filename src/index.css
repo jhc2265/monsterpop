@@ -1712,7 +1712,7 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 8px;
-  margin: -3px auto 0;
+  margin: 15px auto 0;
 }
 .reward-sources > div {
   min-width: 0;
@@ -1805,8 +1805,32 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
     padding: 4px 8px 10px;
   }
   .result-step-2 .reward-total { min-height: 112px; }
+  .result-step-2 .reward-sources { margin-top: 9px; }
   .result-step-2 .next-reward-card { min-height: 76px; }
   .result-step-2 .result-reward-actions .btn-primary { min-height: 52px; }
+}
+
+/* 전투 화면은 카드 묶음이 아니라 하나의 연속된 플레이 필드로 표현한다. */
+.battle-page .battle-arena {
+  margin-inline: -10px;
+  border: 0;
+  border-radius: 0;
+  box-shadow: inset 0 0 50px rgba(4, 1, 23, .3);
+}
+.battle-page .battle-controls {
+  margin-inline: -10px;
+  border: 0;
+  border-radius: 0;
+  box-shadow: 0 -16px 30px rgba(5, 2, 24, .28);
+}
+.boss-battle .boss-arena {
+  margin-bottom: -7px;
+}
+.boss-battle .boss-command {
+  margin-inline: -10px;
+  border: 0;
+  border-radius: 0;
+  background: linear-gradient(180deg, rgba(12, 8, 39, .76), #08051d);
 }
 
 /* ============================================================
