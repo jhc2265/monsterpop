@@ -278,6 +278,12 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
 .hero-copy-block { width: 90%; margin-top: auto; padding-top: 54vh; animation: heroCopyIn .75s .3s cubic-bezier(.2,.8,.2,1) both; }
 .hero-copy-block h1 { display: flex; align-items: baseline; justify-content: center; gap: .09em; margin: 0; font-family: 'Black Han Sans', 'Noto Sans KR', sans-serif; white-space: nowrap; text-shadow: 0 7px 22px rgba(0,0,0,.55); }
 .hero-copy-block h1 span { color: #f34fc3; text-shadow: 0 0 26px rgba(240,76,189,.45), 0 7px 22px rgba(0,0,0,.55); }
+/* 로고는 마스터 계정 진입점이라 눌린다. 커서 말고는 티를 내지 않는다. */
+.hero-copy-block h1 { cursor: default; -webkit-user-select: none; user-select: none; -webkit-tap-highlight-color: transparent; }
+.hero-master-note { margin: 12px 0 0; color: var(--muted); font-size: var(--fs-caption); line-height: 1.5; }
+.hero-master-note.working { color: var(--primary-light); }
+.hero-master-note.done { color: #7dffd0; }
+.hero-master-note.error { color: var(--danger); }
 .hero-copy-block p { margin: 21px 0 0; color: #cbc4e2; }
 .hero-copy-block p strong { color: #fff; }
 .hero-actions { width: 100%; margin-top: 31px; animation: heroCopyIn .75s .45s cubic-bezier(.2,.8,.2,1) both; }
@@ -630,7 +636,31 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
    여섯 개가 한꺼번에 알록달록해 고르지 않은 것도 고른 것처럼 보였다.
    커뮤니티 카테고리 칩과 .filter-chips 를 공유하므로 [data-grade] 가 붙은 것만 잡는다. */
 .filter-chips button[data-grade].active { border-color: var(--grade-color); background: var(--grade-color); color: #0b0824; }
-.collection-tools select, .field select { width: 100%; min-height: 44px; padding: 0 38px 0 14px; border: 1px solid var(--line); border-radius: 13px; background: #121034; color: var(--text-2); }
+/* 열린 옵션 목록은 브라우저가 그리는 것이라 CSS 로 칠할 수 없다.
+   color-scheme: dark 를 주면 그 목록까지 어두운 테마로 렌더된다 — 흰 배경에 파란 하이라이트가 뜨던 이유. */
+.collection-tools select, .field select {
+  width: 100%;
+  min-height: 44px;
+  padding: 0 36px 0 13px;
+  border: 1px solid var(--line);
+  border-radius: 13px;
+  background-color: #121034;
+  color: var(--text-2);
+  color-scheme: dark;
+  /* 기본 화살표는 OS 마다 모양이 달라 통일이 안 된다. 직접 그려 넣는다. */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%239d95b5' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+  transition: border-color .16s, background-color .16s;
+}
+/* 전체 폭을 채우면 등급 필터와 같은 비중의 두 번째 줄처럼 보인다.
+   내용만큼만 차지하고 오른쪽에 붙여 보조 컨트롤로 읽히게 한다. */
+.collection-tools select { width: auto; min-width: 124px; min-height: 36px; display: block; margin-left: auto; }
+.collection-tools select:hover, .field select:hover { border-color: var(--line-strong); }
+.collection-tools select:focus-visible, .field select:focus-visible { border-color: rgba(179,105,255,.55); }
 .collection-card { width: 100%; color: var(--text); font: inherit; cursor: pointer; }
 .collection-card small { display: block; margin-top: 5px; color: #9d95b5; }
 .monster-detail-overlay { z-index: 60; }
@@ -662,8 +692,14 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
 .community-categories { margin-bottom: 12px; }
 .post-head .post-category { margin-left: auto; color: #d6baff; background: rgba(124,60,255,.14); }
 .post-head .post-category + .pill-best { margin-left: 0; }
-.post-footer button { padding: 3px 7px; border: 0; border-radius: 8px; background: transparent; color: #9d95b5; cursor: pointer; }
+/* space-between 이라 이 버튼 폭이 변하면 옆의 이야기 보기가 따라 움직인다.
+   숫자 폭을 고정(tabular-nums)하고 최소 폭을 줘서 좋아요를 눌러도 자리가 흔들리지 않게 한다. */
+.post-footer button { min-width: 58px; display: inline-flex; align-items: center; justify-content: flex-start; gap: 4px; padding: 3px 7px; border: 0; border-radius: 8px; background: transparent; color: #9d95b5; font-variant-numeric: tabular-nums; cursor: pointer; }
 .post-footer button.liked { color: #ff73c7; background: rgba(240,76,189,.1); }
+/* 좋아요와 댓글 수는 같은 성격이라 한 덩어리로 묶고, 진입 링크만 오른쪽에 둔다. */
+.post-stats { gap: 12px; }
+.post-comment-count { color: #9d95b5; font-variant-numeric: tabular-nums; }
+.post-more { color: #9d95b5; }
 .community-page .empty-state { min-height: 340px; }
 
 .settings-page { padding-bottom: 40px; }
@@ -751,12 +787,12 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
   72% { opacity: .65; }
   100% { opacity: 0; transform: scale(1); }
 }
-.ghost-icon-btn { display: grid; place-items: center; flex: 0 0 34px; width: 34px; height: 34px; padding: 0; border: 0; border-radius: 11px; background: transparent; color: #c9c2dc; transition: color .16s ease, background .16s ease, transform .16s ease; }
+/* 화면이 달라도 오른쪽 끝에서 같은 거리에 아이콘이 놓이도록 폭을 하나로 고정한다.
+   34px 이던 시절에는 홈과 프로필의 톱니바퀴 중심이 5px 어긋났고, 터치 영역도 44px 권장치에 못 미쳤다. */
+.ghost-icon-btn { display: grid; place-items: center; flex: 0 0 44px; width: 44px; height: 44px; padding: 0; border: 0; border-radius: 14px; background: transparent; color: #c9c2dc; transition: color .16s ease, background .16s ease, transform .16s ease; }
 .ghost-icon-btn:hover, .ghost-icon-btn:focus-visible { outline: 0; background: rgba(145,104,220,.14); color: #fff; }
 .ghost-icon-btn:active { background: rgba(145,104,220,.22); transform: scale(.92); }
-/* 상단바 안에서는 뒤로가기(.icon-btn 44px)와 같은 자리를 차지해야 제목이 가운데 남는다.
-   테두리·배경만 없애 시각적 무게를 낮춘다 — 설정은 뒤로가기와 같은 비중일 이유가 없다. */
-.topbar .ghost-icon-btn { flex: 0 0 44px; width: 44px; height: 44px; border-radius: 14px; }
+/* 테두리·배경만 없애 무게를 낮춘다 — 설정이 뒤로가기와 같은 비중일 이유는 없다. */
 .home-welcome { align-items: center; }
 .home-hunter-identity { position: relative; display: flex; align-items: center; min-width: 0; width: 100%; gap: 20px; padding: 7px 34px 18px 4px; border: 0; border-bottom: 1px solid rgba(171,127,255,.14); border-radius: 0; background: transparent; box-shadow: none; color: inherit; text-align: left; }
 .home-hunter-identity:hover, .home-hunter-identity:focus-visible { outline: 0; background: linear-gradient(90deg, rgba(132,69,210,.06), transparent 72%); }
@@ -2620,11 +2656,17 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
 .field input,
 .field textarea,
 .field select,
-.collection-tools select,
 .community-search input,
 .comment-composer input {
   font-size: 1rem;
   font-weight: var(--fw-regular);
+  line-height: var(--lh-snug);
+}
+/* 정렬은 등급 필터(13px semibold)보다 한 단계 아래다.
+   예전에는 16px 이라 보조 컨트롤이 주 필터보다 커서 둘이 서로 경쟁했다. */
+.collection-tools select {
+  font-size: var(--fs-label);
+  font-weight: var(--fw-medium);
   line-height: var(--lh-snug);
 }
 .notice {

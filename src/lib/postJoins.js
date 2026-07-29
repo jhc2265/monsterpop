@@ -41,6 +41,18 @@ export async function attachLikes(rows) {
   return list.map((row) => ({ ...row, post_likes: byPost.get(row.id) || [] }))
 }
 
+// 댓글은 개수만 필요하다. 글마다 count 쿼리를 돌리면 50번 왕복하므로 id 목록으로 한 번에 읽고 센다.
+export async function attachCommentCounts(rows) {
+  const list = rows || []
+  const ids = list.map((row) => row.id).filter((id) => id !== undefined && id !== null)
+  if (!ids.length) return list.map((row) => ({ ...row, comment_count: row.comment_count ?? 0 }))
+  const { data, error } = await supabase.from('comments').select('post_id').in('post_id', ids)
+  if (error) return list.map((row) => ({ ...row, comment_count: row.comment_count ?? 0 }))
+  const byPost = new Map()
+  for (const comment of data || []) byPost.set(comment.post_id, (byPost.get(comment.post_id) || 0) + 1)
+  return list.map((row) => ({ ...row, comment_count: byPost.get(row.id) || 0 }))
+}
+
 export async function attachPostMeta(rows) {
-  return attachLikes(await attachAuthors(rows))
+  return attachCommentCounts(await attachLikes(await attachAuthors(rows)))
 }
