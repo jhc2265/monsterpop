@@ -47,7 +47,7 @@ export default function Collection() {
       <div className="filter-chips">{['전체', ...MONSTER_GRADES.map((grade) => grade.label)].map((grade) => <button key={grade} data-grade={grade === '전체' ? undefined : getGradeKey(grade)} className={filter === grade ? 'active' : ''} onClick={() => setFilter(grade)}>{grade}</button>)}</div>
       <div className="collection-sort-row">
         {/* 총 개수만으로는 도감을 얼마나 채웠는지 알 수 없다. 발견 수를 분자로 둔다. */}
-        <span className="collection-progress"><b>{discoveredCount}</b> / {monsters.length}<em>발견</em></span>
+        <span className="collection-progress"><em>발견한 몬스터 :</em><b>{discoveredCount}</b> / {monsters.length}</span>
         <select value={sort} onChange={(event) => setSort(event.target.value)} aria-label="몬스터 정렬">
           <option value="default">기본 순서</option>
           <option value="score">점수 높은 순</option>
