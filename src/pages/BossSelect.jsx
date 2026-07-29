@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom'
-import { DAILY_BOSSES, getBossRecord, getDailyBoss } from '../lib/bosses'
+import { DAILY_BOSSES, getAvailableBosses, getBossRecord, getDailyBoss, isSundayBossDay } from '../lib/bosses'
 import { useAuth } from '../context/AuthContext'
 import { getLevel, resolveProgress } from '../lib/progression'
 import { sound } from '../lib/sound'
@@ -9,9 +9,9 @@ export default function BossSelect() {
   const navigate = useNavigate()
   const { user, profile } = useAuth()
   const level = getLevel(resolveProgress(profile, user.id).xp)
-  // 요일별 출현 규칙은 아직 없다. 지금은 하루마다 도는 "오늘의 보스"만 강조하고,
-  // 활성/비활성 색 구분은 .boss-select-card 의 today / locked 클래스를 그대로 재사용한다.
   const todayBossId = getDailyBoss().id
+  const sundayOpen = isSundayBossDay()
+  const availableBossIds = new Set(getAvailableBosses().map((boss) => boss.id))
 
   function challenge(boss) {
     sound.unlock()
@@ -26,16 +26,20 @@ export default function BossSelect() {
       <span className="topbar-spacer" />
     </header>
 
-    <p className="boss-select-intro">도전할 보스를 선택하세요. 처치하면 하루 한 번 첫 클리어 보상을 받습니다.</p>
+    <p className="boss-select-intro">{sundayOpen
+      ? '일요일 자유 토벌이 열렸어요. 모든 보스에 도전할 수 있고, 첫 처치 한 번만 특별 보상을 받습니다.'
+      : '오늘 출현한 보스에 도전하세요. 첫 처치 보상 이후에도 자유롭게 연습할 수 있습니다.'}</p>
 
     <ul className="boss-select-list">
       {DAILY_BOSSES.map((boss) => {
         const record = getBossRecord(user.id, boss.id)
-        const locked = level < boss.unlockLevel
+        const levelLocked = level < boss.unlockLevel
+        const unavailable = !availableBossIds.has(boss.id)
+        const locked = levelLocked || unavailable
         const isToday = boss.id === todayBossId
         return <li key={boss.id}>
           <button
-            className={`boss-select-card${isToday ? ' today' : ''}${locked ? ' locked' : ''}`}
+            className={`boss-select-card${isToday ? ' today' : ''}${unavailable ? ' unavailable' : ''}${locked ? ' locked' : ''}`}
             style={{ '--boss-color': boss.color }}
             onClick={() => challenge(boss)}
             disabled={locked}
@@ -45,6 +49,8 @@ export default function BossSelect() {
               <span className="boss-select-tags">
                 <em>{boss.element}</em>
                 {isToday && <b className="tag-today">오늘의 보스</b>}
+                {sundayOpen && !isToday && <b className="tag-open">자유 토벌</b>}
+                {unavailable && <b className="tag-waiting">출현 대기</b>}
                 {record.clearedToday && <b className="tag-cleared">클리어</b>}
               </span>
               <strong>{boss.name}</strong>

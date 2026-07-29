@@ -948,8 +948,22 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
 
 /* Daily boss battle */
 .boss-battle { background: radial-gradient(circle at 50% 38%, rgba(157, 42, 203, .2), transparent 45%), #08051d; }
-.boss-hud { grid-template-columns: 43px minmax(0, 1fr) auto 62px; }
-.boss-hud .battle-score strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.boss-hud {
+  height: 64px;
+  flex-basis: 64px;
+  grid-template-columns: 43px minmax(0, 1fr) auto 56px;
+}
+.boss-hud .battle-score strong {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-height: 1.02;
+  overflow-wrap: anywhere;
+  text-overflow: clip;
+  white-space: normal;
+}
+.boss-hud .battle-score span { display: none; }
 .boss-healthbar { flex: 0 0 auto; padding: 2px 6px 5px; }
 .boss-healthbar > div { display: flex; align-items: center; justify-content: space-between; gap: 7px; margin-bottom: 6px; color: #f3d9ff; }
 .boss-healthbar small { color: var(--pink); letter-spacing: .09em; }
@@ -1001,10 +1015,10 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
 .boss-hit-effect { position: absolute; z-index: 8; left: 50%; top: 45%; color: #fff; text-shadow: 0 0 8px var(--pink), 0 0 22px var(--pink); transform: translate(-50%, -50%); animation: bossHit .5s ease forwards; pointer-events: none; }
 .boss-hit-effect.miss { color: #aaa2c5; text-shadow: 0 2px #21183e; }
 .boss-hit-effect.rush { color: var(--gold); text-shadow: 0 0 8px #ff5bcb, 0 0 26px #ff5bcb; }
-.boss-command { flex: 0 0 82px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 8px 14px; border: 1px solid rgba(190, 142, 255, .18); border-radius: 20px; background: rgba(12, 8, 39, .92); text-align: center; }
-.boss-command small { color: var(--pink); letter-spacing: .12em; }
-.boss-command strong { margin: 3px 0; color: #fff; }
-.boss-command span { color: var(--text-2); }
+.boss-command { flex: 0 0 104px; min-height: 104px; display: grid; grid-template-rows: 16px 26px 38px; align-content: center; justify-items: center; padding: 8px 14px; border: 1px solid rgba(190, 142, 255, .18); border-radius: 20px; background: rgba(12, 8, 39, .92); text-align: center; }
+.boss-command small { align-self: center; color: var(--pink); letter-spacing: .12em; }
+.boss-command strong { align-self: center; margin: 0; color: #fff; }
+.boss-command span { display: flex; max-width: 100%; min-height: 38px; align-items: center; justify-content: center; color: var(--text-2); line-height: 1.35; }
 .boss-battle.phase-3 .boss-arena { box-shadow: inset 0 0 52px rgba(255, 54, 153, .27), 0 12px 35px rgba(2, 0, 15, .32); }
 .boss-battle.phase-2 .boss-target:not(.react-hit):not(.react-rush):not(.react-miss) { animation: bossPhaseTwo 2.2s ease-in-out infinite; }
 .boss-battle.phase-3 .boss-target:not(.react-hit):not(.react-rush):not(.react-miss) { animation: bossFinal .72s ease-in-out infinite; }
@@ -3284,16 +3298,6 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
   --reward-panel: #092c3b;
   --reward-panel-deep: #06172d;
 }
-.boss-result-glitch-king-slime.result-step-1 .result-next-button,
-.boss-result-glitch-king-slime.result-step-2 .result-reward-actions .btn-primary {
-  border-color: rgba(85,245,202,.5);
-  background: linear-gradient(112deg, #155d96, #087f75);
-  box-shadow:
-    0 12px 26px rgba(5,91,105,.34),
-    inset 0 1px 0 rgba(255,255,255,.18);
-  color: #fff;
-  text-shadow: 0 1px 3px rgba(0,27,42,.46);
-}
 .boss-result-solar-eclipse-phoenix {
   --reward-accent: #ff8a2a;
   --reward-accent-2: #ffd05a;
@@ -3433,9 +3437,7 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
 /* ============================================================
    BOSS SELECT — 보스 도전 전 선택 화면
    홈의 "보스 도전하기"가 바로 전투로 들어가던 것을 한 단계 앞에 둔다.
-   요일별 출현 규칙은 아직 없다. 지금은 하루마다 도는 오늘의 보스만
-   .today 로 강조하고, 나중에 요일 규칙이 생기면 같은 클래스(활성)와
-   .locked(비활성)를 그대로 재사용한다.
+   평일은 지정 보스만 활성화하고, 일요일에는 네 보스를 모두 연다.
    ============================================================ */
 .boss-select-intro {
   margin: -8px 0 18px;
@@ -3517,6 +3519,16 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
   background: color-mix(in srgb, var(--boss-color) 26%, transparent);
   border: 1px solid color-mix(in srgb, var(--boss-color) 58%, transparent);
   color: var(--text);
+}
+.boss-select-tags .tag-open {
+  background: rgba(38,151,136,.24);
+  border: 1px solid rgba(85,245,202,.4);
+  color: #9ff5df;
+}
+.boss-select-tags .tag-waiting {
+  background: rgba(87,78,119,.2);
+  border: 1px solid rgba(174,160,210,.22);
+  color: #a49abf;
 }
 .boss-select-tags .tag-cleared { background: rgba(30, 122, 90, .55); border: 1px solid rgba(96, 231, 176, .45); color: #b9f5dc; }
 
@@ -3730,6 +3742,18 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
   filter: var(--boss-sword-filter, none);
 }
 
+/* 밝은 민트 CTA 위의 흰 글자가 묻히지 않도록 배경만 어둡게 한다. */
+.boss-result-glitch-king-slime.result-step-1 .result-next-button,
+.boss-result-glitch-king-slime.result-step-2 .result-reward-actions .btn-primary {
+  border-color: rgba(85,245,202,.46);
+  background: linear-gradient(112deg, #155d96, #087f75);
+  box-shadow:
+    0 12px 26px rgba(5,91,105,.34),
+    inset 0 1px 0 rgba(255,255,255,.16);
+  color: #fff;
+  text-shadow: none;
+}
+
 /* 피닉스 전투 배경: 보스 뒤에서 올라오는 잔불과 낮은 열기 파동. */
 .boss-solar-eclipse-phoenix .boss-gem-rain {
   inset: 0;
@@ -3865,6 +3889,35 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
   filter: none;
   animation: frozenFieldPulse .68s ease-in-out both;
 }
+.boss-mechanic-notice {
+  position: absolute;
+  z-index: 11;
+  top: 4%;
+  left: 50%;
+  display: grid;
+  min-width: 178px;
+  gap: 2px;
+  padding: 7px 13px;
+  border: 1px solid color-mix(in srgb, var(--boss-mechanic-color, #f04cbd) 58%, transparent);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--boss-mechanic-color, #f04cbd) 13%, rgba(5,2,24,.9));
+  box-shadow: 0 8px 20px rgba(2,0,18,.3);
+  color: #fff;
+  text-align: center;
+  transform: translateX(-50%);
+  pointer-events: none;
+  animation: mechanicNoticeIn .2s ease-out both;
+}
+.boss-mechanic-notice small {
+  color: var(--boss-mechanic-color, #f04cbd);
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: .1em;
+}
+.boss-mechanic-notice strong {
+  font-size: 12px;
+  line-height: 1.2;
+}
 .battle-countdown em {
   display: inline-flex;
   margin-top: 9px;
@@ -3897,6 +3950,10 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
   0% { opacity: 0; }
   42% { opacity: .88; }
   100% { opacity: .55; }
+}
+@keyframes mechanicNoticeIn {
+  from { opacity: 0; transform: translate(-50%, -6px) scale(.96); }
+  to { opacity: 1; transform: translate(-50%, 0) scale(1); }
 }
 
 /* 긴 모바일 화면에서는 보스 컬러 영역이 고정 내비게이션 위의 남는 높이를 채운다. */

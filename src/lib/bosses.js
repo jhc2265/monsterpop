@@ -87,9 +87,37 @@ export function koreaToday(date = new Date()) {
   }).format(date)
 }
 
+export function koreaWeekday(date = new Date()) {
+  return new Intl.DateTimeFormat('en-US', {
+    timeZone: 'Asia/Seoul',
+    weekday: 'short',
+  }).format(date)
+}
+
+const WEEKDAY_BOSS = {
+  Mon: 'neon-nightmare',
+  Tue: 'glitch-king-slime',
+  Wed: 'solar-eclipse-phoenix',
+  Thu: 'neon-nightmare',
+  Fri: 'glitch-king-slime',
+  Sat: 'solar-eclipse-phoenix',
+  Sun: 'polar-pod',
+}
+
 export function getDailyBoss(date = new Date()) {
-  const dayNumber = Number(koreaToday(date).replaceAll('-', ''))
-  return DAILY_BOSSES[dayNumber % DAILY_BOSSES.length]
+  return getBossById(WEEKDAY_BOSS[koreaWeekday(date)]) || DAILY_BOSSES[0]
+}
+
+export function isSundayBossDay(date = new Date()) {
+  return koreaWeekday(date) === 'Sun'
+}
+
+export function getAvailableBosses(date = new Date()) {
+  return isSundayBossDay(date) ? DAILY_BOSSES : [getDailyBoss(date)]
+}
+
+export function isBossAvailableToday(bossId, date = new Date()) {
+  return getAvailableBosses(date).some((boss) => boss.id === bossId)
 }
 
 export function getBossById(bossId) {
@@ -157,7 +185,10 @@ export function recordBossClear(userId, bossId, { timeLeft = 0 } = {}) {
   const today = koreaToday()
   const state = readState(userId)
   const isNewDay = state.date !== today
-  const firstToday = isNewDay || !state.clearedToday.includes(bossId)
+  // 일요일은 전 보스를 열지만 큰 보상은 처음 처치한 한 마리에만 지급한다.
+  const firstToday = isNewDay || (isSundayBossDay()
+    ? state.clearedToday.length === 0
+    : !state.clearedToday.includes(bossId))
 
   // 어제 클리어했으면 스트릭을 잇고, 하루라도 걸렀으면 1부터 다시 센다.
   const yesterday = koreaToday(new Date(Date.now() - 86400000))

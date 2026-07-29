@@ -9,9 +9,8 @@ import { recordGameForMissions } from '../lib/missions'
 import { getBossById, getDailyBoss, recordBossClear } from '../lib/bosses'
 import { MONSTERS } from '../lib/monsters'
 
-// 보스 반복 도전은 연습으로 본다. 첫 클리어(firstClearXp)와 격차를 둬야
-// 반복 파밍 유인이 생기지 않는다.
-const BOSS_REPEAT_XP = 30
+// 보스 반복 도전은 기록 갱신과 연습용이다. 큰 보상은 오늘 첫 클리어 한 번만 지급한다.
+const BOSS_REPEAT_XP = 0
 
 export default function Result() {
   const { user, refreshProfile } = useAuth(); const navigate = useNavigate(); const location = useLocation(); const { score = 0, maxCombo = 0, monsterCounts = {}, mode = 'hunt', bossClear = false, bossId = '', bossTimeLeft = 0, bossDamage = 0, bossMaxHp = 30 } = location.state || {}
@@ -56,7 +55,7 @@ export default function Result() {
     const missionBonus = recordGameForMissions(user.id, { maxCombo, totalKills })
     setMissionXp(missionBonus)
     // 보스전은 사냥 공식(몬스터 수 기반)을 쓰면 32XP 밖에 안 나온다.
-    // 하루 첫 클리어에만 firstClearXp 를 주고, 반복 도전은 연습으로 취급해 소액만 준다.
+    // 평일은 대표 보스 첫 클리어, 일요일은 자유 토벌 중 첫 처치 한 번만 XP를 준다.
     let gained
     if (mode === 'boss') {
       const boss = activeBoss
@@ -65,7 +64,7 @@ export default function Result() {
         setBossReward(record)
         gained = (record.firstToday ? boss.firstClearXp : BOSS_REPEAT_XP) + missionBonus
       } else {
-        // 실패해도 준 피해만큼은 인정한다 (최대 BOSS_REPEAT_XP)
+        // 실패 기록은 남기되 보스 XP는 지급하지 않는다.
         gained = Math.round((bossDamage / Math.max(1, bossMaxHp)) * BOSS_REPEAT_XP) + missionBonus
       }
     } else {

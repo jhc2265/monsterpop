@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { getBossById, getDailyBoss } from '../lib/bosses'
+import { getBossById, getDailyBoss, isBossAvailableToday } from '../lib/bosses'
 import { sound } from '../lib/sound'
 import Icon from '../components/Icon'
 
@@ -81,8 +81,11 @@ const BOSS_MECHANICS = {
 export default function Boss() {
   const navigate = useNavigate()
   const { bossId } = useParams()
-  // 주소로 직접 들어오거나 없는 id 가 오면 오늘의 보스로 떨어뜨린다.
-  const [boss] = useState(() => getBossById(bossId) || getDailyBoss())
+  // 평일에는 오늘 출현한 보스만, 일요일에는 네 보스 모두 직접 도전할 수 있다.
+  const [boss] = useState(() => {
+    const requestedBoss = getBossById(bossId)
+    return requestedBoss && isBossAvailableToday(requestedBoss.id) ? requestedBoss : getDailyBoss()
+  })
   const pattern = BOSS_PATTERNS[boss.id] || BOSS_PATTERNS['neon-nightmare']
 
   const [countdown, setCountdown] = useState(3)
@@ -364,6 +367,15 @@ export default function Boss() {
 
   const cueType = phaseBreak || frozen ? null : cue?.type
   const mechanicActive = shadowVeil || cueScrambling || frozen || (boss.id === 'solar-eclipse-phoenix' && heat >= 75)
+  const mechanicNotice = shadowVeil
+    ? { title: 'SHADOW VEIL', copy: '그림자 장막이 펼쳐집니다' }
+    : cueScrambling
+      ? { title: 'SIGNAL ERROR', copy: '신호를 해독하고 있어요' }
+      : frozen
+        ? { title: 'TIME FREEZE', copy: '제한 시간이 멈췄습니다' }
+        : boss.id === 'solar-eclipse-phoenix' && heat >= 75
+          ? { title: 'OVERHEAT 75%', copy: '다음 성공 공격이 폭발합니다' }
+          : null
   return <main className={`battle-page boss-battle boss-${boss.id} phase-${phase}${shadowVeil ? ' mechanic-shadow-active' : ''}${cueScrambling ? ' mechanic-glitch-active' : ''}${frozen ? ' mechanic-frozen' : ''}`}>
     <header className="battle-hud boss-hud">
       <button className="battle-pause" onClick={quit} aria-label="보스전 나가기"><Icon name="back" size={18} /></button>
@@ -408,6 +420,7 @@ export default function Boss() {
         <b>{holdReady ? '지금 떼세요!' : '유지'}</b>
       </div>}
       {effect && <div key={effect.id} className={`boss-hit-effect ${effect.type}`}>{effect.text}</div>}
+      {mechanicNotice && <div className="boss-mechanic-notice" aria-live="polite"><small>{mechanicNotice.title}</small><strong>{mechanicNotice.copy}</strong></div>}
       {phaseBreak && <div className="boss-phase-banner"><span>PHASE {phase}</span><strong>{phase === 3 ? '마지막 단계' : '패턴이 늘어납니다'}</strong></div>}
       {countdown > 0 && <div className="battle-countdown"><span>DAILY BOSS</span><strong key={countdown}>{countdown}</strong><p>{boss.title}</p><em>{boss.element} · {mechanic.name}</em></div>}
     </section>
