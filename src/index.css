@@ -3706,7 +3706,7 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
   width: calc(100% + 36px);
   margin-right: -18px;
   margin-left: -18px;
-  padding: 30px 30px 32px;
+  padding: 30px 18px 32px;
   border: 0;
   border-radius: 0;
   background: transparent;
@@ -3894,7 +3894,9 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
     linear-gradient(rgba(9,2,31,.25), rgba(3,0,17,.58));
   content: "";
   pointer-events: none;
-  animation: shadowVeilPass .72s ease-in-out both;
+  /* 장막은 신호에 반응할 때까지 걷히지 않는다. 예전에는 .72s 뒤 opacity 0 으로 끝나
+     상태는 켜져 있는데 화면만 원래대로 돌아가 "깜빡" 하고 마는 것처럼 보였다. */
+  animation: shadowVeilPass .34s ease-out both, shadowVeilBreathe 1.5s ease-in-out .34s infinite;
 }
 .boss-glitch-king-slime.mechanic-glitch-active .boss-target img {
   animation: glitchSignalBoss .42s steps(2) infinite;
@@ -3923,34 +3925,80 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
   filter: none;
   animation: frozenFieldPulse .68s ease-in-out both;
 }
+/* 속성 기믹 전용 레이어. 보스별 상시 연출이 .boss-arena::after 를 이미 쓰고 있어 따로 둔다.
+   신호(z-index 3)보다 아래에 머물러 판독성은 그대로 둔다. */
+.boss-mechanic-field {
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* 과열 — 열기가 쌓일수록 아레나가 눈에 띄게 달아오른다. 예전에는 칩의 % 숫자뿐이었다. */
+.boss-solar-eclipse-phoenix.mechanic-heat .boss-mechanic-field {
+  background:
+    radial-gradient(ellipse at 50% 94%, rgba(255,138,42,.52), rgba(255,64,18,.24) 46%, transparent 74%),
+    linear-gradient(0deg, rgba(255,96,24,.28), transparent 58%);
+  opacity: calc(.4 + var(--boss-heat, 0) * .6);
+  transition: opacity .35s ease;
+  animation: heatFieldPulse 1.6s ease-in-out infinite;
+}
+.boss-solar-eclipse-phoenix.mechanic-overheat .boss-mechanic-field {
+  animation-duration: .5s;
+}
+.boss-solar-eclipse-phoenix.mechanic-overheat .boss-arena {
+  box-shadow:
+    inset 0 0 62px rgba(255,110,32,.46),
+    inset 0 0 0 2px rgba(255,170,90,.38);
+}
+.boss-solar-eclipse-phoenix.mechanic-burst .boss-mechanic-field {
+  background: radial-gradient(circle at 50% 52%, rgba(255,246,220,.95), rgba(255,146,40,.7) 34%, rgba(255,58,12,.32) 62%, transparent 78%);
+  opacity: 1;
+  animation: solarBurstFlash .62s ease-out both;
+}
+
+/* 시간 동결 — 실제로 멈추는 건 제한 시간인데 타이머 UI 는 그대로였다. */
+.boss-polar-pod.mechanic-frozen .battle-timer {
+  border-color: rgba(178,229,255,.72);
+  background: rgba(19,52,84,.9);
+  animation: frozenTimerPulse .9s ease-in-out infinite;
+}
+.boss-polar-pod.mechanic-frozen .battle-timer strong,
+.boss-polar-pod.mechanic-frozen .battle-timer span { color: #cdeeff; }
+
+.boss-mechanic-chip.active { animation: mechanicChipPulse .9s ease-in-out infinite; }
+
 .boss-mechanic-notice {
   position: absolute;
   z-index: 11;
-  top: 4%;
+  top: 3%;
   left: 50%;
   display: grid;
-  min-width: 178px;
-  gap: 2px;
-  padding: 7px 13px;
-  border: 1px solid color-mix(in srgb, var(--boss-mechanic-color, #f04cbd) 58%, transparent);
-  border-radius: 12px;
-  background: color-mix(in srgb, var(--boss-mechanic-color, #f04cbd) 13%, rgba(5,2,24,.9));
-  box-shadow: 0 8px 20px rgba(2,0,18,.3);
+  min-width: 208px;
+  gap: 3px;
+  padding: 9px 17px;
+  border: 2px solid color-mix(in srgb, var(--boss-mechanic-color, #f04cbd) 66%, transparent);
+  border-radius: 13px;
+  background: color-mix(in srgb, var(--boss-mechanic-color, #f04cbd) 16%, rgba(5,2,24,.92));
+  box-shadow:
+    0 8px 20px rgba(2,0,18,.3),
+    0 0 22px color-mix(in srgb, var(--boss-mechanic-color, #f04cbd) 38%, transparent);
   color: #fff;
   text-align: center;
   transform: translateX(-50%);
   pointer-events: none;
-  animation: mechanicNoticeIn .2s ease-out both;
+  animation: mechanicNoticeIn .26s cubic-bezier(.2, 1.5, .4, 1) both;
 }
 .boss-mechanic-notice small {
-  color: var(--boss-mechanic-color, #f04cbd);
-  font-size: 10px;
+  color: color-mix(in srgb, var(--boss-mechanic-color, #f04cbd) 80%, #fff);
+  font-size: 12px;
   font-weight: 900;
   letter-spacing: .1em;
 }
 .boss-mechanic-notice strong {
-  font-size: 12px;
-  line-height: 1.2;
+  font-size: 14px;
+  line-height: 1.25;
 }
 .battle-countdown em {
   display: inline-flex;
@@ -3967,8 +4015,29 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
 }
 
 @keyframes shadowVeilPass {
-  0%, 100% { opacity: 0; }
-  34%, 72% { opacity: 1; }
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes shadowVeilBreathe {
+  0%, 100% { opacity: .82; }
+  50% { opacity: 1; }
+}
+@keyframes heatFieldPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+@keyframes mechanicChipPulse {
+  0%, 100% { opacity: .6; }
+  50% { opacity: 1; }
+}
+@keyframes solarBurstFlash {
+  0% { opacity: 0; transform: scale(.4); }
+  28% { opacity: 1; transform: scale(1.06); }
+  100% { opacity: 0; transform: scale(1.5); }
+}
+@keyframes frozenTimerPulse {
+  0%, 100% { box-shadow: inset 0 0 16px rgba(133,218,255,.3), 0 0 0 rgba(139,215,255,0); }
+  50% { box-shadow: inset 0 0 22px rgba(133,218,255,.55), 0 0 14px rgba(139,215,255,.5); }
 }
 @keyframes glitchSignalBoss {
   0% { transform: translateX(-5px); filter: drop-shadow(-7px 0 rgba(73,216,255,.5)) saturate(1.3); }

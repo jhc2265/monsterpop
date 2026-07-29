@@ -102,6 +102,7 @@ export default function Boss() {
   const [cueScrambling, setCueScrambling] = useState(false)
   const [shadowVeil, setShadowVeil] = useState(false)
   const [heat, setHeat] = useState(0)
+  const [burst, setBurst] = useState(false)
   const [frozen, setFrozen] = useState(false)
 
   const playingRef = useRef(false)
@@ -160,6 +161,7 @@ export default function Boss() {
       if (boss.id === 'neon-nightmare' && cueCountRef.current % 4 === 0) {
         setShadowVeil(true)
         shadowVeilRef.current = true
+        sound.mechanic()
       }
 
       const startResponseWindow = () => {
@@ -216,6 +218,12 @@ export default function Boss() {
         penalty += 4
         penaltyLabel = 'SOLAR BURST'
         message = '태양 폭발이 일어났어요!'
+        setBurst(true)
+        setTimeout(() => setBurst(false), 620)
+        sound.mechanic()
+      } else if (heatRef.current >= 80) {
+        // 다음 실수에 폭발한다는 걸 이때 알려야 HOLD 냉각을 노릴 수 있다.
+        sound.mechanic()
       }
     }
 
@@ -278,6 +286,7 @@ export default function Boss() {
       frozenRef.current = true
       setFrozen(true)
       setJudge('얼음을 깨세요!')
+      sound.mechanic()
       mechanicTimerRef.current = setTimeout(() => {
         frozenRef.current = false
         setFrozen(false)
@@ -414,17 +423,21 @@ export default function Boss() {
   useEffect(() => () => { clearTimers(); sound.stopBossBGM() }, [clearTimers])
 
   const cueType = phaseBreak ? null : cue?.type
-  const mechanicActive = shadowVeil || cueScrambling || frozen || (boss.id === 'solar-eclipse-phoenix' && heat >= 80)
+  const overheated = boss.id === 'solar-eclipse-phoenix' && heat >= 80
+  const mechanicActive = shadowVeil || cueScrambling || frozen || overheated
   const mechanicNotice = shadowVeil
     ? { title: 'SHADOW VEIL', copy: '그림자 장막이 펼쳐집니다' }
     : cueScrambling
       ? { title: 'SIGNAL ERROR', copy: '신호를 해독하고 있어요' }
       : frozen
         ? { title: 'TIME FREEZE', copy: '제한 시간이 멈췄습니다' }
-        : boss.id === 'solar-eclipse-phoenix' && heat >= 80
+        : overheated
           ? { title: `OVERHEAT ${heat}%`, copy: '다음 실수 시 태양 폭발 · HOLD로 냉각' }
           : null
-  return <main className={`battle-page boss-battle boss-${boss.id} phase-${phase}${shadowVeil ? ' mechanic-shadow-active' : ''}${cueScrambling ? ' mechanic-glitch-active' : ''}${frozen ? ' mechanic-frozen' : ''}`}>
+  return <main
+    className={`battle-page boss-battle boss-${boss.id} phase-${phase}${shadowVeil ? ' mechanic-shadow-active' : ''}${cueScrambling ? ' mechanic-glitch-active' : ''}${frozen ? ' mechanic-frozen' : ''}${heat > 0 ? ' mechanic-heat' : ''}${overheated ? ' mechanic-overheat' : ''}${burst ? ' mechanic-burst' : ''}`}
+    style={{ '--boss-heat': heat / 100 }}
+  >
     <header className="battle-hud boss-hud">
       <button className="battle-pause" onClick={quit} aria-label="보스전 나가기"><Icon name="back" size={18} /></button>
       <div className="battle-score"><small>DAILY BOSS</small><strong>{boss.name}</strong><span>{boss.element}</span></div>
@@ -449,6 +462,9 @@ export default function Boss() {
           '--gem-drift': `${-24 + (index % 7) * 8}px`,
         }} />)}
       </div>
+      {/* 속성 기믹 전용 레이어. 아레나 ::after 는 보스별 상시 연출이 이미 쓰고 있어 따로 둔다.
+          같은 z-index 2 안에서 젬 비보다 뒤에 둬야 폭발이 가려지지 않는다. */}
+      <div className="boss-mechanic-field" aria-hidden="true" />
       <div className="boss-crown-glow" />
       <div className="boss-aurora-ring ring-back" aria-hidden="true"><i /><b /></div>
       <button

@@ -167,6 +167,8 @@ export const sound = {
   combo() { if (!effectsEnabled) return; tone(880, 0.09, 'sawtooth', 0.2); tone(1174, 0.09, 'sawtooth', 0.2, 0.06) },
   rare() { if (!effectsEnabled) return; tone(392, 0.14, 'sawtooth', 0.28); tone(587, 0.14, 'sawtooth', 0.24, 0.08); tone(784, 0.18, 'sawtooth', 0.24, 0.16) },
   miss() { if (effectsEnabled) tone(180, 0.18, 'sine', 0.25) },
+  // 보스 속성 기믹이 발동할 때의 경고음. 화면 연출만으로는 놓치기 쉬워 소리로도 알린다.
+  mechanic() { if (!effectsEnabled) return; tone(310, 0.13, 'sawtooth', 0.2); tone(233, 0.2, 'sawtooth', 0.22, 0.09) },
   start() { if (!effectsEnabled) return; tone(523, 0.12, 'square', 0.25); tone(659, 0.12, 'square', 0.25, 0.1); tone(784, 0.18, 'square', 0.25, 0.2) },
   over() { if (!effectsEnabled) return; tone(659, 0.18, 'triangle', 0.28); tone(523, 0.18, 'triangle', 0.28, 0.14); tone(392, 0.3, 'triangle', 0.28, 0.28) },
   startBGM() {

@@ -5,7 +5,7 @@ import { useAuth } from '../context/AuthContext'
 import { sound } from '../lib/sound'
 import Icon from '../components/Icon'
 import { getLevel, getLevelProgress, isMaxLevel, LEVEL_UNLOCKS, resolveProgress, saveStoredProgress } from '../lib/progression'
-import { recordGameForMissions } from '../lib/missions'
+import { DAILY_MISSIONS, getDailyMissions, recordGameForMissions } from '../lib/missions'
 import { getBossById, getDailyBoss, recordBossClear } from '../lib/bosses'
 import { MONSTERS } from '../lib/monsters'
 
@@ -18,6 +18,7 @@ export default function Result() {
   const [saving, setSaving] = useState(true); const [isBest, setIsBest] = useState(false); const [rank, setRank] = useState(null); const [saveError, setSaveError] = useState(''); const [xpGain, setXpGain] = useState(0); const [xpProgress, setXpProgress] = useState(null); const [newDiscoveries, setNewDiscoveries] = useState([]); const [levelUp, setLevelUp] = useState(null); const savedRef = useRef(false)
   const [bossReward, setBossReward] = useState(null)
   const [missionXp, setMissionXp] = useState(0)
+  const [missionsDone, setMissionsDone] = useState(null)
   const rewardThemePlayedRef = useRef(false)
   const [resultStep, setResultStep] = useState(1)
   useEffect(() => {
@@ -54,6 +55,7 @@ export default function Result() {
     const totalKills = Object.values(monsterCounts).reduce((sum, count) => sum + count, 0)
     const missionBonus = recordGameForMissions(user.id, { maxCombo, totalKills })
     setMissionXp(missionBonus)
+    setMissionsDone(getDailyMissions(user.id).filter((mission) => mission.done).length)
     // 보스전은 사냥 공식(몬스터 수 기반)을 쓰면 32XP 밖에 안 나온다.
     // 평일은 대표 보스 첫 클리어, 일요일은 자유 토벌 중 첫 처치 한 번만 XP를 준다.
     let gained
@@ -101,6 +103,10 @@ export default function Result() {
   const baseXp = 20
   const huntBonusXp = totalKills * 2 + (monsterCounts.boss || 0) * 10
   const recordBonusXp = isBest ? 15 : 0
+  // 이번 판에 미션을 새로 채우지 못하면 XP는 늘 +0 이다. 그때는 금액 대신 오늘 진행도를 보여준다.
+  const missionTile = missionXp > 0
+    ? <div><small>미션</small><strong>+{missionXp}</strong></div>
+    : <div><small>오늘의 미션</small><strong>{missionsDone === null ? '...' : `${missionsDone}/${DAILY_MISSIONS.length}`}</strong></div>
   const nextUnlock = xpProgress && LEVEL_UNLOCKS[xpProgress.level + 1]
   const nextUnlockMonster = MONSTERS.find((item) => nextUnlock?.monsters?.includes(item.id))
   return <main
@@ -136,10 +142,14 @@ export default function Result() {
           <span>경험치를 획득했어요</span>
         </div>
         <div className="reward-sources">
-          {isBossMode ? <>
-            <div><small>{bossClear ? (bossReward?.firstToday ? '첫 격파' : '반복 도전') : '입힌 피해'}</small><strong>+{Math.max(0, xpGain - missionXp)}</strong></div>
-            <div><small>미션</small><strong>+{missionXp}</strong></div>
-            <div><small>남은 시간</small><strong>{bossClear ? `${bossTimeLeft}초` : '-'}</strong></div>
+          {isBossMode ? bossClear ? <>
+            <div><small>{bossReward?.firstToday ? '첫 격파' : '반복 도전'}</small><strong>+{Math.max(0, xpGain - missionXp)}</strong></div>
+            {missionTile}
+            <div><small>남은 시간</small><strong>{bossTimeLeft}초</strong></div>
+          </> : <>
+            <div><small>입힌 피해</small><strong>{bossDamage}/{bossMaxHp}</strong></div>
+            <div><small>진행도</small><strong>{Math.round((bossDamage / Math.max(1, bossMaxHp)) * 100)}%</strong></div>
+            {missionTile}
           </> : <>
             <div><small>기본</small><strong>+{baseXp}</strong></div>
             <div><small>사냥</small><strong>+{huntBonusXp}</strong></div>
@@ -151,7 +161,7 @@ export default function Result() {
             ? bossReward?.firstToday
               ? <>오늘 첫 격파! {bossReward.streak > 1 ? <><strong>{bossReward.streak}일 연속</strong> 달성</> : <>내일도 이어가 보세요</>}</>
               : <>오늘은 이미 격파했어요. 반복 도전은 <strong>연습</strong>으로 기록됩니다</>
-            : <>보스에게 <strong>{bossDamage} 피해</strong>를 입혔어요</>
+            : <>보스 XP는 <strong>격파에 성공</strong>해야 지급돼요</>
           : <>이번 사냥에서 몬스터 <strong>{totalKills}마리</strong>를 처치했어요</>}</p>
       </div>
       <div className="xp-progress-card">{xpProgress && <><div className="xp-level-head"><strong>LV.{xpProgress.level}</strong><span>{isMaxLevel(xpProgress.level) ? 'MAX LEVEL' : 'LEVEL PROGRESS'}</span><b>{isMaxLevel(xpProgress.level) ? 'MAX' : `LV.${xpProgress.level + 1}`}</b></div><div className="xp-progress-line"><span><i style={{ width: `${xpProgress.percent}%` }} /></span></div><div className="xp-progress-values"><small>{xpProgress.current} / {xpProgress.needed} XP</small><small>{isMaxLevel(xpProgress.level) ? '최고 레벨 달성' : `${(xpProgress.needed - xpProgress.current).toLocaleString()} XP 남음`}</small></div></>}</div>
