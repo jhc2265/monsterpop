@@ -1497,6 +1497,7 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
 .boss-result-solar-eclipse-phoenix .result-boss-aura i:nth-child(8) { right: 38%; top: 88%; animation-delay: -1.9s; }
 .boss-result.boss-escaped .result-boss-aura,
 .boss-result.boss-escaped .result-monster-stage::before { opacity: .38; }
+.boss-result.boss-escaped .result-burst { display: none; }
 .boss-result-glitch-king-slime .result-card-v2 {
   background:
     radial-gradient(circle at 50% 23%, rgba(41,208,198,.2), transparent 38%),
