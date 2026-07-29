@@ -5,7 +5,7 @@ import { useAuth } from '../context/AuthContext'
 import { sound } from '../lib/sound'
 import Icon from '../components/Icon'
 import { getLevel, getLevelProgress, isMaxLevel, LEVEL_UNLOCKS, resolveProgress, saveStoredProgress } from '../lib/progression'
-import { DAILY_MISSIONS, getDailyMissions, recordGameForMissions } from '../lib/missions'
+import { DAILY_MISSION_COUNT, getDailyMissions, recordGameForMissions } from '../lib/missions'
 import { getBossById, getDailyBoss, hasClearedBossToday, recordBossAttempt, recordBossClear } from '../lib/bosses'
 import { MONSTERS } from '../lib/monsters'
 
@@ -56,7 +56,8 @@ export default function Result() {
   }
   async function saveProgress(newBest) {
     const totalKills = Object.values(monsterCounts).reduce((sum, count) => sum + count, 0)
-    const missionBonus = recordGameForMissions(user.id, { maxCombo, totalKills })
+    // 미션 지표 이름으로 맞춰 넘긴다. 콤보·점수는 한 판 최고값으로 기록된다.
+    const missionBonus = recordGameForMissions(user.id, { kills: totalKills, combo: maxCombo, score })
     setMissionXp(missionBonus)
     setMissionsDone(getDailyMissions(user.id).filter((mission) => mission.done).length)
     // 보스전은 사냥 공식 대신 오늘의 보스 첫 처치 보상을 쓴다.
@@ -121,7 +122,7 @@ export default function Result() {
   // 이번 판에 미션을 새로 채우지 못하면 XP는 늘 +0 이다. 그때는 금액 대신 오늘 미션 진행 상황을 보여준다.
   const missionTile = missionXp > 0
     ? <div><small>미션</small><strong>+{missionXp}</strong></div>
-    : <div><small>오늘의 미션</small><strong>{missionsDone === null ? '...' : `${missionsDone}/${DAILY_MISSIONS.length}`}</strong></div>
+    : <div><small>오늘의 미션</small><strong>{missionsDone === null ? '...' : `${missionsDone}/${DAILY_MISSION_COUNT}`}</strong></div>
   // 세 번째 칸에 격파율(%)을 두면 바로 옆 "가한 피해 90/300"을 나눗셈한 값이라 새 정보가 없다.
   // 대신 이번 판 이전의 오늘 최고 피해를 보여준다 — 도전 보상의 기준선이라 비교할 값이 된다.
   const todaysBestDamage = !bossAttempt ? '...'
