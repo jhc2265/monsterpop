@@ -6,3 +6,7 @@ tmp
 .env.local
 .DS_Store
 *.log
+
+# 포트폴리오용 썸네일 원본. 앱이 참조하지 않는데 3장에 6.9MB 라
+# 저장소와 배포본만 무거워진다. 로컬에는 그대로 두고 추적만 하지 않는다.
+public/images/portfolio/
