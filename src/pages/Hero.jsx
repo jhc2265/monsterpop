@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { sound } from '../lib/sound'
@@ -8,11 +8,15 @@ import { sound } from '../lib/sound'
 const MASTER_TAPS = 7
 const MASTER_TAP_GAP_MS = 700
 
+// 탭 카운터를 컴포넌트 밖에 둔다.
+// useRef 로 두면 탭마다 setMaster 가 일으키는 리렌더 사이에 값이 초기화돼(실측)
+// 아무리 눌러도 2회 이상 쌓이지 않았다. 모듈 스코프는 렌더와 무관하게 유지된다.
+let tapCount = 0
+let lastTapAt = 0
+
 export default function Hero() {
   const navigate = useNavigate()
   const { enterGuest } = useAuth()
-  const tapsRef = useRef(0)
-  const lastTapRef = useRef(0)
   const [master, setMaster] = useState({ status: 'idle', message: '' })
 
   function enter(path) {
@@ -25,17 +29,17 @@ export default function Hero() {
   async function tapLogo() {
     if (master.status === 'working') return
     const now = Date.now()
-    tapsRef.current = now - lastTapRef.current > MASTER_TAP_GAP_MS ? 1 : tapsRef.current + 1
-    lastTapRef.current = now
+    tapCount = now - lastTapAt > MASTER_TAP_GAP_MS ? 1 : tapCount + 1
+    lastTapAt = now
 
-    const left = MASTER_TAPS - tapsRef.current
+    const left = MASTER_TAPS - tapCount
     // 절반쯤 왔을 때부터만 남은 횟수를 알려준다. 그 전에는 아무 흔적도 남기지 않는다.
     if (left > 0) {
-      setMaster({ status: 'idle', message: tapsRef.current >= 4 ? `${left}번 더...` : '' })
+      setMaster({ status: 'idle', message: tapCount >= 4 ? `${left}번 더...` : '' })
       return
     }
 
-    tapsRef.current = 0
+    tapCount = 0
 
     // 배포본에서는 게스트 체험으로 들어간다. 서버 계정이 없어 노출될 비밀번호도 없다.
     if (!import.meta.env.DEV) {
