@@ -418,12 +418,10 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
 .hero-stars i:nth-child(2) { right: 13%; top: 22%; width: 3px; height: 3px; animation-delay: .6s; }
 .hero-stars i:nth-child(3) { left: 8%; top: 48%; width: 2px; height: 2px; animation-delay: 1.2s; }
 .hero-stars i:nth-child(4) { right: 10%; top: 51%; animation-delay: 1.8s; }
-/* 첫 화면 배경은 카드 폭(460px)을 넘어 화면 전체를 채운다.
-   .app-container 의 overflow: hidden 은 position: fixed 자손을 자르지 않고,
-   조상 중 containing block 을 만드는 속성(transform · filter · contain)을 가진 것도 없어서
-   이 세 층만 고정 위치로 바꾸면 inset: 0 이 곧 뷰포트 전체가 된다.
-   내용(.hero-landing-content)은 그대로 460px 안에 머문다 — 배경만 넓어진다. */
-.hero-world-art, .hero-world-shade, .hero-stars { position: fixed; }
+/* 배경은 카드(460px) 안에 머문다.
+   한때 이 세 층을 position: fixed 로 바꿔 화면 전체를 채워봤는데, 넓은 모니터에서는
+   object-fit: cover 가 그림을 과하게 확대·잘라내 몬스터가 거의 안 보였다.
+   이 앱은 모바일 기준으로 짜여 있으니 배경도 그 폭에 맞춘다. */
 .hero-landing-content { min-height: 100svh; display: flex; flex-direction: column; align-items: center; padding: max(51px, calc(env(safe-area-inset-top) + 16px)) 28px calc(38px + env(safe-area-inset-bottom)); text-align: center; }
 .hero-landing-kicker { color: #e2d4ff; text-shadow: 0 0 14px rgba(191,107,255,.8); }
 .hero-landing-kicker span { margin-right: 7px; color: #f477da; }
