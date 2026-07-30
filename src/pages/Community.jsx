@@ -8,6 +8,7 @@ import { attachPostMeta } from '../lib/postJoins'
 import Icon from '../components/Icon'
 import Avatar from '../components/Avatar'
 import BottomNav from '../components/BottomNav'
+import { isGuest } from '../lib/guest'
 
 export default function Community() {
   const { user, profile } = useAuth(); const navigate = useNavigate()
@@ -28,7 +29,10 @@ export default function Community() {
     setLoading(false)
   }
   async function submit() {
-    setError(''); if (title.trim().length < 2 || content.trim().length < 2) { setError('제목과 내용을 2자 이상 입력해 주세요.'); return }
+    setError('')
+    // 게스트는 읽기만 된다. 서버가 어차피 거부하지만, 여기서 막아야 이유를 알려줄 수 있다.
+    if (isGuest(user.id)) { setError('체험 중에는 글을 쓸 수 없어요. 가입하면 바로 참여할 수 있습니다.'); return }
+    if (title.trim().length < 2 || content.trim().length < 2) { setError('제목과 내용을 2자 이상 입력해 주세요.'); return }
     setBusy(true)
     // insert 뒤에 select 를 붙여 저장된 행을 곧바로 되읽는다.
     // 저장은 됐는데 읽기가 막혀 있으면 그 자리에서 드러난다 — 예전에는 저장만 확인하고
@@ -48,6 +52,7 @@ export default function Community() {
   }
   async function toggleLike(event, post) {
     event.stopPropagation()
+    if (isGuest(user.id)) { setLoadError('체험 중에는 좋아요를 누를 수 없어요. 가입하면 바로 참여할 수 있습니다.'); return }
     const mine = post.post_likes?.some((like) => like.user_id === user.id)
     const previous = posts
     setPosts((items) => items.map((item) => item.id === post.id ? { ...item, post_likes: mine ? item.post_likes.filter((like) => like.user_id !== user.id) : [...(item.post_likes || []), { user_id: user.id }] } : item))

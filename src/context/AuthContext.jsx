@@ -3,6 +3,7 @@ import { supabase } from '../lib/supabase'
 import { getStoredProgress, saveStoredProgress } from '../lib/progression'
 import { getSyncError, subscribeSyncError } from '../lib/stateCache'
 import { pullUserState } from '../lib/syncState'
+import { GUEST_ID, GUEST_PROFILE, readGuestFlag, writeGuestFlag } from '../lib/guest'
 
 const AuthContext = createContext(null)
 
@@ -55,6 +56,8 @@ export function AuthProvider({ children }) {
   const [syncing, setSyncing] = useState(false)
   const [profileError, setProfileError] = useState('')
   const [pushError, setPushError] = useState(getSyncError())
+  // 가입 없이 체험하는 상태. 새로고침해도 유지되도록 localStorage 에 표시만 남긴다.
+  const [guest, setGuest] = useState(readGuestFlag)
 
   useEffect(() => {
     // 새로고침 후에도 로그인 유지
@@ -103,15 +106,26 @@ export function AuthProvider({ children }) {
     return () => { cancelled = true }
   }, [session])
 
+  // 실제 로그인이 있으면 그쪽이 이긴다 — 체험 중 가입하면 자연히 계정 사용자로 넘어간다.
+  const guestActive = guest && !session?.user
+
   const value = {
     session,
-    user: session?.user ?? null,
-    profile,
+    user: session?.user ?? (guestActive ? { id: GUEST_ID, isGuest: true } : null),
+    isGuest: guestActive,
+    profile: guestActive ? GUEST_PROFILE : profile,
     loading,
     syncing,
     // 계정 데이터가 서버에 닿지 않는 상태를 화면에 드러내기 위한 값이다.
-    syncError: profileError || pushError,
-    signOut: () => supabase.auth.signOut(),
+    // 게스트는 서버에 저장할 것이 없으므로 경고할 것도 없다.
+    syncError: guestActive ? '' : (profileError || pushError),
+    enterGuest: () => { writeGuestFlag(true); setGuest(true) },
+    exitGuest: () => { writeGuestFlag(false); setGuest(false) },
+    signOut: async () => {
+      writeGuestFlag(false)
+      setGuest(false)
+      await supabase.auth.signOut()
+    },
     refreshProfile: async () => {
       if (!session?.user) return
       const { data, error } = await supabase

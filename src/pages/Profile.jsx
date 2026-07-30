@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext'
 import { isMonsterDiscovered } from '../lib/bosses'
 import { getProfileAvatarOptions, resolveAvatarUrl } from '../lib/avatar'
 import { getHunterTitle, getLevelProgress, resolveProgress } from '../lib/progression'
+import { isGuest } from '../lib/guest'
 import { sound } from '../lib/sound'
 import Icon from '../components/Icon'
 
@@ -29,6 +30,8 @@ export default function Profile() {
   }, [profile])
 
   useEffect(() => {
+    // 게스트는 서버에 점수가 없다. user_id 는 uuid 컬럼이라 'guest' 로 조회하면 형변환 에러가 난다.
+    if (isGuest(user.id)) return
     supabase
       .from('scores')
       .select('score, max_combo')
@@ -45,6 +48,11 @@ export default function Profile() {
   }, [user.id])
 
   async function saveProfile() {
+    // 게스트는 서버에 프로필 행이 없다. 아바타 선택은 화면에서 되지만 저장은 가입 후에 열린다.
+    if (isGuest(user.id)) {
+      setNotice('체험 중에는 프로필을 저장할 수 없어요. 가입하면 바로 저장됩니다.')
+      return
+    }
     const trimmed = nickname.trim()
     if (trimmed.length < 2) {
       setNotice('닉네임은 2자 이상 입력해 주세요.')

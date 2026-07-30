@@ -268,6 +268,14 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
 .field { margin-bottom: 15px; }.field label { display: block; margin: 0 0 7px 2px; color: var(--text-2); }.field input, .field textarea, .comment-composer input { width: 100%; border: 1px solid var(--line-strong); border-radius: 14px; background: rgba(7,5,29,.72); color: var(--text); padding: 14px 15px; resize: vertical; }.field input { min-height: 50px; }.field input::placeholder, .field textarea::placeholder, .comment-composer input::placeholder { color: #696387; }.field input:focus, .field textarea:focus, .comment-composer input:focus { border-color: var(--primary-light); background: rgba(13,9,40,.9); }
 .notice { margin: 0 0 14px; padding: 11px 13px; border-radius: 12px; }.notice-error { color: #ff9aac; background: rgba(255,97,120,.09); border: 1px solid rgba(255,97,120,.22); }.notice-info { color: #9fefff; background: rgba(70,229,255,.08); border: 1px solid rgba(70,229,255,.2); }.muted { color: var(--muted); }.pill { display: inline-flex; align-items: center; gap: 6px; width: fit-content; padding: 5px 8px; border-radius: 999px; }.pill-best { margin-left: auto; color: #fff; background: linear-gradient(135deg, #ff4c9d, #cb3fff); }
 
+/* 가입 없이 체험하기 — 가입 결정을 내리는 자리에 두되, 주 CTA(로그인)보다는 조용하게. */
+.auth-guest { display: grid; gap: 10px; margin-top: 18px; text-align: center; }
+.auth-guest-divider { display: flex; align-items: center; gap: 10px; color: #6d6690; font-size: var(--fs-caption); }
+.auth-guest-divider i { flex: 1; height: 1px; background: var(--line); }
+.auth-guest-button { display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 48px; padding: 0 18px; border: 1px solid rgba(184,151,255,.3); border-radius: 15px; background: rgba(24,18,59,.6); color: #d9cffa; cursor: pointer; transition: border-color .16s, background .16s; }
+.auth-guest-button:hover { border-color: rgba(184,151,255,.55); background: rgba(33,25,78,.7); }
+.auth-guest small { color: #7d759c; font-size: var(--fs-caption); line-height: var(--lh-normal); }
+
 /* Login */
 .login-page { display: flex; flex-direction: column; justify-content: center; padding-top: 30px; }.login-page .tabs { margin-bottom: 12px; }
 /* Home */

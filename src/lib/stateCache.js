@@ -1,4 +1,5 @@
 import { supabase } from './supabase'
+import { isGuest } from './guest'
 
 // 미션·보스 기록의 원본은 서버(user_state 테이블)이고, localStorage 는 그 캐시다.
 //
@@ -46,6 +47,9 @@ function setSyncError(message) {
 const pending = new Set()
 
 export function pushState(key, userId, value) {
+  // 게스트는 서버 계정이 없다. 올리려 하면 user_id(uuid) 형변환부터 실패하고,
+  // 그 에러가 동기화 실패 배너로 떠서 체험 중에 경고가 뜬다.
+  if (isGuest(userId)) return Promise.resolve()
   const task = (async () => {
     try {
       const { error } = await supabase

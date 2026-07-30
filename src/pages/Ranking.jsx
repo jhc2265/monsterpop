@@ -5,13 +5,16 @@ import { sound } from '../lib/sound'
 import Icon from '../components/Icon'
 import BottomNav from '../components/BottomNav'
 import SharedAvatar from '../components/Avatar'
+import { isGuest } from '../lib/guest'
 
 export default function Ranking() {
   const { user, profile } = useAuth()
   const [tab, setTab] = useState('all'); const [rows, setRows] = useState([]); const [loading, setLoading] = useState(true); const [prevScore, setPrevScore] = useState(null)
   useEffect(() => { load() }, [tab, profile?.avatar_url, profile?.nickname])
   useEffect(() => {
-    if (!user) return
+    // 게스트는 서버에 점수가 없다. user_id 는 uuid 컬럼이라 'guest' 로 조회하면 형변환 에러가 난다.
+    // 순위 비교 대상도 없으니 아래 MY RANK 카드는 자연히 숨는다.
+    if (!user || isGuest(user.id)) return
     supabase.from('scores').select('score').eq('user_id', user.id).order('score', { ascending: false }).limit(2)
       .then(({ data }) => setPrevScore(data?.[1]?.score ?? null))
   }, [user])

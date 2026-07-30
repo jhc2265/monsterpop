@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext'
 import { sound } from '../lib/sound'
 import { haptics } from '../lib/haptics'
 import { getPreferences, savePreferences } from '../lib/preferences'
+import { isGuest } from '../lib/guest'
 import Icon from '../components/Icon'
 
 // iOS 사파리는 Vibration API 자체가 없다. 켤 수는 있지만 아무 일도 안 일어나므로 미리 알려준다.
@@ -28,6 +29,8 @@ export default function Settings() {
     setPreferences((current) => ({ ...current, [key]: value }))
   }
 
+  const guest = isGuest(user.id)
+
   async function resetPassword() {
     const { error } = await supabase.auth.resetPasswordForEmail(user.email, { redirectTo: `${window.location.origin}/login` })
     setNotice(error ? error.message : '비밀번호 변경 링크를 이메일로 보냈어요.')
@@ -41,7 +44,7 @@ export default function Settings() {
 
   return <main className="page settings-page">
     <header className="topbar"><button className="icon-btn" onClick={() => navigate('/home')} aria-label="뒤로"><Icon name="back" /></button><div className="title-stack"><span className="overline">PREFERENCES</span><h1>설정</h1></div><span className="topbar-spacer" /></header>
-    <button className="settings-profile" onClick={() => navigate('/profile')}><div className="avatar">{profile?.avatar_url ? <img src={profile.avatar_url} alt="" /> : (profile?.nickname || '헌')[0]}</div><div><strong>{profile?.nickname || '헌터'} 헌터님</strong><span>{user.email}</span></div><b>›</b></button>
+    <button className="settings-profile" onClick={() => navigate('/profile')}><div className="avatar">{profile?.avatar_url ? <img src={profile.avatar_url} alt="" /> : (profile?.nickname || '헌')[0]}</div><div><strong>{profile?.nickname || '헌터'} 헌터님</strong><span>{guest ? '체험 중 · 기록은 이 기기에만 저장돼요' : user.email}</span></div><b>›</b></button>
     <SettingsGroup icon="sound" title="게임">
       <SettingToggle label="배경음악" checked={preferences.bgm} onChange={() => toggle('bgm')} />
       {preferences.bgm && <SettingSlider
@@ -59,8 +62,11 @@ export default function Settings() {
       <SettingToggle label="랭킹 마감 알림" checked={preferences.rankingNotifications} onChange={() => toggle('rankingNotifications')} />
     </SettingsGroup>
     <SettingsGroup icon="user" title="계정">
-      <SettingAction label="비밀번호 변경" onClick={resetPassword} />
-      <SettingAction label="로그아웃" onClick={logout} />
+      {/* 게스트에겐 이메일이 없어 비밀번호 변경이 의미가 없다. 대신 가입 안내를 그 자리에 둔다. */}
+      {guest
+        ? <SettingAction label="가입하고 기록 저장하기" onClick={() => { sound.button(); navigate('/signup') }} />
+        : <SettingAction label="비밀번호 변경" onClick={resetPassword} />}
+      <SettingAction label={guest ? '체험 종료' : '로그아웃'} onClick={logout} />
     </SettingsGroup>
     <SettingsGroup icon="info" title="정보">
       <SettingAction label="이용약관" muted="준비 중" />

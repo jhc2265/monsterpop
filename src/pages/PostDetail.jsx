@@ -7,6 +7,7 @@ import { timeAgo } from '../lib/format'
 import { attachAuthors, attachPostMeta } from '../lib/postJoins'
 import Icon from '../components/Icon'
 import Avatar from '../components/Avatar'
+import { isGuest } from '../lib/guest'
 
 export default function PostDetail() {
   const { id } = useParams(); const { user } = useAuth(); const navigate = useNavigate()
@@ -41,6 +42,8 @@ export default function PostDetail() {
   }
   async function toggleLike() {
     if (!post) return
+    // 게스트는 읽기만 된다. 수정·삭제는 작성자 본인일 때만 열리므로(uuid ≠ 'guest') 따로 막을 필요가 없다.
+    if (isGuest(user.id)) { setLoadError('체험 중에는 좋아요를 누를 수 없어요. 가입하면 바로 참여할 수 있습니다.'); return }
     const mine = post.post_likes?.some((like) => like.user_id === user.id)
     const previous = post
     setPost({ ...post, post_likes: mine ? post.post_likes.filter((like) => like.user_id !== user.id) : [...(post.post_likes || []), { user_id: user.id }] })
@@ -53,7 +56,7 @@ export default function PostDetail() {
     sound.button()
   }
   async function loadComments() { const { data } = await supabase.from('comments').select('id, content, created_at, user_id').eq('post_id', id).order('created_at', { ascending: true }); setComments(await attachAuthors(data)) }
-  async function addComment() { if (!text.trim() || busy) return; setBusy(true); const { error } = await supabase.from('comments').insert({ post_id: Number(id), user_id: user.id, content: text.trim() }); setBusy(false); if (!error) { sound.button(); setText(''); loadComments() } }
+  async function addComment() { if (!text.trim() || busy) return; if (isGuest(user.id)) { setLoadError('체험 중에는 댓글을 쓸 수 없어요. 가입하면 바로 참여할 수 있습니다.'); return } setBusy(true); const { error } = await supabase.from('comments').insert({ post_id: Number(id), user_id: user.id, content: text.trim() }); setBusy(false); if (!error) { sound.button(); setText(''); loadComments() } }
   async function deletePost() { if (!window.confirm('이 게시글을 삭제할까요?')) return; await supabase.from('posts').delete().eq('id', id); navigate('/community', { replace: true }) }
   if (loading) return <main className="page"><div className="empty-state"><span className="loader" />게시글을 불러오는 중...</div></main>
   if (!post) return <main className="page">{loadError && <div className="notice notice-error">{loadError}</div>}<div className="empty-state"><h3>게시글을 찾을 수 없어요</h3><button className="btn btn-secondary" onClick={() => navigate('/community')}>목록으로</button></div></main>
