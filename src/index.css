@@ -814,6 +814,9 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
 
 /* The home header acts as a compact hunter identity card. */
 .home-daily-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 10px; }
+/* 동기화 실패 배너. 두 번째 줄은 "기록이 사라진 건 아니다"를 말하는 자리라 한 톤 낮춘다. */
+.home-sync-error { display: grid; gap: 3px; }
+.home-sync-error span { color: #d8b3bd; font-size: var(--fs-caption); }
 .home-daily-greeting { position: relative; display: flex; min-width: 0; align-items: center; gap: 7px; margin: 0 0 0 3px; color: #c8c0d8; font-family: 'Paperlogy', sans-serif; font-size: 17px; font-weight: 700; line-height: 1; letter-spacing: -.02em; white-space: nowrap; animation: homeGreetingIn .46s ease-out both; }
 .home-greeting-text { display: block; line-height: 1.2; }
 .home-greeting-burst { position: relative; display: grid; place-items: center; flex: 0 0 22px; width: 22px; height: 22px; color: #f04cbd; isolation: isolate; }

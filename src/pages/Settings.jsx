@@ -13,11 +13,12 @@ const supportsVibration = typeof navigator !== 'undefined' && typeof navigator.v
 export default function Settings() {
   const navigate = useNavigate()
   const { user, profile, signOut } = useAuth()
-  const [preferences, setPreferences] = useState(getPreferences)
+  const [preferences, setPreferences] = useState(() => getPreferences(user.id))
   const [notice, setNotice] = useState('')
 
-  // savePreferences 가 applyPreferences 를 거쳐 배경음·효과음·진동·모션을 한 번에 반영한다.
-  useEffect(() => { savePreferences(preferences) }, [preferences])
+  // savePreferences 가 applyPreferences 를 거쳐 배경음·효과음·진동·모션을 한 번에 반영하고,
+  // 값이 실제로 바뀌었을 때만 계정 설정으로 올린다(이 effect 는 화면을 열 때도 한 번 돈다).
+  useEffect(() => { savePreferences(user.id, preferences) }, [user.id, preferences])
 
   function toggle(key) {
     setPreferences((current) => ({ ...current, [key]: !current[key] }))

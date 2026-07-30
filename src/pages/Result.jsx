@@ -7,6 +7,7 @@ import Icon from '../components/Icon'
 import { getLevel, getLevelProgress, isMaxLevel, LEVEL_UNLOCKS, resolveProgress, saveStoredProgress } from '../lib/progression'
 import { DAILY_MISSION_COUNT, getDailyMissions, recordGameForMissions } from '../lib/missions'
 import { getBossById, getDailyBoss, hasClearedBossToday, recordBossAttempt, recordBossClear } from '../lib/bosses'
+import { flushState } from '../lib/stateCache'
 import { MONSTERS } from '../lib/monsters'
 
 // 보스 반복 도전은 기록 갱신과 연습용이다. 큰 보상은 오늘 첫 클리어 한 번만 지급한다.
@@ -58,7 +59,7 @@ export default function Result() {
     const totalKills = Object.values(monsterCounts).reduce((sum, count) => sum + count, 0)
     // 미션 후보가 레벨에 따라 달라지므로 기록 전에 레벨을 알아야 한다.
     // 홈 화면과 같은 값(resolveProgress)을 써야 두 화면의 미션 목록이 어긋나지 않는다.
-    const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single()
+    const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).maybeSingle()
     const previous = resolveProgress(profile, user.id)
     const level = getLevel(previous.xp)
     // 미션 지표 이름으로 맞춰 넘긴다. 콤보·점수는 한 판 최고값으로 기록된다.
@@ -104,8 +105,13 @@ export default function Result() {
     const oldLevel = level
     const newLevel = getLevel(next.xp)
     if (newLevel > oldLevel) setLevelUp({ oldLevel, newLevel, unlock: LEVEL_UNLOCKS[newLevel] })
+    // 서버 저장 실패를 조용히 넘기면 안 된다. 화면은 localStorage 값으로 정상처럼 보이지만
+    // 다른 기기로 로그인하는 순간 이 판의 기록이 없다.
     const { error } = await supabase.from('profiles').update({ xp: next.xp, discovered_monsters: next.discovered }).eq('id', user.id)
-    if (!error) await refreshProfile()
+    if (error) setSaveError(`성장 기록을 서버에 저장하지 못했습니다: ${error.message}`)
+    else await refreshProfile()
+    // 미션·보스 기록 업로드가 끝난 뒤에 저장 중 표시를 내린다.
+    await flushState()
   }
   async function saveMonsterCounts(userId, counts) {
     for (const [monsterId, count] of Object.entries(counts)) {

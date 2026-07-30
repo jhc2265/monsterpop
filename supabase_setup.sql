@@ -68,6 +68,22 @@ create table if not exists public.user_monster_stats (
   primary key (user_id, monster_id)
 );
 
+-- ---------- 7) 사용자별 진행 상태 (미션 · 보스 기록 · 설정 · 조작 안내) ----------
+-- 예전에는 이것들이 localStorage 에만 있어서, 다른 기기로 로그인하면 오늘의 미션과
+-- 보스 스트릭이 처음부터 다시 시작하고, 설정은 기본값으로 돌아가고, 조작 안내가 다시 떴습니다.
+-- key 로 종류를 구분하고 value 에 그 종류의 상태를 통째로 담습니다.
+--   'missions'    → { date, progress, claimed }
+--   'boss'        → { date, rewardDate, clearedToday, bestTimeLeft, attempts, streak }
+--   'preferences' → { updatedAt, values }   -- 설정은 마지막에 저장한 쪽이 이기므로 시각을 함께 둡니다
+--   'tutorial'    → { hunt, boss, burst }   -- 종류별로 "본 버전". VERSION 을 올리면 다시 뜹니다
+create table if not exists public.user_state (
+  user_id     uuid not null references public.profiles(id) on delete cascade,
+  key         text not null,
+  value       jsonb not null default '{}'::jsonb,
+  updated_at  timestamptz default now(),
+  primary key (user_id, key)
+);
+
 -- 이미 만들어진 프로젝트에도 새 필드를 안전하게 추가합니다.
 alter table public.scores add column if not exists monster_counts jsonb not null default '{}'::jsonb;
 alter table public.posts add column if not exists category text not null default '자유';
@@ -82,6 +98,7 @@ alter table public.posts    enable row level security;
 alter table public.comments enable row level security;
 alter table public.post_likes enable row level security;
 alter table public.user_monster_stats enable row level security;
+alter table public.user_state enable row level security;
 
 -- 프로필: 누구나 조회 가능(랭킹 닉네임 표시용), 본인 것만 수정
 drop policy if exists "profiles_select_all" on public.profiles;
@@ -149,6 +166,17 @@ drop policy if exists "monster_stats_update_own" on public.user_monster_stats;
 create policy "monster_stats_update_own" on public.user_monster_stats
   for update using (auth.uid() = user_id);
 
+-- 진행 상태: 남에게 보여줄 값이 아니므로 다른 테이블과 달리 조회도 본인만 허용한다.
+drop policy if exists "user_state_select_own" on public.user_state;
+create policy "user_state_select_own" on public.user_state
+  for select using (auth.uid() = user_id);
+drop policy if exists "user_state_insert_own" on public.user_state;
+create policy "user_state_insert_own" on public.user_state
+  for insert with check (auth.uid() = user_id);
+drop policy if exists "user_state_update_own" on public.user_state;
+create policy "user_state_update_own" on public.user_state
+  for update using (auth.uid() = user_id);
+
 -- ============================================================
 --  회원가입 시 프로필 자동 생성 트리거
 --  (닉네임은 가입 시 user_metadata.nickname 값을 사용)
@@ -189,4 +217,4 @@ from public.scores s
 join public.profiles p on p.id = s.user_id
 order by s.user_id, s.score desc;
 
--- 끝. RUN 후 왼쪽 Table Editor 에서 6개 테이블이 보이면 성공입니다.
+-- 끝. RUN 후 왼쪽 Table Editor 에서 7개 테이블이 보이면 성공입니다.

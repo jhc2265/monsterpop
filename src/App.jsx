@@ -15,21 +15,30 @@ import Collection from './pages/Collection'
 import Settings from './pages/Settings'
 import Profile from './pages/Profile'
 import ErrorBoundary from './components/ErrorBoundary'
-import { applyPreferences } from './lib/preferences'
+import { applyPreferences, getPreferences } from './lib/preferences'
 import { sound } from './lib/sound'
 
 function Protected({ children }) {
-  const { user, loading } = useAuth()
+  const { user, loading, syncing } = useAuth()
   if (loading) return <div className="center-screen"><span className="loader" />몬스터를 불러오는 중...</div>
   if (!user) return <Navigate to="/login" replace />
+  // 미션·보스 기록은 렌더 도중 동기로 읽힌다. 서버 값을 캐시에 합치기 전에 그리면
+  // 새 기기에서 LV.1 · 미션 0개가 한 번 스쳐 보인다.
+  if (syncing) return <div className="center-screen"><span className="loader" />사냥 기록을 불러오는 중...</div>
   return children
 }
 
 export default function App() {
   const location = useLocation()
+  const { user, syncing } = useAuth()
 
   // applyPreferences 하나가 배경음·효과음·진동·모션을 모두 반영한다.
-  useEffect(() => { applyPreferences() }, [])
+  // 로그인 전에는 이 브라우저에 남은 값으로, 로그인 뒤에는 계정 설정으로 반영한다.
+  // 동기화 중에 걸면 서버 설정이 도착하기 전 값으로 한 번 적용됐다가 바뀐다.
+  useEffect(() => {
+    if (syncing) return
+    applyPreferences(getPreferences(user?.id))
+  }, [user?.id, syncing])
 
   useEffect(() => {
     let scene = 'silent'

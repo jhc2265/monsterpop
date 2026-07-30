@@ -1,4 +1,5 @@
 import { koreaToday } from './bosses'
+import { pushState, readCached, writeCached } from './stateCache'
 
 // 하루 경계는 한국시간 자정이다.
 // 예전에는 new Date().toISOString() 을 잘라 썼는데 그건 UTC 기준이라, 한국 사용자에게는
@@ -54,23 +55,50 @@ export function getMissionsForDate(date = today(), level = 1) {
   return picked
 }
 
-const storageKey = (userId) => `monsterpop-missions-${userId}`
+const STATE_KEY = 'missions'
 const emptyProgress = () => Object.fromEntries(Object.keys(METRICS).map((key) => [key, 0]))
 
-function readState(userId) {
-  let state = null
-  try { state = JSON.parse(localStorage.getItem(storageKey(userId)) || 'null') } catch { state = null }
-  if (!state || state.date !== today()) {
-    state = { date: today(), progress: emptyProgress(), claimed: [] }
+// 날짜를 지우지 않는 정규화. 병합은 어느 쪽이 더 최근인지 알아야 하므로 원본 날짜가 필요하다.
+function normalizeState(raw) {
+  const state = raw && typeof raw === 'object' ? raw : {}
+  return {
+    date: typeof state.date === 'string' ? state.date : '',
+    // 지표가 늘어난 뒤에도 예전 저장본을 읽을 수 있어야 한다.
+    progress: { ...emptyProgress(), ...(state.progress && typeof state.progress === 'object' ? state.progress : {}) },
+    claimed: Array.isArray(state.claimed) ? state.claimed : [],
   }
-  // 지표가 늘어난 뒤에도 예전 저장본을 읽을 수 있어야 한다.
-  state.progress = { ...emptyProgress(), ...state.progress }
-  state.claimed = Array.isArray(state.claimed) ? state.claimed : []
+}
+
+function readState(userId) {
+  const state = normalizeState(readCached(STATE_KEY, userId))
+  if (state.date !== today()) return { date: today(), progress: emptyProgress(), claimed: [] }
   return state
 }
 
 function writeState(userId, state) {
-  try { localStorage.setItem(storageKey(userId), JSON.stringify(state)) } catch { /* 저장 실패는 무시 */ }
+  writeCached(STATE_KEY, userId, state)
+  pushState(STATE_KEY, userId, state)
+}
+
+// 로그인할 때 서버 값과 이 기기 값을 합친다. 어느 쪽도 잃지 않는 방향으로만 움직인다.
+//   같은 날이면 지표는 큰 쪽, 받은 보상(claimed)은 합집합 —
+//   합산하면 한 기기에서 한 판이 두 판으로 불어나고, claimed 를 빠뜨리면 같은 미션 보상을 두 번 준다.
+export function mergeMissionState(localRaw, remoteRaw) {
+  if (!localRaw) return remoteRaw ? normalizeState(remoteRaw) : null
+  if (!remoteRaw) return normalizeState(localRaw)
+  const local = normalizeState(localRaw)
+  const remote = normalizeState(remoteRaw)
+  if (local.date !== remote.date) {
+    // 날짜가 다르면 오늘치가 이긴다. 둘 다 지난 날이면 최신 쪽을 남긴다(어차피 읽을 때 비워진다).
+    if (local.date === today()) return local
+    if (remote.date === today()) return remote
+    return local.date >= remote.date ? local : remote
+  }
+  return {
+    date: local.date,
+    progress: Object.fromEntries(Object.keys(METRICS).map((key) => [key, Math.max(local.progress[key] || 0, remote.progress[key] || 0)])),
+    claimed: [...new Set([...local.claimed, ...remote.claimed])],
+  }
 }
 
 // 한 판이 끝났을 때 호출: 진행도를 갱신하고, 이번에 '새로' 완료된 미션의 보상 XP 합계를 반환합니다.

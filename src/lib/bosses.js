@@ -1,3 +1,5 @@
+import { pushState, readCached, writeCached } from './stateCache'
+
 export const DAILY_BOSSES = [
   {
     id: 'neon-nightmare',
@@ -226,13 +228,11 @@ export function isMonsterDiscovered(discovered = [], monsterId) {
 }
 
 // 반복 클리어로 보상을 무한히 받지 못하도록 "오늘 첫 클리어"를 기록한다.
-// 미션과 같은 localStorage 방식이라 별도 DB 세팅이 필요 없다.
-const storageKey = (userId) => `monsterpop-boss-${userId}`
+// 미션과 같은 방식으로 서버(user_state)에 저장하고 localStorage 는 캐시로 쓴다.
+const STATE_KEY = 'boss'
 
-function readState(userId) {
-  let state = null
-  try { state = JSON.parse(localStorage.getItem(storageKey(userId)) || 'null') } catch { state = null }
-  if (!state || typeof state !== 'object') state = {}
+function normalizeState(raw) {
+  const state = raw && typeof raw === 'object' ? raw : {}
   return {
     date: state.date || '',
     rewardDate: state.rewardDate || state.date || '',
@@ -247,8 +247,50 @@ function readState(userId) {
   }
 }
 
+function readState(userId) {
+  return normalizeState(readCached(STATE_KEY, userId))
+}
+
 function writeState(userId, state) {
-  try { localStorage.setItem(storageKey(userId), JSON.stringify(state)) } catch { /* 저장 실패는 무시 */ }
+  writeCached(STATE_KEY, userId, state)
+  pushState(STATE_KEY, userId, state)
+}
+
+// 값별로 큰 쪽을 남긴다. 최고 기록과 도전 진행도는 둘 다 "높을수록 좋다"라서 이 규칙이 통한다.
+function mergeMax(a = {}, b = {}) {
+  const merged = { ...a }
+  for (const [key, value] of Object.entries(b)) {
+    merged[key] = Math.max(Number(merged[key]) || 0, Number(value) || 0)
+  }
+  return merged
+}
+
+// 로그인할 때 서버 값과 이 기기 값을 합친다.
+// 보상 중복 지급을 막는 쪽으로 실패해야 하므로, 같은 날이면 "이미 잡았다"를 합집합으로 남긴다.
+export function mergeBossState(localRaw, remoteRaw) {
+  if (!localRaw) return remoteRaw ? normalizeState(remoteRaw) : null
+  if (!remoteRaw) return normalizeState(localRaw)
+  const local = normalizeState(localRaw)
+  const remote = normalizeState(remoteRaw)
+  const today = koreaToday()
+  // 오늘치가 있으면 그쪽, 없으면 최신 날짜가 기준이 된다.
+  const primary = local.date === today ? local
+    : remote.date === today ? remote
+      : local.date >= remote.date ? local : remote
+  const other = primary === local ? remote : local
+  return {
+    ...primary,
+    // 최고 기록은 날짜와 상관없이 계속 남는 값이다.
+    bestTimeLeft: mergeMax(local.bestTimeLeft, remote.bestTimeLeft),
+    clearedToday: primary.date === other.date
+      ? [...new Set([...primary.clearedToday, ...other.clearedToday])]
+      : primary.clearedToday,
+    attempts: primary.attempts.date === other.attempts.date
+      ? { date: primary.attempts.date, values: mergeMax(primary.attempts.values, other.attempts.values) }
+      : primary.attempts,
+    // 스트릭은 같은 날 보상을 받았을 때만 비교할 수 있다. 날짜가 다르면 기준 쪽 값이 맞다.
+    streak: primary.rewardDate === other.rewardDate ? Math.max(primary.streak, other.streak) : primary.streak,
+  }
 }
 
 export function hasClearedBossToday(userId, bossId) {

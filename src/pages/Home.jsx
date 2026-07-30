@@ -33,7 +33,7 @@ function getTodaysHunt(level, today) {
 }
 
 export default function Home() {
-  const { user, profile } = useAuth()
+  const { user, profile, syncError } = useAuth()
   const navigate = useNavigate()
 
   function go(path) {
@@ -73,6 +73,9 @@ export default function Home() {
       </p>
       <button className="ghost-icon-btn" onClick={() => go('/settings')} aria-label="설정"><Icon name="settings" size={20} /></button>
     </div>
+    {/* 서버에 닿지 않는 상태를 여기서 알려야 한다. 예전에는 이 화면이 localStorage 값으로
+        멀쩡하게 그려져서, 다른 기기로 로그인할 때까지 저장 실패를 알 수 없었다. */}
+    {syncError && <div className="notice notice-error home-sync-error">{syncError}<span>이 기기에는 기록이 남아 있어요. 연결이 돌아오면 다시 올라갑니다.</span></div>}
     <header className="home-welcome">
       <button className="home-hunter-identity" onClick={() => go('/profile')} aria-label="내 프로필 보기">
         <span className="home-hunter-avatar"><i /><img src={resolveAvatarUrl(profile?.avatar_url)} alt="" /><em aria-hidden="true">✎</em></span>
