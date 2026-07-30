@@ -700,9 +700,26 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
   content: '';
   position: absolute;
   z-index: -1;
-  inset: -14px -12px -10px;
-  background: linear-gradient(180deg, rgba(13,9,38,0) 0%, rgba(13,9,38,.94) 60%);
-  backdrop-filter: blur(10px);
+  /* 아래는 바(bottom: max(10px, safe-area))가 떠 있는 만큼 정확히 따라가야 한다.
+     -10px 로 고정했더니 홈 인디케이터가 있는 기기(safe-area 34px 쯤)에서
+     24px 가 그대로 노출돼 콘텐츠가 바 아래로 보였다. */
+  bottom: calc(-1 * (max(10px, env(safe-area-inset-bottom)) + 28px));
+  left: -12px;
+  right: -12px;
+  /* 위로 넉넉히 올려 서서히 사라지게 한다. 짧으면 시작 지점이 선으로 보인다. */
+  top: -64px;
+  /* backdrop-filter 는 요소 경계에서 뚝 끊긴다(페더링 불가). 부드러운 그라데이션과 함께 쓰면
+     블러 경계가 칼같은 선으로 남아 "딱딱해" 보였다. 그라데이션만으로 덮는다.
+     중간 정지점을 여러 개 둬 직선 보간의 꺾임과 밴딩을 줄인다. */
+  background: linear-gradient(180deg,
+    rgba(13,9,38,0) 0%,
+    rgba(13,9,38,.06) 16%,
+    rgba(13,9,38,.18) 30%,
+    rgba(13,9,38,.38) 43%,
+    rgba(13,9,38,.60) 55%,
+    rgba(13,9,38,.78) 66%,
+    rgba(13,9,38,.90) 78%,
+    rgba(13,9,38,.96) 100%);
   pointer-events: none;
 }
 .bottom-nav button { position: relative; min-width: 0; height: 54px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; padding: 0; border: 0; border-radius: 16px; background: transparent; color: #777090; cursor: pointer; transition: color .16s, background .16s, transform .16s; }
@@ -717,7 +734,10 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
 .bottom-nav button.primary > span img { width: 32px; height: 32px; opacity: 1; filter: saturate(.9) brightness(1.08) drop-shadow(0 3px 4px rgba(70,16,121,.4)); }
 .bottom-nav button.primary small { margin-top: -1px; color: #c5bce0; }
 .bottom-nav button.primary.active::after { display: none; }
-.community-page .fab { bottom: calc(95px + env(safe-area-inset-bottom)); }
+/* 하단 바 뒤 그라데이션(.bottom-nav::before)이 위로 64px 올라오면서 이 버튼 높이에 걸친다.
+   그 그라데이션은 바의 쌓임 문맥(z-index 40) 안에 있어 기본 z-index 15 인 버튼을 덮는다.
+   바와 겹치는 높이가 아니므로 41 로 올려도 바를 가리지 않는다. */
+.community-page .fab { z-index: 41; bottom: calc(95px + env(safe-area-inset-bottom)); }
 
 /* 넓은 화면에서 하단 바와 글쓰기 버튼을 카드 안쪽으로 밀어 올리던 보정도
    상하 여백이 사라졌으니 필요 없다. 기본값(하단 10px · 95px)이 그대로 맞다. */
