@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useAuth } from '../context/AuthContext'
 import { sound } from '../lib/sound'
 
 // 로고를 이 횟수만큼 연속으로 눌러야 마스터 계정으로 들어간다.
@@ -9,6 +10,7 @@ const MASTER_TAP_GAP_MS = 700
 
 export default function Hero() {
   const navigate = useNavigate()
+  const { enterGuest } = useAuth()
   const tapsRef = useRef(0)
   const lastTapRef = useRef(0)
   const [master, setMaster] = useState({ status: 'idle', message: '' })
@@ -21,9 +23,6 @@ export default function Hero() {
   }
 
   async function tapLogo() {
-    // 프로덕션 빌드에서는 import.meta.env.DEV 가 false 로 치환돼 아래가 통째로 죽은 코드가 되고,
-    // 도달할 수 없는 동적 import 라 masterAccount 모듈도 번들에서 빠진다.
-    if (!import.meta.env.DEV) return
     if (master.status === 'working') return
     const now = Date.now()
     tapsRef.current = now - lastTapRef.current > MASTER_TAP_GAP_MS ? 1 : tapsRef.current + 1
@@ -37,6 +36,19 @@ export default function Hero() {
     }
 
     tapsRef.current = 0
+
+    // 배포본에서는 게스트 체험으로 들어간다. 서버 계정이 없어 노출될 비밀번호도 없다.
+    if (!import.meta.env.DEV) {
+      sound.unlock()
+      sound.button()
+      enterGuest()
+      navigate('/home', { replace: true })
+      return
+    }
+
+    // 개발 서버에서만 실제 마스터 계정으로 들어간다(서버 저장까지 확인하려고).
+    // 이 아래가 프로덕션에서 통째로 죽은 코드가 되어야 masterAccount 모듈이 번들에서 빠진다.
+    // 위 조건을 없애거나 이 모듈을 정적 import 하면 그 순간 비밀번호가 배포본에 들어간다.
     setMaster({ status: 'working', message: '마스터 계정 준비 중...' })
     try {
       const { enterMasterAccount, MASTER_EMAIL } = await import('../lib/masterAccount')

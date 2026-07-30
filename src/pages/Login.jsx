@@ -15,7 +15,7 @@ export default function Login({ initialMode = 'login' }) {
   const [error, setError] = useState('')
   const [info, setInfo] = useState('')
   const [busy, setBusy] = useState(false)
-  const { user, enterGuest } = useAuth()
+  const { user } = useAuth()
   const navigate = useNavigate()
 
   useEffect(() => { if (user) navigate('/home', { replace: true }) }, [user, navigate])
@@ -133,15 +133,6 @@ export default function Login({ initialMode = 'login' }) {
     <button className="auth-route-link" onClick={() => navigate(isLogin ? '/signup' : '/login')}>
       {isLogin ? <>처음이신가요? <strong>회원가입</strong></> : <>이미 계정이 있나요? <strong>로그인</strong></>} <span>›</span>
     </button>
-
-    {/* 가입 결정을 내리는 자리에 체험 입구를 둔다. 여기서 막히는 사람이 그냥 돌아가는 걸 막는다. */}
-    <div className="auth-guest">
-      <span className="auth-guest-divider"><i />또는<i /></span>
-      <button className="auth-guest-button" onClick={() => { sound.unlock(); sound.button(); enterGuest(); navigate('/home', { replace: true }) }}>
-        <Icon name="spark" size={17} /> 가입 없이 먼저 체험하기
-      </button>
-      <small>몬스터와 보스가 모두 열린 상태로 시작해요. 기록은 이 기기에만 저장되고 랭킹·커뮤니티 참여는 가입 후에 열립니다.</small>
-    </div>
   </main>
 }
 

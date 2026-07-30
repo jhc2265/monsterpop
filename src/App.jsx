@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
+import { Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from './context/AuthContext'
 import Login from './pages/Login'
 import Hero from './pages/Hero'
@@ -17,6 +17,19 @@ import Profile from './pages/Profile'
 import ErrorBoundary from './components/ErrorBoundary'
 import { applyPreferences, getPreferences } from './lib/preferences'
 import { sound } from './lib/sound'
+
+// 체험 진입구. 어느 화면에도 링크하지 않는다 — 주소를 아는 사람만 들어온다.
+// 보안이 아니라 노출을 줄이는 장치다. 게스트는 서버에 아무것도 쓰지 못하고
+// 비밀번호도 없으므로, 주소가 새어도 최악은 "모르는 사람이 혼자 체험판을 해본다" 정도다.
+function GuestEntry() {
+  const { enterGuest } = useAuth()
+  const navigate = useNavigate()
+  useEffect(() => {
+    enterGuest()
+    navigate('/home', { replace: true })
+  }, [])
+  return <div className="center-screen"><span className="loader" />체험을 준비하는 중...</div>
+}
 
 function Protected({ children }) {
   const { user, loading, syncing } = useAuth()
@@ -55,6 +68,7 @@ export default function App() {
     <Route path="/" element={<Hero />} />
     <Route path="/login" element={<Login initialMode="login" />} />
     <Route path="/signup" element={<Login initialMode="signup" />} />
+    <Route path="/demo" element={<GuestEntry />} />
     <Route path="/home" element={<Protected><Home /></Protected>} />
     <Route path="/game" element={<Protected><Game /></Protected>} />
     <Route path="/boss" element={<Protected><BossSelect /></Protected>} />
