@@ -52,6 +52,26 @@ npm run dev
 두 기기에서 따로 쌓인 기록은 로그인할 때 병합됩니다. 규칙이 종류마다 다른 이유는
 진행도는 줄어들면 안 되고, 설정은 "가장 최근 선택"이 맞기 때문입니다.
 
+## 폰트
+
+본문은 **Pretendard**(가변, 100~900), 표제는 **Paperlogy**, 워드마크는 **Black Han Sans** 입니다.
+세 폰트 모두 자체 호스팅합니다 — 구글 폰트를 `@import` 로 불러오면 CSS 파싱이 멈추고
+`googleapis`(CSS) → `gstatic`(폰트) 왕복이 연달아 생깁니다.
+
+Pretendard 통짜 파일은 2MB 로, 첫 화면 다운로드의 70% 를 폰트 하나가 차지했습니다.
+그래서 `unicode-range` 로 쪼개 `public/fonts/pretendard/` 에 둡니다.
+**글자를 빼는 서브셋이 아니라 범위를 나누는 것**이라 어떤 글자도 사라지지 않습니다 —
+브라우저가 화면에 실제로 나온 글자의 조각만 받아갑니다. 닉네임에 어떤 한글이 와도 안전합니다.
+
+조각을 다시 만들려면 (`pip install fonttools brotli` 필요):
+
+```bash
+python scripts/split-fonts.py
+```
+
+`public/fonts/PretendardVariable.woff2` 를 원본으로 조각을 다시 만들고,
+`src/index.css` 에 넣을 `@font-face` 블록을 출력합니다. 원본 파일은 지우지 마세요.
+
 ## 폴더 구조
 ```
 src/

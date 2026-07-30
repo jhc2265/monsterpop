@@ -1,11 +1,140 @@
-@import url('https://fonts.googleapis.com/css2?family=Black+Han+Sans&display=swap');
+/* Black Han Sans (OFL-1.1) 를 자체 호스팅한다.
+   예전에는 CSS 첫 줄의 @import 로 구글 폰트를 불러왔는데, @import 는 CSS 파싱을 멈추고
+   googleapis(CSS) → gstatic(폰트) 왕복을 둘 연달아 만든다. 워드마크 "MONSTERPOP" 에만
+   쓰이므로 구글이 주던 라틴 서브셋 그대로(9KB) 받아 두었다. */
+@font-face {
+  font-family: 'Black Han Sans';
+  src: url('/fonts/black-han-sans-latin.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
 
+/* Pretendard 는 본문 기본 폰트라 첫 화면부터 바로 받는다. 통짜 2MB 를 그대로 두면
+   첫 화면 다운로드의 70% 를 폰트 하나가 차지했다.
+   그래서 unicode-range 로 쪼갠다 — 글자를 빼는 서브셋이 아니라 범위를 나누는 것이므로
+   브라우저가 화면에 실제로 나온 글자의 조각만 받아가고, 어떤 글자도 사라지지 않는다.
+   조각은 fonttools 로 만들며 재생성 방법은 README 에 적어 두었다. */
 @font-face {
   font-family: 'Pretendard';
-  src: url('/fonts/PretendardVariable.woff2') format('woff2-variations');
+  src: url('/fonts/pretendard/pretendard-base.woff2') format('woff2-variations');
   font-weight: 100 900;
   font-style: normal;
   font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+20A9, U+20AC, U+2122, U+2190-21FF, U+2212, U+2215, U+2500-257F, U+25A0-25FF, U+2600-26FF, U+2700-27BF, U+3000-303F, U+FF00-FFEF, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Pretendard';
+  src: url('/fonts/pretendard/pretendard-jamo.woff2') format('woff2-variations');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+1100-11FF, U+3130-318F, U+A960-A97F, U+D7B0-D7FF;
+}
+@font-face {
+  font-family: 'Pretendard';
+  src: url('/fonts/pretendard/pretendard-kr01.woff2') format('woff2-variations');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+AC00-AFA2;
+}
+@font-face {
+  font-family: 'Pretendard';
+  src: url('/fonts/pretendard/pretendard-kr02.woff2') format('woff2-variations');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+AFA3-B345;
+}
+@font-face {
+  font-family: 'Pretendard';
+  src: url('/fonts/pretendard/pretendard-kr03.woff2') format('woff2-variations');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+B346-B6E8;
+}
+@font-face {
+  font-family: 'Pretendard';
+  src: url('/fonts/pretendard/pretendard-kr04.woff2') format('woff2-variations');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+B6E9-BA8B;
+}
+@font-face {
+  font-family: 'Pretendard';
+  src: url('/fonts/pretendard/pretendard-kr05.woff2') format('woff2-variations');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+BA8C-BE2E;
+}
+@font-face {
+  font-family: 'Pretendard';
+  src: url('/fonts/pretendard/pretendard-kr06.woff2') format('woff2-variations');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+BE2F-C1D1;
+}
+@font-face {
+  font-family: 'Pretendard';
+  src: url('/fonts/pretendard/pretendard-kr07.woff2') format('woff2-variations');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+C1D2-C574;
+}
+@font-face {
+  font-family: 'Pretendard';
+  src: url('/fonts/pretendard/pretendard-kr08.woff2') format('woff2-variations');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+C575-C917;
+}
+@font-face {
+  font-family: 'Pretendard';
+  src: url('/fonts/pretendard/pretendard-kr09.woff2') format('woff2-variations');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+C918-CCBA;
+}
+@font-face {
+  font-family: 'Pretendard';
+  src: url('/fonts/pretendard/pretendard-kr10.woff2') format('woff2-variations');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+CCBB-D05D;
+}
+@font-face {
+  font-family: 'Pretendard';
+  src: url('/fonts/pretendard/pretendard-kr11.woff2') format('woff2-variations');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+D05E-D400;
+}
+@font-face {
+  font-family: 'Pretendard';
+  src: url('/fonts/pretendard/pretendard-kr12.woff2') format('woff2-variations');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+D401-D7A3;
+}
+@font-face {
+  font-family: 'Pretendard';
+  src: url('/fonts/pretendard/pretendard-app.woff2') format('woff2-variations');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+AC00-AC01, U+AC04, U+AC08, U+AC10-AC12, U+AC14-AC15, U+AC19, U+AC1C, U+AC20, U+AC31, U+AC70, U+AC74, U+AC77-AC78, U+AC80, U+AC83, U+AC89, U+AC8C, U+ACA0, U+ACA8-ACA9, U+ACAC, U+ACB0, U+ACB9, U+ACBC-ACBD, U+ACC1, U+ACC4, U+ACE0, U+ACE7-ACE8, U+ACF1, U+ACF3, U+ACF5, U+ACFC-ACFD, U+AD00, U+AD04, U+AD11, U+AD50, U+AD6C-AD6D, U+AD70, U+AD75, U+AD81, U+AD88, U+AD8C, U+AD9C, U+ADC0, U+ADC4, U+ADDC, U+ADE0, U+ADF8, U+ADFC, U+AE00, U+AE08-AE09, U+AE0B, U+AE30, U+AE34, U+AE38, U+AE40, U+AE4C, U+AE4E, U+AE50, U+AE54, U+AE5C, U+AE68, U+AE6C, U+AEBC, U+AED8, U+AF2C, U+AF43, U+AF49, U+AFB8-AFB9, U+AFBC, U+AFC0, U+AFC8, U+AFD4, U+B00C, U+B010, U+B014, U+B044, U+B048, U+B04A, U+B04C, U+B05D, U+B07C, U+B080, U+B098, U+B09C, U+B0A0, U+B0A8-B0A9, U+B0AC, U+B0AE, U+B0B4, U+B0B8, U+B0C8-B0C9, U+B0E5, U+B108-B109, U+B110, U+B113, U+B118, U+B123-B124, U+B137, U+B178-B179, U+B180, U+B192-B193, U+B204, U+B208, U+B20C, U+B217, U+B258, U+B274, U+B290-B291, U+B294, U+B298, U+B2A5-B2A6, U+B2C8-B2C9, U+B2CC, U+B2D8, U+B2E4, U+B2E8, U+B2EB-B2EC, U+B2F4-B2F5, U+B2F9, U+B2FF-B300, U+B308, U+B313, U+B354-B355, U+B358, U+B35C, U+B369, U+B36E, U+B370, U+B3C4-B3C5, U+B3C8, U+B3CC, U+B3D9, U+B3FC, U+B410, U+B418, U+B41C, U+B420, U+B429, U+B450, U+B454, U+B458, U+B460-B461, U+B46C, U+B4A4, U+B4C8, U+B4DC-B4DD, U+B4E0, U+B4E4, U+B4EC, U+B4F1, U+B514, U+B51C, U+B529, U+B530, U+B54C, U+B5A0, U+B5A4, U+B5A8, U+B5B4, U+B5BC, U+B610-B611, U+B6AB, U+B728, U+B72C, U+B73B, U+B744, U+B760, U+B77C-B77D, U+B780, U+B78C, U+B791, U+B798-B799, U+B7AC-B7AD, U+B7B5, U+B7C9, U+B7EC, U+B7FC-B7FD, U+B800, U+B807-B808, U+B80C, U+B818-B819, U+B824-B825, U+B82C, U+B838, U+B840, U+B85C-B85D, U+B864, U+B86D, U+B8CC, U+B8E8, U+B8EC, U+B8F9, U+B958, U+B960, U+B968, U+B96D, U+B974, U+B978, U+B97C, U+B984, U+B9AC-B9AD, U+B9B0, U+B9B4, U+B9BC-B9BD, U+B9C1, U+B9C8-B9C9, U+B9CC, U+B9D0, U+B9DD-B9DE, U+B9E1, U+B9E4, U+B9E8, U+BA38-BA39, U+BA3C, U+BA40, U+BA48, U+BA4B, U+BA54, U+BA70, U+BA74, U+BA85, U+BAA8-BAA9, U+BAAB-BAAC, U+BAB8, U+BABB, U+BB34-BB36, U+BB38, U+BB3B-BB3C, U+BB54, U+BBA4, U+BBC0, U+BBF8-BBF9, U+BBFC, U+BC00, U+BC0D, U+BC11, U+BC14-BC16, U+BC18, U+BC1B-BC1D, U+BC24, U+BC29, U+BC30-BC31, U+BC43, U+BC84, U+BC88, U+BC8C, U+BC94-BC95, U+BCA0, U+BCA4, U+BCA8, U+BCBD, U+BCC0, U+BCC4, U+BCD1, U+BCF4-BCF5, U+BCF8, U+BCFC, U+BD24, U+BD80, U+BD84, U+BD88, U+BD99, U+BDF0, U+BE0C, U+BE14, U+BE44, U+BE48, U+BE4C, U+BE57, U+BE59, U+BE5B, U+BE60-BE61, U+BE68, U+BE7C, U+BE80, U+BE90, U+BF08, U+BF51, U+BFCC, U+BFD0, U+C0AC-C0AD, U+C0B0, U+C0B4, U+C0BC, U+C0C1, U+C0C8-C0C9, U+C0DD, U+C100, U+C11C-C11D, U+C120, U+C124, U+C12F-C131, U+C138-C139, U+C13C, U+C140, U+C148, U+C14B, U+C158, U+C15C, U+C168, U+C18C-C18D, U+C190, U+C1A1, U+C218-C219, U+C21C, U+C228, U+C22B, U+C26C, U+C2A4-C2A5, U+C2A8, U+C2AC, U+C2B4-C2B5, U+C2B9, U+C2DC-C2DD, U+C2E0, U+C2E4, U+C2EC-C2ED, U+C2F1, U+C30D, U+C313, U+C368, U+C37C, U+C3DF, U+C4F0, U+C4F4, U+C4F8, U+C529, U+C52C, U+C544-C545, U+C548, U+C54A, U+C54C, U+C555, U+C557-C559, U+C55E, U+C560-C561, U+C571, U+C57C-C57D, U+C587, U+C591, U+C598, U+C5B4-C5B5, U+C5B8-C5B9, U+C5BB-C5BC, U+C5C5-C5C9, U+C5D0, U+C5D4, U+C5E3, U+C5EC-C5ED, U+C5F0, U+C5F4, U+C600-C601, U+C606, U+C608, U+C624, U+C628, U+C62C, U+C62E, U+C635, U+C640, U+C644, U+C654-C655, U+C65C, U+C678, U+C67C, U+C694, U+C6A9, U+C6B0, U+C6B4, U+C6B8, U+C6C0, U+C6C3, U+C6C5, U+C6CC, U+C6D0, U+C6D4, U+C6E0, U+C6F9, U+C704, U+C717, U+C720, U+C728, U+C73C, U+C740, U+C744, U+C74C, U+C751, U+C758, U+C774-C775, U+C778, U+C77C-C77D, U+C783-C785, U+C788, U+C78A, U+C790-C791, U+C794, U+C798, U+C7A0-C7A1, U+C7A5-C7A6, U+C7AC, U+C7BF, U+C7C1, U+C800-C801, U+C804, U+C808, U+C810-C811, U+C815, U+C81C, U+C82C, U+C838, U+C84C, U+C870, U+C874, U+C881, U+C885, U+C88B-C88C, U+C8FC-C8FD, U+C900, U+C904, U+C911, U+C918, U+C92C, U+C988-C989, U+C99D, U+C9C0-C9C1, U+C9C4, U+C9C8, U+C9D0-C9D1, U+C9D3, U+C9D5, U+C9DC-C9DD, U+C9E7, U+C9F8, U+CA61, U+CABC-CABD, U+CBE4, U+CC0D, U+CC28-CC29, U+CC38-CC39, U+CC3C, U+CC3E, U+CC44, U+CC98, U+CCAB, U+CCAD, U+CCB4, U+CCD0, U+CCE4, U+CD08, U+CD1D, U+CD5C, U+CD94-CD95, U+CD98, U+CD9C, U+CDA9, U+CDB0, U+CDC4, U+CDE8, U+CE20-CE21, U+CE35, U+CE58-CE59, U+CE5C, U+CE60, U+CE68-CE69, U+CE6D, U+CE74, U+CE78, U+CE90, U+CEA1, U+CEE4, U+CEE8, U+CEEC, U+CF00, U+CF1C, U+CF20, U+CF24, U+CF54, U+CF58, U+CF64, U+CFFC, U+D034, U+D050, U+D06C, U+D070, U+D074, U+D07C, U+D0A4, U+D0A8, U+D0AC, U+D0B9, U+D0C0, U+D0DC-D0DD, U+D0EC-D0ED, U+D130, U+D134, U+D138, U+D140, U+D14C-D14D, U+D150, U+D15C, U+D17C, U+D1A0-D1A1, U+D1A4, U+D1B1, U+D1B5, U+D22C-D22D, U+D280, U+D284, U+D295, U+D29C, U+D2B8-D2B9, U+D2BC, U+D2C0, U+D2C8, U+D2F0, U+D2F4, U+D305, U+D30C, U+D310, U+D314, U+D31D, U+D328, U+D37C, U+D398-D399, U+D3AD, U+D3B8, U+D3C9, U+D3EC-D3ED, U+D3F0, U+D3F4, U+D3FC, U+D45C, U+D480, U+D488, U+D504, U+D50C, U+D53C-D53D, U+D540, U+D544, U+D551, U+D558, U+D55C, U+D560, U+D568-D569, U+D56D, U+D574-D575, U+D588-D589, U+D5A5, U+D5CC, U+D5D8, U+D5E4, U+D600, U+D604, U+D614-D615, U+D638, U+D63C, U+D640, U+D648, U+D654-D655, U+D658, U+D65C, U+D669, U+D68C-D68D, U+D69F, U+D6A8, U+D6C4, U+D6CC, U+D6D1, U+D6E8, U+D734, U+D750, U+D754, U+D758, U+D761, U+D769, U+D76C, U+D770, U+D788, U+D78C, U+D798-D799;
 }
 @font-face {
   font-family: 'Paperlogy';
