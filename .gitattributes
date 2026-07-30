@@ -1,0 +1,14 @@
+# 줄바꿈은 저장소에 LF 로 저장하고 체크아웃할 때 각 OS 에 맞춘다.
+# 이걸 두지 않으면 Windows 에서 커밋할 때마다
+# "LF will be replaced by CRLF" 경고가 파일마다 쏟아진다.
+* text=auto eol=lf
+
+# 바이너리는 손대지 않는다. 줄바꿈을 변환하면 파일이 깨진다.
+*.webp binary
+*.png  binary
+*.jpg  binary
+*.jpeg binary
+*.ico  binary
+*.mp3  binary
+*.woff binary
+*.woff2 binary

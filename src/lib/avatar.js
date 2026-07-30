@@ -1,13 +1,13 @@
 import { MONSTERS } from './monsters'
 import { getBossArchiveEntries } from './bosses'
 
-export const DEFAULT_AVATAR_URL = '/images/ranking/default-hunter.png'
+export const DEFAULT_AVATAR_URL = '/images/ranking/default-hunter.webp'
 
 const PROFILE_REWARD_AVATARS = [
   {
     id: 'avatar-shadow-hunter',
     name: '그림자 헌터',
-    image: '/images/ranking/default-hunter.png',
+    image: '/images/ranking/default-hunter.webp',
     color: '#a45cff',
     profileExtra: true,
     unlockLevel: 1,
