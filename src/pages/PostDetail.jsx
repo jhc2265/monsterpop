@@ -6,6 +6,7 @@ import { sound } from '../lib/sound'
 import { timeAgo } from '../lib/format'
 import { attachAuthors, attachPostMeta } from '../lib/postJoins'
 import Icon from '../components/Icon'
+import Avatar from '../components/Avatar'
 
 export default function PostDetail() {
   const { id } = useParams(); const { user } = useAuth(); const navigate = useNavigate()
@@ -61,7 +62,7 @@ export default function PostDetail() {
     <header className="topbar"><button className="icon-btn" onClick={() => navigate('/community')} aria-label="뒤로"><Icon name="back" /></button><div className="title-stack"><span className="overline">HUNTER STORY</span><h1>게시글</h1></div><span className="topbar-spacer" /></header>
     {loadError && <div className="notice notice-error">{loadError}</div>}
     <article className="detail-card">
-      <div className="post-head"><div className="avatar small">{(post.profiles?.nickname || '헌')[0]}</div><div><strong>{post.profiles?.nickname || '익명 헌터'}</strong><small>{timeAgo(post.created_at)}</small></div></div>
+      <div className="post-head"><Avatar avatarUrl={post.profiles?.avatar_url} size="small" /><div><strong>{post.profiles?.nickname || '익명 헌터'}</strong><small>{timeAgo(post.created_at)}</small></div></div>
       {editing ? <div className="detail-edit">
         <div className="field"><label htmlFor="edit-title">제목</label><input id="edit-title" value={draft.title} onChange={(event) => setDraft({ ...draft, title: event.target.value })} maxLength={60} /></div>
         <div className="field"><label htmlFor="edit-content">내용</label><textarea id="edit-content" value={draft.content} onChange={(event) => setDraft({ ...draft, content: event.target.value })} rows={6} /></div>
@@ -80,7 +81,7 @@ export default function PostDetail() {
         </div>}
       </div>}
     </article>
-    <section className="comments-section"><div className="section-heading"><h2>댓글 <span>{comments.length}</span></h2></div>{comments.length === 0 ? <p className="muted">첫 댓글을 남겨보세요.</p> : comments.map((comment) => <article key={comment.id} className="comment"><div className="avatar tiny">{(comment.profiles?.nickname || '헌')[0]}</div><div><div className="comment-meta"><strong>{comment.profiles?.nickname || '익명 헌터'}</strong><span>{timeAgo(comment.created_at)}</span></div><p>{comment.content}</p></div></article>)}</section>
+    <section className="comments-section"><div className="section-heading"><h2>댓글 <span>{comments.length}</span></h2></div>{comments.length === 0 ? <p className="muted">첫 댓글을 남겨보세요.</p> : comments.map((comment) => <article key={comment.id} className="comment"><Avatar avatarUrl={comment.profiles?.avatar_url} size="tiny" /><div><div className="comment-meta"><strong>{comment.profiles?.nickname || '익명 헌터'}</strong><span>{timeAgo(comment.created_at)}</span></div><p>{comment.content}</p></div></article>)}</section>
     <div className="comment-composer"><input value={text} onChange={(e) => setText(e.target.value)} placeholder="댓글을 입력하세요" onKeyDown={(e) => e.key === 'Enter' && addComment()} /><button onClick={addComment} disabled={busy || !text.trim()} aria-label="댓글 등록"><Icon name="send" size={19} /></button></div>
   </main>
 }
