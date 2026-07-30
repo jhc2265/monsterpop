@@ -4,6 +4,7 @@ import { getStoredProgress, saveStoredProgress } from '../lib/progression'
 import { getSyncError, subscribeSyncError } from '../lib/stateCache'
 import { pullUserState } from '../lib/syncState'
 import { GUEST_ID, GUEST_PROFILE, readGuestFlag, writeGuestFlag } from '../lib/guest'
+import { seedGuestProgress } from '../lib/guestSeed'
 
 const AuthContext = createContext(null)
 
@@ -119,7 +120,9 @@ export function AuthProvider({ children }) {
     // 계정 데이터가 서버에 닿지 않는 상태를 화면에 드러내기 위한 값이다.
     // 게스트는 서버에 저장할 것이 없으므로 경고할 것도 없다.
     syncError: guestActive ? '' : (profileError || pushError),
-    enterGuest: () => { writeGuestFlag(true); setGuest(true) },
+    // 체험은 최고 레벨에서 시작한다 — 몬스터 전종 · 보스 · 일일 미션이 열린 상태여야
+    // 게임을 보여줄 수 있다. LV.1 이면 말랑 슬라임 하나만 나온다.
+    enterGuest: () => { seedGuestProgress(); writeGuestFlag(true); setGuest(true) },
     exitGuest: () => { writeGuestFlag(false); setGuest(false) },
     signOut: async () => {
       writeGuestFlag(false)
